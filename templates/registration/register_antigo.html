@@ -1,0 +1,293 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% comment %} <link rel="stylesheet" href="{% static 'styles/registration/loginregistro.css' %}"> {% endcomment %}
+    <title>IF SADD - Registro</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Vidaloka&display=swap');
+
+        @import url('https://fonts.googleapis.com/css2?family=Vidaloka&display=swap');
+
+        :root {
+            --cor01: #f1f1f1;
+            --cor02: #00fd94;
+            --cor03: #376f6c;
+            --cor04: #1e3231;
+            --cor05: #090909;
+
+            --cor06: #00cafd;
+            --cor07: #ffffff;
+            --cor08: #ff3c3c;
+
+            --font01: "Poppins", sans-serif;
+            --font02: "Vidaloka", serif;
+
+            --shadow: 4px 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+
+            font-family: var(--font01);
+        }
+
+        body {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            position: relative;
+
+            background: linear-gradient(-45deg, var(--cor04), var(--cor03));
+
+            header,
+            main,
+            footer {
+                width: 90vw;
+                margin: auto;
+            }
+
+            header,
+            footer {
+                height: 10vh;
+                position: absolute;
+            }
+
+            header {
+                top: 5vh;
+            }
+
+            footer {
+                bottom: 5vh;
+            }
+
+            main {
+                height: 60vh;
+            }
+        }
+
+
+
+
+        /* --------- LOGIN --------- */
+
+        header {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+
+            img {
+                width: 70px;
+                height: 70px;
+                background: var(--cor01);
+                border-radius: 20px;
+                margin-right: 20px;
+            }
+
+            h1,
+            p {
+                color: var(--cor01);
+            }
+        }
+
+        .login-error {
+            background-color: rgba(255, 0, 0, 0.1);
+            border-left: 4px solid #ff0000;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            box-shadow: var(--shadow);
+        }
+
+        .login-error p {
+            color: var(--cor01);
+            margin-bottom: 5px;
+        }
+
+        .login-error p:first-child {
+            font-weight: 500;
+        }
+
+        .login-error strong {
+            color: #ff6b6b;
+        }
+
+
+        main {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #perfilImg {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            background: var(--cor07);
+
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translate(-50%, -50%);
+
+
+            img {
+                width: 80px;
+            }
+        }
+
+        #loginForm {
+            width: 60vw;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+
+            background: var(--cor03);
+            box-shadow: var(--shadow);
+            border-radius: 25px;
+            padding: 100px 40px 40px 40px;
+
+            position: relative;
+
+            #buttonLogin {
+                width: 100px;
+                padding: 8px 16px;
+                border-radius: 0 0 10px 10px;
+                border: none;
+                box-shadow: var(--shadow);
+
+                background: var(--cor02);
+                color: var(--cor05);
+
+                font-weight: bold;
+
+                cursor: pointer;
+
+                position: absolute;
+                bottom: 0;
+                left: 50%;
+                transform: translate(-50%, 100%);
+            }
+        }
+
+        .labelInput {
+            width: 100%;
+
+            display: flex;
+            align-items: center;
+
+            position: relative;
+
+
+            img {
+                width: 15px;
+
+                position: absolute;
+                left: 10px;
+            }
+
+            input {
+                width: 100%;
+                padding: 10px 10px 10px 30px;
+
+                border-radius: 5px;
+                border: none;
+                box-shadow: var(--shadow);
+
+                background: var(--cor07);
+            }
+
+            input:focus {
+                outline: 1px solid var(--cor02);
+            }
+        }
+
+        footer {
+            text-align: center;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            gap: 10px;
+
+            p {
+                color: var(--cor01);
+                font-size: 0.75rem;
+            }
+
+            span {
+                color: var(--cor06);
+                font-weight: 600;
+                cursor: pointer;
+                text-decoration: underline;
+            }
+        }
+    </style>
+
+</head>
+
+<body>
+    <header>
+        <img src="{% static 'assets/saad_logo.svg' %}" alt="SADD Logo">
+        <div>
+            <h1>Login no SADD</h1>
+            <p>Sistema de Avaliação e Desenvolvimento Docente</p>
+        </div>
+    </header>
+    <main>
+        <aside id="perfilImg">
+            <img src="{% static 'assets/perfil.svg' %}" draggable="false" alt="perfil-ico">
+        </aside>
+
+        {% if form.errors %}
+        <div class="login-error">
+            <p><strong>Erro no registro:</strong></p>
+            <ul>
+                {% for field in form %}
+                {% for error in field.errors %}
+                <li>{{ error }}</li>
+                {% endfor %}
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        <form method="post" id="loginForm">
+            {% csrf_token %}
+            
+            <label>
+                <img src="{% static 'assets/perfil.svg' %}" class="icon" alt="user-ico">
+                {{ form.username }}
+            </label>
+            <label>
+                <img src="{% static 'assets/eye.svg' %}" class="icon" alt="pass-ico">
+                {{ form.password1 }}
+            </label>
+            <label>
+                <img src="{% static 'assets/eye.svg' %}" class="icon" alt="pass-ico">
+                {{ form.password2 }}
+            </label>
+
+            <button type="submit" id="btn-login" style="bottom: -12%;">Registrar</button>
+        </form>
+    </main>
+
+    <footer>
+        <p>Já tem uma conta? <a href="{% url 'login' %}">Faça login</a></p>
+    </footer>
+
+</body>
+
+</html>

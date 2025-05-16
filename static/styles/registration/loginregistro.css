@@ -1,0 +1,260 @@
+@charset "UTF-8";
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Vidaloka&display=swap');
+
+@import url('https://fonts.googleapis.com/css2?family=Vidaloka&display=swap');
+
+:root {
+    --cor01: #f0f0f0;
+    --cor02: #00fd94;
+    --cor03: #376f6c;
+    --cor04: #1e3231;
+    --cor05: #090909;
+
+    --cor06: #00cafd;
+
+    --font01: "Poppins", sans-serif;
+    --font02: "Vidaloka", serif;
+
+    --shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-size: 1rem;
+
+    font-family: var(--font01);
+}
+
+body {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: linear-gradient(-45deg, var(--cor04), var(--cor03));
+
+    position: relative;
+    
+}
+
+main {
+    width: 50%;
+    margin: auto;
+    padding: 100px 60px 50px 60px;
+    background: var(--cor03);
+    border-radius: 35px;
+    box-shadow: var(--shadow);
+
+    display: block;
+    align-content: center;
+
+    position: relative;
+    z-index: 1;
+}
+
+aside {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: var(--cor01);
+    box-shadow: var(--shadow);
+
+    position: absolute;
+    top: -120px;
+    left: 50%;
+    transform: translate(-50%);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#perfil img {
+    width: 50%;
+}
+
+
+.login-error {
+    background-color: rgba(255, 0, 0, 0.1);
+    border-left: 4px solid #ff0000;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    box-shadow: var(--shadow);
+}
+
+.login-error p {
+    color: var(--cor01);
+    margin-bottom: 5px;
+}
+
+.login-error p:first-child {
+    font-weight: 500;
+}
+
+.login-error strong {
+    color: #ff6b6b;
+}
+
+
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+
+form label {
+    width: 100%;
+    position: relative;
+}
+
+form label input {
+    width: 100%;
+    font-size: 1rem;
+    padding: 10px 10px 10px 40px;
+    border-radius: 8px;
+    border: none;
+    box-shadow: var(--shadow);
+
+    transition: outline 0.2s;
+}
+
+form label input:focus {
+    outline: 1px solid var(--cor02);
+}
+
+form label .icon {
+    width: 22px;
+    height: 22px;
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+form #btn-login {
+    position: absolute;
+    
+    left: 50%;
+    transform: translateX(-50%);
+
+    background: var(--cor02);
+    padding: 10px 25px;
+    font-weight: bold;
+    border: none;
+    box-shadow: var(--shadow);
+    border-radius: 0 0 10px 10px;
+
+    transition: background 0.2s, padding 0.2s;
+}
+
+#btn-login:hover {
+    background: var(--cor06);
+    color: var(--cor01);
+    cursor: pointer;
+}
+
+#btn-login:active {
+    padding: 12px 22px 8px 22px;
+}
+
+footer {
+    width: 100%;
+    padding: 15px;
+    text-align: center;
+    z-index: 1;
+}
+
+footer p {
+    color: var(--cor01);
+    font-size: 0.875rem;
+}
+
+footer a {
+    font-weight: bold;
+    color: var(--cor02);
+}
+
+.background {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    position: absolute;
+    z-index: 0;
+    top: 40%;
+}
+
+.back_lines {
+    max-height: 60vh;
+}
+
+
+@media (max-width: 1300px) {
+    .back_lines {
+        max-height: 53vh;
+    }
+}
+
+
+@media (max-width: 880px) {
+    main {
+        width: 70%;
+    }
+
+    .background {
+        top: 55%;
+    }
+
+    .back_lines {
+        
+        max-height: 35vh;
+    }
+}
+
+@media (max-width: 600px) {
+    main {
+        width: 85%;
+    }
+
+    .background {
+        top: 60%;
+    }
+
+    .back_lines {
+        
+        max-height: 25vh;
+    }
+}
+
+@media (max-width: 400px) {
+    main {
+        width: 95%;
+        padding: 90px 30px 30px 30px;
+    }
+
+    aside {
+        width: 150px;
+        height: 150px;
+        top: -80px;
+    }
+
+    form {
+        gap: 30px;
+    }
+
+    form #btn-login {
+        bottom: -62%;
+    }
+
+    .background {
+        top: 55%;
+    }
+
+    .back_lines {
+        
+        max-height: 15vh;
+    }
+}
