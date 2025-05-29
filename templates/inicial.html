@@ -169,11 +169,23 @@
                 <button id="realizar_avaliacao">Realizar avaliação docente <span id="anoAtual">ano/periodo</span></button>
                 <button onclick="window.location.href='{% url 'avaliacoes' %}'" id="relatorio_avaliacoes">Visualizar
                     avaliações antigas</button>
+                <button onclick="window.location.href='{% url 'gerenciar_roles' %}'" id="gerenciar_roles">Gerenciar
+                    Roles de Usuários</button>
             </section>
 
  
         {% elif user|has_role:'coordenador' %}
             <h1>Seja bem-vindo(a) Coordenador: <span id="alunoAtual"> {{ user.username }}</span></h1>
+            <section id="opcoes">
+                <h2>Opções Disponíveis</h2>
+                <button id="realizar_avaliacao">Realizar avaliação docente <span id="anoAtual">ano/periodo</span></button>
+                <button onclick="window.location.href='{% url 'avaliacoes' %}'" id="relatorio_avaliacoes">Visualizar
+                    avaliações antigas</button>
+                <button onclick="window.location.href='{% url 'gerenciar_roles' %}'" id="gerenciar_roles">Gerenciar
+                    Roles de Usuários</button>
+            </section>
+        {% elif user|has_role:'professor' %}
+            <h1>Seja bem-vindo(a) Professor: <span id="alunoAtual"> {{ user.username }}</span></h1>
             <section id="opcoes">
                 <h2>Opções Disponíveis</h2>
                 <button id="realizar_avaliacao">Realizar avaliação docente <span id="anoAtual">ano/periodo</span></button>
@@ -187,6 +199,7 @@
                 <button id="realizar_avaliacao">Realizar avaliação docente <span id="anoAtual">ano/periodo</span></button>
                 <button onclick="window.location.href='{% url 'avaliacoes' %}'" id="relatorio_avaliacoes">Visualizar
                     avaliações antigas</button>
+            </section>
         {% else %}
         <h1>Seja bem-vindo(a) <span id="alunoAtual"> {{ user.username }}</span></h1>
         <h2 style="color:rgb(255, 0, 0);">Por favor, entre em contato com o administrador do sistema para definir seu perfil de usuario.</h2>
