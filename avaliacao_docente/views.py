@@ -15,21 +15,6 @@ from rolepermissions.checkers import has_role
 from django.contrib import messages
 
 
-# painel temporarios
-def criar_usuario(request):
-    # Cria um usuário temporário
-
-    usuario = request.user
-
-    """ usuario = User.objects.create_user(
-        username="Cood",
-        password="134679",
-        first_name="Cood",
-        last_name="Coordenador",
-    ) """
-    assign_role(usuario, "admin")
-    return JsonResponse({"message": "Usuário criado com sucesso!"})
-
 
 @login_required
 def gerenciar_roles(request):
