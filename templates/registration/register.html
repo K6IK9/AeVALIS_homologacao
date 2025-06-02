@@ -281,7 +281,7 @@
             <ul>
                 {% for field in form %}
                 {% for error in field.errors %}
-                <li>{{ error }}</li>
+                {{ error }}
                 {% endfor %}
                 {% endfor %}
             </ul>
@@ -297,6 +297,11 @@
             <label for="username" class="labelInput">
                 <img src="{% static 'assets/perfil.svg' %}" alt="Matricula">
                 {{ form.username }}
+            </label>
+
+            <label for="name" class="labelInput">
+                <img src="{% static 'assets/perfil.svg' %}" alt="Nome">
+                {{ form.name }}
             </label>
 
             <label for="password1" class="labelInput" style="position:relative;">

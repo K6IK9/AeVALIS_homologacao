@@ -34,8 +34,6 @@ class CustomUserAdmin(UserAdmin):
     )
     list_filter = ("is_staff", "is_superuser", "is_active", "date_joined")
 
-    fieldsets = UserAdmin.fieldsets + (("Roles", {"fields": ("user_role",)}),)
-
     def get_user_role(self, obj):
         """Retorna a role atual do usuário"""
         if has_role(obj, "admin"):
@@ -54,7 +52,7 @@ class CustomUserAdmin(UserAdmin):
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)
 
-        # Adiciona campo para seleção de role
+        # Adiciona campo para seleção de role apenas se estiver editando um usuário existente
         if obj:
             current_role = "aluno"  # padrão
             if has_role(obj, "admin"):
@@ -81,6 +79,16 @@ class CustomUserAdmin(UserAdmin):
             )
 
         return form
+
+    def get_fieldsets(self, request, obj=None):
+        """Personaliza os fieldsets baseado na situação"""
+        fieldsets = super().get_fieldsets(request, obj)
+
+        # Adiciona a seção de role apenas para usuários existentes
+        if obj:
+            fieldsets = fieldsets + (("Roles", {"fields": ("user_role",)}),)
+
+        return fieldsets
 
     def save_model(self, request, obj, form, change):
         super().save_model(request, obj, form, change)

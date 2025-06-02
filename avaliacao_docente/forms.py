@@ -4,7 +4,12 @@ from django.contrib.auth.models import User
 
 
 class RegistroForm(UserCreationForm):
-    username = forms.CharField(widget=forms.TextInput(attrs={"placeholder": "Usuário"}))
+    name = forms.CharField(
+        widget=forms.TextInput(attrs={"placeholder": "Nome Completo"})
+    )
+    username = forms.CharField(
+        widget=forms.TextInput(attrs={"placeholder": "Matrícula"})
+    )
     password1 = forms.CharField(
         widget=forms.PasswordInput(attrs={"placeholder": "Senha"})
     )
