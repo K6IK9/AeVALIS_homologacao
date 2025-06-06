@@ -10,11 +10,15 @@
             </aside>
             <label class="infos_modal">
                 <img src="{% static 'assets/perfil.svg' %}" alt="Nome Usuário">
-                <p id="nome_usuario_modal">Nome: {{ user.username }}</p>
+                <p id="nome_usuario_modal">Nome: {{ user.first_name }} {{ user.last_name }}</p>
             </label>
             <label class="infos_modal">
                 <img src="{% static 'assets/perfil.svg' %}" alt="Matrícula">
-                <p id="matricula_usuario_modal">Numero de Matricula</p>
+                <p id="matricula_usuario_modal">Matrícula: {{ user.username }}</p>
+            </label>
+            <label class="infos_modal">
+                <img src="{% static 'assets/email.svg' %}" alt="Email">
+                <p id="email_usuario_modal">Email: {{ user.email }}</p>
             </label>
 
             

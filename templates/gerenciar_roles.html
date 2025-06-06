@@ -217,7 +217,8 @@
             <table class="users-table">
                 <thead>
                     <tr>
-                        <th>Usuário</th>
+                        <th>Nome</th>
+                        <th>Matrícula</th>
                         <th>Email</th>
                         <th>Role Atual</th>
                         <th>Data de Cadastro</th>
@@ -226,6 +227,7 @@
                 <tbody>
                     {% for item in usuarios_com_roles %}
                     <tr>
+                        <td>{{ item.usuario.first_name }} {{ item.usuario.last_name|default:"" }}</td>
                         <td>{{ item.usuario.username }}</td>
                         <td>{{ item.usuario.email|default:"Não informado" }}</td>
                         <td>
@@ -237,7 +239,7 @@
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="4" style="text-align: center; padding: 40px;">
+                        <td colspan="5" style="text-align: center; padding: 40px;">
                             Nenhum usuário encontrado.
                         </td>
                     </tr>

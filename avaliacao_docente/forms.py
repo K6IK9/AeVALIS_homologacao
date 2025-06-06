@@ -4,22 +4,74 @@ from django.contrib.auth.models import User
 
 
 class RegistroForm(UserCreationForm):
-    name = forms.CharField(
-        widget=forms.TextInput(attrs={"placeholder": "Nome Completo"})
+    first_name = forms.CharField(
+        max_length=150,
+        required=True,
+        label="Nome",
+        widget=forms.TextInput(attrs={"placeholder": "Nome"}),
+    )
+    last_name = forms.CharField(
+        max_length=150,
+        required=True,
+        label="Sobrenome",
+        widget=forms.TextInput(attrs={"placeholder": "Sobrenome"}),
+    )
+    email = forms.EmailField(
+        max_length=254,
+        required=True,
+        label="Email Institucional",
+        widget=forms.EmailInput(attrs={"placeholder": "Email institucional"}),
     )
     username = forms.CharField(
-        widget=forms.TextInput(attrs={"placeholder": "Matrícula"})
+        required=True,
+        label="Matrícula",
+        widget=forms.TextInput(attrs={"placeholder": "Matrícula"}),
     )
     password1 = forms.CharField(
-        widget=forms.PasswordInput(attrs={"placeholder": "Senha"})
+        required=True,
+        label="Senha",
+        widget=forms.PasswordInput(attrs={"placeholder": "Senha"}),
     )
     password2 = forms.CharField(
-        widget=forms.PasswordInput(attrs={"placeholder": "Confirme a senha"})
+        required=True,
+        label="Confirmação de Senha",
+        widget=forms.PasswordInput(attrs={"placeholder": "Confirme a senha"}),
     )
 
     class Meta:
         model = User
-        fields = ["username", "password1", "password2"]
+        fields = [
+            "username",
+            "first_name",
+            "last_name",
+            "email",
+            "password1",
+            "password2",
+        ]
+
+    def clean_email(self):
+        email = self.cleaned_data.get("email")
+        if email:
+            # Verifica se o email já existe
+            if User.objects.filter(email=email).exists():
+                raise forms.ValidationError(
+                    "Este email já está sendo usado por outro usuário."
+                )
+                
+        return email
+
+    def clean_username(self):
+        username = self.cleaned_data.get("username")
+        if username:
+            # Validação para formato de matrícula (opcional - pode ser personalizada)
+            if not username.isdigit():
+                raise forms.ValidationError("A matrícula deve conter apenas números.")
+            if len(username) < 6:
+                raise forms.ValidationError(
+                    "A matrícula deve ter pelo menos 6 dígitos."
+                )
+
+        return username
 
 
 class GerenciarRoleForm(forms.Form):

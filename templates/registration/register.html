@@ -151,7 +151,8 @@
         }
 
         #loginForm {
-            width: 60vw;
+            width: 80vw;
+            max-width: 800px;
             display: flex;
             flex-direction: column;
             gap: 25px;
@@ -162,6 +163,20 @@
             padding: 100px 40px 40px 40px;
 
             position: relative;
+
+            .form-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 25px;
+            }
+
+            .form-grid .labelInput {
+                width: 100%;
+            }
+
+            .full-width {
+                grid-column: 1 / -1;
+            }
 
             #buttonLogin {
                 width: 100px;
@@ -181,6 +196,12 @@
                 bottom: 0;
                 left: 50%;
                 transform: translate(-50%, 100%);
+            }
+        }
+
+        @media (max-width: 768px) {
+            #loginForm .form-grid {
+                grid-template-columns: 1fr;
             }
         }
 
@@ -219,6 +240,18 @@
         .labelInput input[type="password"],
         .labelInput input[type="text"] {
             padding-right: 40px !important;
+        }
+
+        .field-error {
+            color: var(--cor08, #ff3c3c);
+            font-size: 0.75rem;
+            margin-top: 5px;
+            display: block;
+            font-weight: 500;
+        }
+
+        .labelInput.error input {
+            border: 2px solid var(--cor08, #ff3c3c) !important;
         }
 
         .toggle-password {
@@ -280,9 +313,14 @@
             <p><strong>Erro no registro:</strong></p>
             <ul>
                 {% for field in form %}
-                {% for error in field.errors %}
-                {{ error }}
+                    {% if field.errors %}
+                        {% for error in field.errors %}
+                            <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+                        {% endfor %}
+                    {% endif %}
                 {% endfor %}
+                {% for error in form.non_field_errors %}
+                    <li>{{ error }}</li>
                 {% endfor %}
             </ul>
         </div>
@@ -294,38 +332,50 @@
                 <img src="{% static 'assets/perfil.svg' %}" alt="AA">
             </aside>
 
-            <label for="username" class="labelInput">
-                <img src="{% static 'assets/perfil.svg' %}" alt="Matricula">
-                {{ form.username }}
-            </label>
+            <div class="form-grid">
+                <label for="username" class="labelInput">
+                    <img src="{% static 'assets/perfil.svg' %}" alt="Matricula">
+                    {{ form.username }}
+                </label>
 
-            <label for="name" class="labelInput">
-                <img src="{% static 'assets/perfil.svg' %}" alt="Nome">
-                {{ form.name }}
-            </label>
+                <label for="email" class="labelInput">
+                    <img src="{% static 'assets/email.svg' %}" alt="Email">
+                    {{ form.email }}
+                </label>
 
-            <label for="password1" class="labelInput" style="position:relative;">
-                <img src="{% static 'assets/eye.svg' %}" alt="Pass">
-                {{ form.password1 }}
-                <button type="button" class="toggle-password" tabindex="-1" style="position:absolute; right:50px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer;">
-                    <img src="{% static 'assets/eye.svg' %}" alt="Mostrar senha" style="width:22px;">
-                </button>
-            </label>
+                <label for="first_name" class="labelInput">
+                    <img src="{% static 'assets/perfil.svg' %}" alt="Nome">
+                    {{ form.first_name }}
+                </label>
 
-            <label for="password2" class="labelInput" style="position:relative;">
-                <img src="{% static 'assets/eye.svg' %}" alt="Pass">
-                {{ form.password2 }}
-                <button type="button" class="toggle-password" tabindex="-1" style="position:absolute; right:50px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer;">
-                    <img src="{% static 'assets/eye.svg' %}" alt="Mostrar senha" style="width:22px;">
-                </button>
-            </label>
+                <label for="last_name" class="labelInput">
+                    <img src="{% static 'assets/perfil.svg' %}" alt="Sobrenome">
+                    {{ form.last_name }}
+                </label>
+
+                <label for="password1" class="labelInput" style="position:relative;">
+                    <img src="{% static 'assets/lock.svg' %}" alt="Senha">
+                    {{ form.password1 }}
+                    <button type="button" class="toggle-password" tabindex="-1" style="position:absolute; right:50px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer;">
+                        <img src="{% static 'assets/eye.svg' %}" alt="Mostrar senha" style="width:22px;">
+                    </button>
+                </label>
+
+                <label for="password2" class="labelInput" style="position:relative;">
+                    <img src="{% static 'assets/lock.svg' %}" alt="Confirmar senha">
+                    {{ form.password2 }}
+                    <button type="button" class="toggle-password" tabindex="-1" style="position:absolute; right:50px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer;">
+                        <img src="{% static 'assets/eye.svg' %}" alt="Mostrar senha" style="width:22px;">
+                    </button>
+                </label>
+            </div>
 
             <input id="buttonLogin" type="submit" value="Registrar">
 
         </form>
     </main>
     <footer>
-        <p>Já tem uma conta? <a href="{% url 'login' %}">Faça login</a></p>
+        <p>Já tem uma conta? <a href="{% url 'login' %}"><span>Faça login</span></a></p>
     </footer>
     <script>
         document.querySelectorAll('.toggle-password').forEach(function(btn) {

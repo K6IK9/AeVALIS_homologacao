@@ -15,7 +15,6 @@ from rolepermissions.checkers import has_role
 from django.contrib import messages
 
 
-
 @login_required
 def gerenciar_roles(request):
     """
@@ -85,7 +84,13 @@ class RegistrarUsuarioView(CreateView):
     success_url = reverse_lazy("inicio")  # Altere para o nome correto
 
     def form_valid(self, form):
-        usuario = form.save()
+        # Salva o usuário com todos os campos
+        usuario = form.save(commit=False)
+        usuario.first_name = form.cleaned_data["first_name"]
+        usuario.last_name = form.cleaned_data["last_name"]
+        usuario.email = form.cleaned_data["email"]
+        usuario.save()
+
         # Atribui automaticamente a role "aluno" para novos usuários
         assign_role(usuario, "aluno")
         login(self.request, usuario)
