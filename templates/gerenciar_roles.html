@@ -180,7 +180,7 @@
         <a href="{% url 'inicio' %}" class="back-button">← Voltar ao Início</a>
         
         <div class="header">
-            <h1>Gerenciamento de Roles de Usuários</h1>
+            <h1>Gerenciamento de Permissões de Usuários</h1>
             <p>Altere as permissões dos usuários no sistema</p>
         </div>
 
@@ -195,7 +195,7 @@
         {% endif %}
 
         <div class="form-section">
-            <h2>Alterar Role de Usuário</h2>
+            <h2>Alterar Permissões do Usuário</h2>
             <form method="post">
                 {% csrf_token %}
                 <div class="form-group">
@@ -208,7 +208,7 @@
                     {{ form.role }}
                 </div>
                 
-                <button type="submit" class="btn">Alterar Role</button>
+                <button type="submit" class="btn">Alterar Permissões</button>
             </form>
         </div>
 
