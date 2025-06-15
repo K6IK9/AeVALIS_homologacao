@@ -6,7 +6,15 @@ from django.views.generic import TemplateView
 from django.urls import reverse_lazy
 from django.contrib.auth import login
 from .forms import RegistroForm, GerenciarRoleForm
-from .models import DiarioProfessorDisciplina, Diario, RespostaAluno, Avaliacao, Aluno
+from .models import (
+    DiarioProfessorDisciplina,
+    Diario,
+    RespostaAluno,
+    Avaliacao,
+    PerfilAluno,
+    PerfilProfessor,
+    Curso
+)
 from django.contrib.auth.models import User
 
 from django.http import JsonResponse
@@ -38,6 +46,14 @@ def gerenciar_roles(request):
 
             # Atribui a nova role
             assign_role(usuario, nova_role)
+
+            # Cria o perfil específico se necessário
+            if nova_role == "aluno":
+                PerfilAluno.objects.get_or_create(user=usuario)
+            elif nova_role == "professor" or nova_role == "coordenador":
+                PerfilProfessor.objects.get_or_create(
+                    user=usuario, defaults={"registro_academico": usuario.username}
+                )
 
             messages.success(
                 request,
@@ -81,7 +97,7 @@ class IndexView(LoginRequiredMixin, TemplateView):
 class RegistrarUsuarioView(CreateView):
     form_class = RegistroForm
     template_name = "registration/register.html"
-    success_url = reverse_lazy("inicio")  # Altere para o nome correto
+    success_url = reverse_lazy("inicio")
 
     def form_valid(self, form):
         # Salva o usuário com todos os campos
@@ -93,6 +109,10 @@ class RegistrarUsuarioView(CreateView):
 
         # Atribui automaticamente a role "aluno" para novos usuários
         assign_role(usuario, "aluno")
+
+        # Cria o perfil de aluno
+        PerfilAluno.objects.create(user=usuario)
+
         login(self.request, usuario)
         return super().form_valid(form)
 
@@ -104,23 +124,27 @@ class Avaliacoes(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["avaliacoes"] = Avaliacao.objects.all()  # Altere para o modelo correto
+        context["avaliacoes"] = Avaliacao.objects.all()
         return context
 
 
-def get_aluno_from_user(user):
+def get_perfil_aluno_from_user(user):
+    """
+    Função simplificada - agora usa o relacionamento OneToOne
+    """
     try:
-        return Aluno.objects.get(aluno_nome=user.username)
-    except Aluno.DoesNotExist:
+        return user.perfil_aluno
+    except PerfilAluno.DoesNotExist:
         return None
 
 
 @login_required
 def diarios_usuario(request):
-    aluno = get_aluno_from_user(request.user)
-    if not aluno:
-        return JsonResponse({"error": "Aluno não encontrado."}, status=404)
-    diarios = Diario.objects.filter(entradas__aluno=aluno).distinct()
+    perfil_aluno = get_perfil_aluno_from_user(request.user)
+    if not perfil_aluno:
+        return JsonResponse({"error": "Perfil de aluno não encontrado."}, status=404)
+
+    diarios = Diario.objects.filter(entradas__aluno=perfil_aluno).distinct()
     diarios_list = [
         {"id": d.id, "periodo": d.diario_periodo, "ano": d.ano_letivo} for d in diarios
     ]
@@ -130,13 +154,13 @@ def diarios_usuario(request):
 @login_required
 def avaliacoes_por_diario(request, diario_id):
     diario = get_object_or_404(Diario, id=diario_id)
-    aluno = get_aluno_from_user(request.user)
-    if not aluno:
-        return JsonResponse({"error": "Aluno não encontrado."}, status=404)
+    perfil_aluno = get_perfil_aluno_from_user(request.user)
+    if not perfil_aluno:
+        return JsonResponse({"error": "Perfil de aluno não encontrado."}, status=404)
 
     avaliacoes = Avaliacao.objects.filter(
         professor_disciplina__diarios__diario=diario,
-        professor_disciplina__diarios__aluno=aluno,
+        professor_disciplina__diarios__aluno=perfil_aluno,
     ).distinct()
 
     avaliacoes_list = [
@@ -151,15 +175,14 @@ def avaliacoes_por_diario(request, diario_id):
         for a in avaliacoes
     ]
 
-    return JsonResponse(
-        {"avaliacoes": avaliacoes_list, "diario": diario},
-    )
+    return JsonResponse({"avaliacoes": avaliacoes_list, "diario": diario})
 
 
 @login_required
 def avaliacoes_anteriores(request):
-    aluno = get_aluno_from_user(request.user)
-    if not aluno:
+    perfil_aluno = get_perfil_aluno_from_user(request.user)
+    if not perfil_aluno:
         return render(request, "avaliacoes.html", {"avaliacoes_recentes": None})
-    diarios = Diario.objects.filter(entradas__aluno=aluno).distinct()
+
+    diarios = Diario.objects.filter(entradas__aluno=perfil_aluno).distinct()
     return render(request, "avaliacoes.html", {"diarios": diarios})

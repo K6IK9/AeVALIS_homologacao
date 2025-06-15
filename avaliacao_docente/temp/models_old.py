@@ -1,45 +1,6 @@
 from django.db import models
-from django.contrib.auth.models import User
 
-
-class PerfilAluno(models.Model):
-    """
-    Extensão do modelo User para dados específicos de alunos
-    """
-
-    user = models.OneToOneField(
-        User, on_delete=models.CASCADE, related_name="perfil_aluno"
-    )
-    situacao = models.CharField(max_length=45, default="Ativo")
-
-    def __str__(self):
-        return f"{self.user.get_full_name()} - {self.user.username}"
-
-    @property
-    def matricula(self):
-        return self.user.username
-
-    @property
-    def nome_completo(self):
-        return f"{self.user.first_name} {self.user.last_name}"
-
-    @property
-    def email(self):
-        return self.user.email
-
-
-class PerfilProfessor(models.Model):
-    """
-    Extensão do modelo User para dados específicos de professores
-    """
-
-    user = models.OneToOneField(
-        User, on_delete=models.CASCADE, related_name="perfil_professor"
-    )
-    registro_academico = models.CharField(max_length=45)
-
-    def __str__(self):
-        return f"{self.user.get_full_name()} ({self.registro_academico})"
+from django.db import models
 
 
 class Curso(models.Model):
@@ -49,13 +10,17 @@ class Curso(models.Model):
         return self.curso_nome
 
 
-class CoordenadorCurso(models.Model):
-    """
-    Agora usa o PerfilProfessor em vez de uma tabela Professor separada
-    """
+class Professor(models.Model):
+    professor_nome = models.CharField(max_length=150)
+    registro_academico = models.CharField(max_length=45)
 
+    def __str__(self):
+        return f"{self.professor_nome} ({self.registro_academico})"
+
+
+class CoordenadorCurso(models.Model):
     professor = models.ForeignKey(
-        PerfilProfessor, on_delete=models.CASCADE, related_name="cursos_coordenados"
+        Professor, on_delete=models.CASCADE, related_name="cursos_coordenados"
     )
     curso = models.ForeignKey(
         Curso, on_delete=models.CASCADE, related_name="coordenadores"
@@ -79,7 +44,7 @@ class Disciplina(models.Model):
 
 class ProfessorDisciplina(models.Model):
     professor = models.ForeignKey(
-        PerfilProfessor, on_delete=models.CASCADE, related_name="disciplinas"
+        Professor, on_delete=models.CASCADE, related_name="disciplinas"
     )
     disciplina = models.ForeignKey(
         Disciplina, on_delete=models.CASCADE, related_name="professores"
@@ -97,20 +62,24 @@ class Diario(models.Model):
         return f"{self.diario_periodo}/{self.ano_letivo}"
 
 
-class DiarioProfessorDisciplina(models.Model):
-    """
-    Agora usa PerfilAluno em vez da tabela Aluno
-    """
+class Aluno(models.Model):
+    aluno_matricula = models.CharField(max_length=45)
+    aluno_nome = models.CharField(max_length=100)
+    aluno_email = models.CharField(max_length=100)
+    aluno_situacao = models.CharField(max_length=45)
 
+    def __str__(self):
+        return f"{self.aluno_nome} - {self.aluno_matricula}"
+
+
+class DiarioProfessorDisciplina(models.Model):
     diario = models.ForeignKey(
         Diario, on_delete=models.CASCADE, related_name="entradas"
     )
     professor_disciplina = models.ForeignKey(
         ProfessorDisciplina, on_delete=models.CASCADE, related_name="diarios"
     )
-    aluno = models.ForeignKey(
-        PerfilAluno, on_delete=models.CASCADE, related_name="diarios"
-    )
+    aluno = models.ForeignKey(Aluno, on_delete=models.CASCADE, related_name="diarios")
 
     def __str__(self):
         return f"{self.aluno} em {self.professor_disciplina}"
@@ -149,14 +118,8 @@ class AvaliacaoPergunta(models.Model):
 
 
 class RespostaAluno(models.Model):
-    """
-    Agora usa PerfilAluno em vez da tabela Aluno
-    """
-
     resposta_pergunta = models.CharField(max_length=300)
-    aluno = models.ForeignKey(
-        PerfilAluno, on_delete=models.CASCADE, related_name="respostas"
-    )
+    aluno = models.ForeignKey(Aluno, on_delete=models.CASCADE, related_name="respostas")
     avaliacao_pergunta = models.ForeignKey(
         AvaliacaoPergunta, on_delete=models.CASCADE, related_name="respostas"
     )

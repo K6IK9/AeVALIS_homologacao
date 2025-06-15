@@ -52,7 +52,7 @@ def test_roles():
     
     # Testar o método get_user_role do admin
     print("\n--- Testando método get_user_role ---")
-    from avaliacao_docente.admin import CustomUserAdmin
+    from avaliacao_docente.admin_old import CustomUserAdmin
     admin_instance = CustomUserAdmin(User, None)
     role_display = admin_instance.get_user_role(user)
     print(f'✓ Display da role: {role_display}')
