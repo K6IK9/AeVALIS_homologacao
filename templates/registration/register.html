@@ -315,12 +315,12 @@
                 {% for field in form %}
                     {% if field.errors %}
                         {% for error in field.errors %}
-                            <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+                            <strong>{{ field.label }}:</strong> {{ error }}
                         {% endfor %}
                     {% endif %}
                 {% endfor %}
                 {% for error in form.non_field_errors %}
-                    <li>{{ error }}</li>
+                    {{ error }}
                 {% endfor %}
             </ul>
         </div>

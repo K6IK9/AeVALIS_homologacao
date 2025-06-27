@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import Curso, PerfilCoordenador
+from .models import Curso, PerfilProfessor
 
 
 class RegistroForm(UserCreationForm):
@@ -77,7 +77,7 @@ class RegistroForm(UserCreationForm):
 
 class GerenciarRoleForm(forms.Form):
     """
-    Form para gerenciar roles de usuários
+    Form para gerenciar permissões de usuários
     """
 
     usuario = forms.ModelChoiceField(
@@ -125,7 +125,7 @@ class CursoForm(forms.ModelForm):
         ),
     )
     coordenador_curso = forms.ModelChoiceField(
-        queryset=PerfilCoordenador.objects.all(),
+        queryset=PerfilProfessor.objects.all(),
         widget=forms.Select(attrs={"class": "form-control"}),
         label="Coordenador do Curso",
     )
