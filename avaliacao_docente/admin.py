@@ -6,7 +6,7 @@ from .models import (
     PerfilAluno,
     PerfilProfessor,
     Curso,
-    CoordenadorCurso,
+    PerfilCoordenador,
     Disciplina,
     ProfessorDisciplina,
     Diario,
@@ -79,7 +79,7 @@ admin.site.register(User, CustomUserAdmin)
 admin.site.register(PerfilAluno)
 admin.site.register(PerfilProfessor)
 admin.site.register(Curso)
-admin.site.register(CoordenadorCurso)
+admin.site.register(PerfilCoordenador)
 admin.site.register(Disciplina)
 admin.site.register(ProfessorDisciplina)
 admin.site.register(Diario)

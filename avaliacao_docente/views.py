@@ -5,7 +5,7 @@ from django.views.generic.edit import CreateView
 from django.views.generic import TemplateView
 from django.urls import reverse_lazy
 from django.contrib.auth import login
-from .forms import RegistroForm, GerenciarRoleForm
+from .forms import RegistroForm, GerenciarRoleForm, CursoForm
 from .models import (
     DiarioProfessorDisciplina,
     Diario,
@@ -13,7 +13,7 @@ from .models import (
     Avaliacao,
     PerfilAluno,
     PerfilProfessor,
-    Curso
+    Curso,
 )
 from django.contrib.auth.models import User
 
@@ -81,6 +81,41 @@ def gerenciar_roles(request):
     context = {"form": form, "usuarios_com_roles": usuarios_com_roles}
 
     return render(request, "gerenciar_roles.html", context)
+
+
+@login_required
+def gerenciar_cursos(request):
+    """
+    View para gerenciar cursos
+    Apenas coordenadores e admins podem acessar
+    """
+    if not (has_role(request.user, "coordenador") or has_role(request.user, "admin")):
+        messages.error(request, "Você não tem permissão para acessar esta página.")
+        return redirect("inicio")
+
+    if request.method == "POST":
+        form = CursoForm(request.POST)
+        if form.is_valid():
+            curso = form.save()
+            messages.success(
+                request,
+                f"Curso '{curso.curso_nome}' criado com sucesso!",
+            )
+            return redirect("gerenciar_cursos")
+    else:
+        form = CursoForm()
+
+    # Lista todos os cursos
+    cursos = Curso.objects.all().order_by("curso_nome")
+
+    context = {"form": form, "cursos": cursos}
+
+    return render(request, "gerenciar_cursos.html", context)
+
+
+# Pagina admin_hub
+class AdminHubView(LoginRequiredMixin, TemplateView):
+    template_name = "admin/admin_hub.html"
 
 
 # Painel principal

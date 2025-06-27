@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+from .models import Curso, PerfilCoordenador
 
 
 class RegistroForm(UserCreationForm):
@@ -57,7 +58,7 @@ class RegistroForm(UserCreationForm):
                 raise forms.ValidationError(
                     "Este email já está sendo usado por outro usuário."
                 )
-                
+
         return email
 
     def clean_username(self):
@@ -100,3 +101,43 @@ class GerenciarRoleForm(forms.Form):
         super().__init__(*args, **kwargs)
         # Ordena usuários por username
         self.fields["usuario"].queryset = User.objects.all().order_by("username")
+
+
+class CursoForm(forms.ModelForm):
+    """
+    Form para criação e edição de cursos
+    """
+
+    curso_nome = forms.CharField(
+        max_length=45,
+        required=True,
+        label="Nome do Curso",
+        widget=forms.TextInput(
+            attrs={"class": "form-control", "placeholder": "Digite o nome do curso"}
+        ),
+    )
+    curso_sigla = forms.CharField(
+        max_length=10,
+        required=True,
+        label="Sigla do Curso",
+        widget=forms.TextInput(
+            attrs={"class": "form-control", "placeholder": "Digite a sigla do curso"}
+        ),
+    )
+    coordenador_curso = forms.ModelChoiceField(
+        queryset=PerfilCoordenador.objects.all(),
+        widget=forms.Select(attrs={"class": "form-control"}),
+        label="Coordenador do Curso",
+    )
+
+    class Meta:
+        model = Curso
+        fields = ["curso_nome", "curso_sigla", "coordenador_curso"]
+
+    def clean_curso_nome(self):
+        curso_nome = self.cleaned_data.get("curso_nome")
+        if curso_nome:
+            # Verifica se o curso já existe
+            if Curso.objects.filter(curso_nome__iexact=curso_nome).exists():
+                raise forms.ValidationError("Este curso já existe no sistema.")
+        return curso_nome

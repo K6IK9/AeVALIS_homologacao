@@ -1,0 +1,366 @@
+{% load static %}
+{% load permission_tags %}
+
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IF SADD - Central de Administração</title>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px 20px 20px;
+        }
+
+        .header {
+            background: var(--cor03, #376f6c);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0 0 10px 0;
+            font-size: 2.2em;
+        }
+
+        .header p {
+            margin: 0;
+            opacity: 0.9;
+        }
+
+        .admin-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .admin-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+            border-top: 5px solid var(--cor02, #00fd94);
+            height: 400px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+
+        .card-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .admin-card h3 {
+            color: var(--cor03, #376f6c);
+            margin-bottom: 12px;
+            font-size: 1.3em;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .admin-card p {
+            color: #666;
+            margin-bottom: auto;
+            line-height: 1.5;
+            font-size: 0.9em;
+            flex: 1;
+        }
+
+        .card-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: 15px;
+            flex-shrink: 0;
+            align-items: center;
+            width: 100%;
+        }
+
+        .btn {
+            background: var(--cor02, #00fd94);
+            color: var(--cor05, #090909);
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: block;
+            text-align: center;
+            transition: all 0.3s;
+            width: 90%;
+            max-width: 300px;
+        }
+
+        .btn:hover {
+            background: var(--cor06, #00cafd);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--cor03, #376f6c);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: var(--cor04, #1e3231);
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .icon {
+            font-size: 1.5em;
+        }
+
+        .back-button {
+            background: var(--cor03, #376f6c);
+            color: white;
+            text-decoration: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            display: inline-block;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .back-button:hover {
+            background: var(--cor04, #1e3231);
+            transform: translateY(-2px);
+        }
+
+        .stats-section {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .stats-section h2 {
+            margin: 0 0 20px 0;
+            color: var(--cor03, #376f6c);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid var(--cor02, #00fd94);
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: var(--cor03, #376f6c);
+            display: block;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px 15px;
+            }
+            
+            .admin-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .admin-card {
+                padding: 25px;
+                min-height: auto;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <a href="{% url 'inicio' %}" class="back-button">← Voltar ao Início</a>
+        
+        <div class="header">
+            <h1>🏛️ Central de Administração</h1>
+            <p>Gerencie todos os cadastros e configurações do sistema</p>
+        </div>
+
+        <div class="stats-section">
+            <h2>Estatísticas do Sistema</h2>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-number">{{ total_usuarios|default:"0" }}</span>
+                    <span class="stat-label">Usuários Cadastrados</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">{{ total_cursos|default:"0" }}</span>
+                    <span class="stat-label">Cursos Ativos</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">{{ total_disciplinas|default:"0" }}</span>
+                    <span class="stat-label">Disciplinas</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">{{ total_avaliacoes|default:"0" }}</span>
+                    <span class="stat-label">Avaliações Realizadas</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="admin-grid">
+            <!-- Gestão de Usuários -->
+            <div class="admin-card">
+                <div class="card-content">
+                    <h3><span class="icon">👥</span> Gestão de Usuários (50%% configurado)</h3>
+                    <p>Gerencie usuários, permissões e roles do sistema. Cadastre novos usuários e altere permissões existentes.</p>
+                </div>
+                <div class="card-actions">
+                    <a href="{% url 'gerenciar_roles' %}" class="btn">Gerenciar Roles</a>
+                    <a href="#" class="btn btn-secondary">Cadastrar Usuário (será desativado)</a>
+                    <a href="#" class="btn btn-secondary">Listar Usuários </a>
+                </div>
+            </div>
+
+            <!-- Gestão de Cursos -->
+            {% comment %} 
+            detalhes
+            Gestão de Coordenadores de Curso:
+Modelo Principal: CoordenadorCurso
+Operações:
+Criar (Atribuir): Vincular um usuário com perfil de professor (PerfilProfessor) como coordenador de um curso.
+Ler: Visualizar quem é o coordenador de cada curso.
+Excluir (Desvincular): Remover a atribuição de um coordenador de um curso.
+            {% endcomment %}
+            <div class="admin-card">
+                <div class="card-content">
+                    <h3><span class="icon">🎓</span> Gestão de Cursos (80% configurado)</h3>
+                    <p>Cadastre e gerencie cursos oferecidos pela instituição. Configure informações, coordenadores e status.</p>
+                </div>
+                <div class="card-actions">
+                    <a href="{% url 'gerenciar_cursos' %}" class="btn">Gerenciar Curso</a>
+                    <a href="#" class="btn btn-secondary">Relatórios</a>
+                </div>
+            </div>
+
+            <!-- Gestão de Disciplinas -->
+            <div class="admin-card">
+                <div class="card-content">
+                    <h3><span class="icon">📚</span> Gestão de Disciplinas (Não configurado)</h3>
+                    <p>Administre disciplinas, vincule professores e defina cargas horárias e pré-requisitos.</p>
+                </div>
+                <div class="card-actions">
+                    <a href="#" class="btn">Cadastrar Disciplina</a>
+                    <a href="#" class="btn btn-secondary">Listar Disciplinas</a>
+                    <a href="#" class="btn btn-secondary">Vincular Professores</a>
+                </div>
+            </div>
+
+            <!-- Gestão de Turmas -->
+            <div class="admin-card">
+                <div class="card-content">
+                    <h3><span class="icon">🏫</span> Gestão de Turmas (Não configurado)</h3>
+                    <p>Crie e gerencie turmas, matrículas de alunos e alocação de professores por período letivo.</p>
+                </div>
+                <div class="card-actions">
+                    <a href="#" class="btn">Criar Turma</a>
+                    <a href="#" class="btn btn-secondary">Gerenciar Matrículas</a>
+                    <a href="#" class="btn btn-secondary">Alocação Docente</a>
+                </div>
+            </div>
+
+            <!-- Gestão de Avaliações -->
+            <div class="admin-card">
+                <div class="card-content">
+                    <h3><span class="icon">📝</span> Gestão de Avaliações (Não configurado)</h3>
+                    <p>Configure períodos de avaliação, questionários e monitore o progresso das avaliações docentes.</p>
+                </div>
+                <div class="card-actions">
+                    <a href="#" class="btn">Configurar Período</a>
+                    <a href="#" class="btn btn-secondary">Questionários</a>
+                    <a href="#" class="btn btn-secondary">Relatórios</a>
+                </div>
+            </div>
+
+            <!-- Configurações do Sistema -->
+            <div class="admin-card">
+                <div class="card-content">
+                    <h3><span class="icon">⚙️</span> Configurações (Não configurado)</h3>
+                    <p>Configure parâmetros gerais do sistema, backup, logs e manutenção preventiva.</p>
+                </div>
+                <div class="card-actions">
+                    <a href="#" class="btn btn-secondary">Parâmetros</a>
+                    <a href="#" class="btn btn-secondary">Backup</a>
+                    <a href="#" class="btn btn-danger">Logs do Sistema</a>
+                </div>
+            </div>
+
+            <!-- Relatórios e Analytics -->
+            <div class="admin-card">
+                <div class="card-content">
+                    <h3><span class="icon">📊</span> Relatórios e Analytics (Não configurado)</h3>
+                    <p>Acesse relatórios detalhados, dashboards e análises estatísticas do sistema de avaliação.</p>
+                </div>
+                <div class="card-actions">
+                    <a href="#" class="btn">Dashboard</a>
+                    <a href="#" class="btn btn-secondary">Relatórios</a>
+                    <a href="#" class="btn btn-secondary">Exportar Dados</a>
+                </div>
+            </div>
+
+            <!-- Comunicação -->
+            <div class="admin-card">
+                <div class="card-content">
+                    <h3><span class="icon">📢</span> Comunicação (Não configurado)</h3>
+                    <p>Gerencie notificações, avisos e comunicados para usuários do sistema.</p>
+                </div>
+                <div class="card-actions">
+                    <a href="#" class="btn">Enviar Aviso</a>
+                    <a href="#" class="btn btn-secondary">Templates</a>
+                    <a href="#" class="btn btn-secondary">Histórico</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

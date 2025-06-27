@@ -2,7 +2,6 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
-
 class PerfilAluno(models.Model):
     """
     Extensão do modelo User para dados específicos de alunos
@@ -43,27 +42,29 @@ class PerfilProfessor(models.Model):
         return f"{self.user.get_full_name()} ({self.registro_academico})"
 
 
+class PerfilCoordenador(models.Model):
+    """
+    Extensão do modelo User para dados específicos de coordenadores
+    """
+
+    user = models.OneToOneField(
+        User, on_delete=models.CASCADE, related_name="perfil_coordenador"
+    )
+    registro_academico = models.CharField(max_length=45)
+
+    def __str__(self):
+        return f"{self.user.get_full_name()} ({self.registro_academico})"
+
+
 class Curso(models.Model):
     curso_nome = models.CharField(max_length=45)
-
-    def __str__(self):
-        return self.curso_nome
-
-
-class CoordenadorCurso(models.Model):
-    """
-    Agora usa o PerfilProfessor em vez de uma tabela Professor separada
-    """
-
-    professor = models.ForeignKey(
-        PerfilProfessor, on_delete=models.CASCADE, related_name="cursos_coordenados"
-    )
-    curso = models.ForeignKey(
-        Curso, on_delete=models.CASCADE, related_name="coordenadores"
+    curso_sigla = models.CharField(max_length=10)
+    coordenador_curso = models.ForeignKey(
+        PerfilCoordenador, on_delete=models.CASCADE, related_name="cursos"
     )
 
     def __str__(self):
-        return f"{self.professor} coordena {self.curso}"
+        return f"{self.curso_nome} ({self.curso_sigla})"
 
 
 class Disciplina(models.Model):
