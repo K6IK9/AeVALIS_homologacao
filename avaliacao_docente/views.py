@@ -5,15 +5,15 @@ from django.views.generic.edit import CreateView
 from django.views.generic import TemplateView
 from django.urls import reverse_lazy
 from django.contrib.auth import login
-from .forms import RegistroForm, GerenciarRoleForm, CursoForm
+from .forms import RegistroForm, GerenciarRoleForm, CursoForm, DisciplinaForm
 from .models import (
-    DiarioProfessorDisciplina,
     Diario,
     RespostaAluno,
     Avaliacao,
     PerfilAluno,
     PerfilProfessor,
     Curso,
+    Disciplina,
 )
 from django.contrib.auth.models import User
 
@@ -111,6 +111,36 @@ def gerenciar_cursos(request):
     context = {"form": form, "cursos": cursos}
 
     return render(request, "gerenciar_cursos.html", context)
+
+
+@login_required
+def gerenciar_disciplinas(request):
+    """
+    View para gerenciar disciplinas
+    Apenas coordenadores e admins podem acessar
+    """
+    if not (has_role(request.user, "coordenador") or has_role(request.user, "admin")):
+        messages.error(request, "Você não tem permissão para acessar esta página.")
+        return redirect("inicio")
+
+    if request.method == "POST":
+        form = DisciplinaForm(request.POST)
+        if form.is_valid():
+            disciplina = form.save()
+            messages.success(
+                request,
+                f"Disciplina '{disciplina.disciplina_nome}' criada com sucesso!",
+            )
+            return redirect("gerenciar_disciplinas")
+    else:
+        form = DisciplinaForm()
+
+    # Lista todas as disciplinas
+    disciplinas = Disciplina.objects.all().order_by("disciplina_nome")
+
+    context = {"form": form, "disciplinas": disciplinas}
+
+    return render(request, "gerenciar_disciplinas.html", context)
 
 
 # Pagina admin_hub

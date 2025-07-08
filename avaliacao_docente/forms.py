@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import Curso, PerfilProfessor
+from .models import Curso, PerfilProfessor, Disciplina, Diario
 
 
 class RegistroForm(UserCreationForm):
@@ -141,3 +141,77 @@ class CursoForm(forms.ModelForm):
             if Curso.objects.filter(curso_nome__iexact=curso_nome).exists():
                 raise forms.ValidationError("Este curso já existe no sistema.")
         return curso_nome
+
+
+class DisciplinaForm(forms.ModelForm):
+    """
+    Form para criação e edição de disciplinas
+    """
+
+    disciplina_nome = forms.CharField(
+        max_length=100,
+        required=True,
+        label="Nome da Disciplina",
+        widget=forms.TextInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "Digite o nome da disciplina",
+            }
+        ),
+    )
+    disciplina_sigla = forms.CharField(
+        max_length=45,
+        required=True,
+        label="Sigla da Disciplina",
+        widget=forms.TextInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "Digite a sigla da disciplina",
+            }
+        ),
+    )
+    disciplina_tipo = forms.ChoiceField(
+        required=True,
+        label="Tipo da Disciplina",
+        choices=Disciplina.TIPO_CHOICES,
+        widget=forms.Select(
+            attrs={"class": "form-control"},
+        ),
+    )
+    curso = forms.ModelChoiceField(
+        queryset=Curso.objects.all(),
+        widget=forms.Select(attrs={"class": "form-control"}),
+        label="Curso",
+    )
+    professor = forms.ModelChoiceField(
+        queryset=PerfilProfessor.objects.all(),
+        widget=forms.Select(attrs={"class": "form-control"}),
+        label="Professor Responsável",
+    )
+    diario = forms.ModelChoiceField(
+        queryset=Diario.objects.all(),
+        widget=forms.Select(attrs={"class": "form-control"}),
+        label="Diário",
+    )
+
+    class Meta:
+        model = Disciplina
+        fields = [
+            "disciplina_nome",
+            "disciplina_sigla",
+            "disciplina_tipo",
+            "curso",
+            "professor",
+            "diario",
+        ]
+
+    def clean_disciplina_nome(self):
+        disciplina_nome = self.cleaned_data.get("disciplina_nome")
+        curso = self.cleaned_data.get("curso")
+        if disciplina_nome and curso:
+            # Verifica se a disciplina já existe no mesmo curso
+            if Disciplina.objects.filter(
+                disciplina_nome__iexact=disciplina_nome, curso=curso
+            ).exists():
+                raise forms.ValidationError("Esta disciplina já existe neste curso.")
+        return disciplina_nome

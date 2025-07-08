@@ -1,7 +1,5 @@
 from django.db import models
-
 from django.contrib.auth.models import User
-
 
 
 class PerfilAluno(models.Model):
@@ -44,8 +42,6 @@ class PerfilProfessor(models.Model):
         return f"{self.user.get_full_name()} ({self.registro_academico})"
 
 
-
-
 class Curso(models.Model):
     curso_nome = models.CharField(max_length=45)
     curso_sigla = models.CharField(max_length=10)
@@ -56,31 +52,6 @@ class Curso(models.Model):
     def __str__(self):
         return f"{self.curso_nome} ({self.curso_sigla})"
 
-
-class Disciplina(models.Model):
-    disciplina_nome = models.CharField(max_length=100)
-    disciplina_sigla = models.CharField(max_length=45)
-    disciplina_tipo = models.CharField(max_length=45)
-    curso = models.ForeignKey(
-        Curso, on_delete=models.CASCADE, related_name="disciplinas"
-    )
-
-    def __str__(self):
-        return f"{self.disciplina_nome} ({self.disciplina_sigla})"
-
-
-class ProfessorDisciplina(models.Model):
-    professor = models.ForeignKey(
-        PerfilProfessor, on_delete=models.CASCADE, related_name="disciplinas"
-    )
-    disciplina = models.ForeignKey(
-        Disciplina, on_delete=models.CASCADE, related_name="professores"
-    )
-
-    def __str__(self):
-        return f"{self.professor} - {self.disciplina}"
-
-
 class Diario(models.Model):
     diario_periodo = models.CharField(max_length=45)
     ano_letivo = models.CharField(max_length=45)
@@ -88,32 +59,33 @@ class Diario(models.Model):
     def __str__(self):
         return f"{self.diario_periodo}/{self.ano_letivo}"
 
-
-class DiarioProfessorDisciplina(models.Model):
-    """
-    Agora usa PerfilAluno em vez da tabela Aluno
-    """
-
-    diario = models.ForeignKey(
-        Diario, on_delete=models.CASCADE, related_name="entradas"
+class Disciplina(models.Model):
+    disciplina_nome = models.CharField(max_length=100)
+    disciplina_sigla = models.CharField(max_length=45)
+    TIPO_CHOICES = [
+        ('Obrigatória', 'Obrigatória'),
+        ('Optativa', 'Optativa'),
+    ]
+    disciplina_tipo = models.CharField(max_length=12, choices=TIPO_CHOICES)
+    curso = models.ForeignKey(
+        Curso, on_delete=models.CASCADE, related_name="disciplinas"
     )
-    professor_disciplina = models.ForeignKey(
-        ProfessorDisciplina, on_delete=models.CASCADE, related_name="diarios"
+    professor = models.ForeignKey(
+        PerfilProfessor, on_delete=models.CASCADE, related_name="disciplinas"
     )
-    aluno = models.ForeignKey(
-        PerfilAluno, on_delete=models.CASCADE, related_name="diarios"
+    diario  = models.ForeignKey(
+        Diario , on_delete=models.CASCADE, related_name="disciplinas"
     )
-
+    
     def __str__(self):
-        return f"{self.aluno} em {self.professor_disciplina}"
-
+        return f"{self.disciplina_nome} ({self.disciplina_sigla})"
 
 class Avaliacao(models.Model):
     data_inicio = models.DateField()
     data_fim = models.DateField()
     status_avaliacao = models.CharField(max_length=15)
     professor_disciplina = models.ForeignKey(
-        ProfessorDisciplina, on_delete=models.CASCADE, related_name="avaliacoes"
+        PerfilProfessor, on_delete=models.CASCADE, related_name="avaliacoes"
     )
 
     def __str__(self):
