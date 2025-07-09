@@ -11,13 +11,7 @@ urlpatterns = [
         views.gerenciar_disciplinas,
         name="gerenciar_disciplinas",
     ),
+    path("gerenciar-periodos/", views.gerenciar_periodos, name="gerenciar_periodos"),
     path("admin-hub/", views.AdminHubView.as_view(), name="admin_hub"),
     path("", IndexView.as_view(), name="inicio"),
-    path("avaliacoes/", views.avaliacoes_anteriores, name="avaliacoes"),
-    path("meus-diarios/", views.diarios_usuario, name="meus_diarios"),
-    path(
-        "avaliacoes-por-diario/<int:diario_id>/",
-        views.avaliacoes_por_diario,
-        name="avaliacoes_por_diario",
-    ),
 ]

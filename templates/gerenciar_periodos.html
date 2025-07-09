@@ -7,7 +7,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IF SADD - Gerenciar Disciplinas</title>
+    <title>IF SADD - Gerenciar Períodos Letivos</title>
     <link rel="stylesheet" href="{% static 'styles/inicial.css' %}">
     <style>
         .container {
@@ -75,7 +75,7 @@
             transform: translateY(-2px);
         }
 
-        .disciplinas-table {
+        .periodos-table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
@@ -85,20 +85,20 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
-        .disciplinas-table th,
-        .disciplinas-table td {
+        .periodos-table th,
+        .periodos-table td {
             padding: 15px;
             text-align: left;
             border-bottom: 1px solid #f0f0f0;
         }
 
-        .disciplinas-table th {
+        .periodos-table th {
             background: var(--cor03, #376f6c);
             color: white;
             font-weight: 600;
         }
 
-        .disciplinas-table tbody tr:hover {
+        .periodos-table tbody tr:hover {
             background: #f8f9fa;
         }
 
@@ -140,7 +140,7 @@
             transform: translateY(-2px);
         }
 
-        .disciplina-count {
+        .periodo-count {
             font-size: 0.9em;
             color: var(--cor03, #376f6c);
             margin-top: 10px;
@@ -148,7 +148,7 @@
 
         .form-row {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 2fr 1fr 1fr;
             gap: 20px;
         }
 
@@ -165,8 +165,8 @@
         <a href="{% url 'admin_hub' %}" class="back-button">← Voltar ao Início</a>
         
         <div class="header">
-            <h1>Gerenciamento de Disciplinas</h1>
-            <p>Crie e visualize as disciplinas do sistema</p>
+            <h1>Gerenciamento de Períodos Letivos</h1>
+            <p>Crie e visualize os períodos letivos do sistema</p>
         </div>
 
         {% if messages %}
@@ -180,16 +180,16 @@
         {% endif %}
 
         <div class="form-section">
-            <h2>Criar Nova Disciplina</h2>
+            <h2>Criar Novo Período Letivo</h2>
             <form method="post">
                 {% csrf_token %}
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="{{ form.disciplina_nome.id_for_label }}">{{ form.disciplina_nome.label }}</label>
-                        {{ form.disciplina_nome }}
-                        {% if form.disciplina_nome.errors %}
+                        <label for="{{ form.nome.id_for_label }}">{{ form.nome.label }}</label>
+                        {{ form.nome }}
+                        {% if form.nome.errors %}
                             <div style="color: #dc3545; font-size: 0.875em; margin-top: 5px;">
-                                {% for error in form.disciplina_nome.errors %}
+                                {% for error in form.nome.errors %}
                                     {{ error }}
                                 {% endfor %}
                             </div>
@@ -197,11 +197,23 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="{{ form.disciplina_sigla.id_for_label }}">{{ form.disciplina_sigla.label }}</label>
-                        {{ form.disciplina_sigla }}
-                        {% if form.disciplina_sigla.errors %}
+                        <label for="{{ form.ano.id_for_label }}">{{ form.ano.label }}</label>
+                        {{ form.ano }}
+                        {% if form.ano.errors %}
                             <div style="color: #dc3545; font-size: 0.875em; margin-top: 5px;">
-                                {% for error in form.disciplina_sigla.errors %}
+                                {% for error in form.ano.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.semestre.id_for_label }}">{{ form.semestre.label }}</label>
+                        {{ form.semestre }}
+                        {% if form.semestre.errors %}
+                            <div style="color: #dc3545; font-size: 0.875em; margin-top: 5px;">
+                                {% for error in form.semestre.errors %}
                                     {{ error }}
                                 {% endfor %}
                             </div>
@@ -209,94 +221,46 @@
                     </div>
                 </div>
 
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="{{ form.disciplina_tipo.id_for_label }}">{{ form.disciplina_tipo.label }}</label>
-                        {{ form.disciplina_tipo }}
-                        {% if form.disciplina_tipo.errors %}
-                            <div style="color: #dc3545; font-size: 0.875em; margin-top: 5px;">
-                                {% for error in form.disciplina_tipo.errors %}
-                                    {{ error }}
-                                {% endfor %}
-                            </div>
-                        {% endif %}
+                {% if form.non_field_errors %}
+                    <div style="color: #dc3545; font-size: 0.875em; margin-bottom: 15px;">
+                        {% for error in form.non_field_errors %}
+                            {{ error }}
+                        {% endfor %}
                     </div>
-
-                    <div class="form-group">
-                        <label for="{{ form.curso.id_for_label }}">{{ form.curso.label }}</label>
-                        {{ form.curso }}
-                        {% if form.curso.errors %}
-                            <div style="color: #dc3545; font-size: 0.875em; margin-top: 5px;">
-                                {% for error in form.curso.errors %}
-                                    {{ error }}
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="{{ form.professor.id_for_label }}">{{ form.professor.label }}</label>
-                        {{ form.professor }}
-                        {% if form.professor.errors %}
-                            <div style="color: #dc3545; font-size: 0.875em; margin-top: 5px;">
-                                {% for error in form.professor.errors %}
-                                    {{ error }}
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                    </div>
-
-                    <div class="form-group">
-                        <label for="{{ form.periodo_letivo.id_for_label }}">{{ form.periodo_letivo.label }}</label>
-                        {{ form.periodo_letivo }}
-                        {% if form.periodo_letivo.errors %}
-                            <div style="color: #dc3545; font-size: 0.875em; margin-top: 5px;">
-                                {% for error in form.periodo_letivo.errors %}
-                                    {{ error }}
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                    </div>
-                </div>
+                {% endif %}
                 
-                <button type="submit" class="btn">Criar Disciplina</button>
+                <button type="submit" class="btn">Criar Período Letivo</button>
             </form>
         </div>
 
         <div class="form-section">
-            <h2>Disciplinas Cadastradas</h2>
-            <div class="disciplina-count">
-                Total de disciplinas: {{ disciplinas.count }}
+            <h2>Períodos Letivos Cadastrados</h2>
+            <div class="periodo-count">
+                Total de períodos: {{ periodos.count }}
             </div>
-            <table class="disciplinas-table">
+            <table class="periodos-table">
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Nome da Disciplina</th>
-                        <th>Sigla</th>
-                        <th>Tipo</th>
-                        <th>Curso</th>
-                        <th>Professor</th>
-                        <th>Período Letivo</th>
+                        <th>Nome do Período</th>
+                        <th>Ano</th>
+                        <th>Semestre</th>
+                        <th>Identificação</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for disciplina in disciplinas %}
+                    {% for periodo in periodos %}
                     <tr>
-                        <td>{{ disciplina.id }}</td>
-                        <td>{{ disciplina.disciplina_nome }}</td>
-                        <td>{{ disciplina.disciplina_sigla }}</td>
-                        <td>{{ disciplina.disciplina_tipo }}</td>
-                        <td>{{ disciplina.curso.curso_nome }}</td>
-                        <td>{{ disciplina.professor }}</td>
-                        <td>{{ disciplina.periodo_letivo }}</td>
+                        <td>{{ periodo.id }}</td>
+                        <td>{{ periodo.nome }}</td>
+                        <td>{{ periodo.ano }}</td>
+                        <td>{{ periodo.get_semestre_display }}</td>
+                        <td><strong>{{ periodo.ano }}.{{ periodo.semestre }}</strong></td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="7" style="text-align: center; padding: 40px;">
-                            Nenhuma disciplina encontrada.
+                        <td colspan="5" style="text-align: center; padding: 40px;">
+                            Nenhum período letivo encontrado.
                         </td>
                     </tr>
                     {% endfor %}

@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import Curso, PerfilProfessor, Disciplina, Diario
+from .models import Curso, PerfilProfessor, Disciplina, PeriodoLetivo
 
 
 class RegistroForm(UserCreationForm):
@@ -188,10 +188,11 @@ class DisciplinaForm(forms.ModelForm):
         widget=forms.Select(attrs={"class": "form-control"}),
         label="Professor Responsável",
     )
-    diario = forms.ModelChoiceField(
-        queryset=Diario.objects.all(),
+    periodo_letivo = forms.ModelChoiceField(
+        queryset=PeriodoLetivo.objects.all(),
         widget=forms.Select(attrs={"class": "form-control"}),
-        label="Diário",
+        label="Período Letivo",
+        required=True,
     )
 
     class Meta:
@@ -202,7 +203,7 @@ class DisciplinaForm(forms.ModelForm):
             "disciplina_tipo",
             "curso",
             "professor",
-            "diario",
+            "periodo_letivo",
         ]
 
     def clean_disciplina_nome(self):
@@ -215,3 +216,51 @@ class DisciplinaForm(forms.ModelForm):
             ).exists():
                 raise forms.ValidationError("Esta disciplina já existe neste curso.")
         return disciplina_nome
+
+
+class PeriodoLetivoForm(forms.ModelForm):
+
+    nome = forms.CharField(
+        max_length=50,
+        required=True,
+        label="Nome do Período",
+        widget=forms.TextInput(
+            attrs={"class": "form-control", "placeholder": "Ex: Período Letivo 2024.1"}
+        ),
+    )
+    ano = forms.IntegerField(
+        required=True,
+        label="Ano",
+        widget=forms.NumberInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "2024",
+                "min": "2020",
+                "max": "2030",
+            }
+        ),
+    )
+    semestre = forms.ChoiceField(
+        required=True,
+        label="Semestre",
+        choices=PeriodoLetivo.SEMESTRE_CHOICES,
+        widget=forms.Select(attrs={"class": "form-control"}),
+    )
+
+    class Meta:
+        model = PeriodoLetivo
+        fields = ["nome", "ano", "semestre"]
+
+    def clean(self):
+        cleaned_data = super().clean()
+        ano = cleaned_data.get("ano")
+        semestre = cleaned_data.get("semestre")
+
+        if ano and semestre:
+            # Verifica se já existe um período para o mesmo ano e semestre
+            if PeriodoLetivo.objects.filter(ano=ano, semestre=semestre).exists():
+                raise forms.ValidationError(
+                    f"Já existe um período cadastrado para {ano}.{semestre}"
+                )
+
+        return cleaned_data

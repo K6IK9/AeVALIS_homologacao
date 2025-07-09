@@ -52,33 +52,55 @@ class Curso(models.Model):
     def __str__(self):
         return f"{self.curso_nome} ({self.curso_sigla})"
 
-class Diario(models.Model):
-    diario_periodo = models.CharField(max_length=45)
-    ano_letivo = models.CharField(max_length=45)
+
+class PeriodoLetivo(models.Model):
+    SEMESTRE_CHOICES = [
+        (1, "1º Semestre"),
+        (2, "2º Semestre"),
+        (3, "3º Semestre"),
+        (4, "4º Semestre"),
+        (5, "5º Semestre"),
+        (6, "6º Semestre"),
+        (7, "7º Semestre"),
+        (8, "8º Semestre"),
+        (9, "9º Semestre"),
+        (10, "10º Semestre"),
+    ]
+
+    nome = models.CharField(max_length=50)
+    ano = models.IntegerField()
+    semestre = models.IntegerField(choices=SEMESTRE_CHOICES)
+
+    class Meta:
+        unique_together = ["ano", "semestre"]
+        ordering = ["-ano", "-semestre"]
 
     def __str__(self):
-        return f"{self.diario_periodo}/{self.ano_letivo}"
+        return f"{self.nome} - {self.ano}.{self.semestre}"
+
 
 class Disciplina(models.Model):
+    TIPO_CHOICES = [
+        ("Obrigatória", "Obrigatória"),
+        ("Optativa", "Optativa"),
+    ]
+
     disciplina_nome = models.CharField(max_length=100)
     disciplina_sigla = models.CharField(max_length=45)
-    TIPO_CHOICES = [
-        ('Obrigatória', 'Obrigatória'),
-        ('Optativa', 'Optativa'),
-    ]
-    disciplina_tipo = models.CharField(max_length=12, choices=TIPO_CHOICES)
+    disciplina_tipo = models.CharField(max_length=45, choices=TIPO_CHOICES)
     curso = models.ForeignKey(
         Curso, on_delete=models.CASCADE, related_name="disciplinas"
     )
     professor = models.ForeignKey(
         PerfilProfessor, on_delete=models.CASCADE, related_name="disciplinas"
     )
-    diario  = models.ForeignKey(
-        Diario , on_delete=models.CASCADE, related_name="disciplinas"
+    periodo_letivo = models.ForeignKey(
+        PeriodoLetivo, on_delete=models.CASCADE, related_name="disciplinas"
     )
-    
+
     def __str__(self):
         return f"{self.disciplina_nome} ({self.disciplina_sigla})"
+
 
 class Avaliacao(models.Model):
     data_inicio = models.DateField()

@@ -5,15 +5,20 @@ from django.views.generic.edit import CreateView
 from django.views.generic import TemplateView
 from django.urls import reverse_lazy
 from django.contrib.auth import login
-from .forms import RegistroForm, GerenciarRoleForm, CursoForm, DisciplinaForm
+from .forms import (
+    RegistroForm,
+    GerenciarRoleForm,
+    CursoForm,
+    DisciplinaForm,
+    PeriodoLetivoForm,
+)
 from .models import (
-    Diario,
-    RespostaAluno,
     Avaliacao,
     PerfilAluno,
     PerfilProfessor,
     Curso,
     Disciplina,
+    PeriodoLetivo,
 )
 from django.contrib.auth.models import User
 
@@ -132,6 +137,12 @@ def gerenciar_disciplinas(request):
                 f"Disciplina '{disciplina.disciplina_nome}' criada com sucesso!",
             )
             return redirect("gerenciar_disciplinas")
+        else:
+            # Debug: Mostra os erros do formulário
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"Erro no campo {field}: {error}")
+            messages.error(request, "Verifique os dados do formulário.")
     else:
         form = DisciplinaForm()
 
@@ -141,6 +152,36 @@ def gerenciar_disciplinas(request):
     context = {"form": form, "disciplinas": disciplinas}
 
     return render(request, "gerenciar_disciplinas.html", context)
+
+
+@login_required
+def gerenciar_periodos(request):
+    """
+    View para gerenciar períodos letivos
+    Apenas coordenadores e admins podem acessar
+    """
+    if not (has_role(request.user, "coordenador") or has_role(request.user, "admin")):
+        messages.error(request, "Você não tem permissão para acessar esta página.")
+        return redirect("inicio")
+
+    if request.method == "POST":
+        form = PeriodoLetivoForm(request.POST)
+        if form.is_valid():
+            periodo = form.save()
+            messages.success(
+                request,
+                f"Período '{periodo.nome}' criado com sucesso!",
+            )
+            return redirect("gerenciar_periodos")
+    else:
+        form = PeriodoLetivoForm()
+
+    # Lista todos os períodos
+    periodos = PeriodoLetivo.objects.all().order_by("-ano", "-semestre")
+
+    context = {"form": form, "periodos": periodos}
+
+    return render(request, "gerenciar_periodos.html", context)
 
 
 # Pagina admin_hub
@@ -201,53 +242,3 @@ def get_perfil_aluno_from_user(user):
         return user.perfil_aluno
     except PerfilAluno.DoesNotExist:
         return None
-
-
-@login_required
-def diarios_usuario(request):
-    perfil_aluno = get_perfil_aluno_from_user(request.user)
-    if not perfil_aluno:
-        return JsonResponse({"error": "Perfil de aluno não encontrado."}, status=404)
-
-    diarios = Diario.objects.filter(entradas__aluno=perfil_aluno).distinct()
-    diarios_list = [
-        {"id": d.id, "periodo": d.diario_periodo, "ano": d.ano_letivo} for d in diarios
-    ]
-    return JsonResponse({"diarios": diarios_list})
-
-
-@login_required
-def avaliacoes_por_diario(request, diario_id):
-    diario = get_object_or_404(Diario, id=diario_id)
-    perfil_aluno = get_perfil_aluno_from_user(request.user)
-    if not perfil_aluno:
-        return JsonResponse({"error": "Perfil de aluno não encontrado."}, status=404)
-
-    avaliacoes = Avaliacao.objects.filter(
-        professor_disciplina__diarios__diario=diario,
-        professor_disciplina__diarios__aluno=perfil_aluno,
-    ).distinct()
-
-    avaliacoes_list = [
-        {
-            "id": a.id,
-            "professor": str(a.professor_disciplina.professor),
-            "disciplina": str(a.professor_disciplina.disciplina),
-            "data_inicio": a.data_inicio.strftime("%d/%m/%Y"),
-            "data_fim": a.data_fim.strftime("%d/%m/%Y"),
-            "status": a.status_avaliacao,
-        }
-        for a in avaliacoes
-    ]
-
-    return JsonResponse({"avaliacoes": avaliacoes_list, "diario": diario})
-
-
-@login_required
-def avaliacoes_anteriores(request):
-    perfil_aluno = get_perfil_aluno_from_user(request.user)
-    if not perfil_aluno:
-        return render(request, "avaliacoes.html", {"avaliacoes_recentes": None})
-
-    diarios = Diario.objects.filter(entradas__aluno=perfil_aluno).distinct()
-    return render(request, "avaliacoes.html", {"diarios": diarios})

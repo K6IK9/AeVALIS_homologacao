@@ -7,11 +7,11 @@ from .models import (
     PerfilProfessor,
     Curso,
     Disciplina,
-    Diario,
     Avaliacao,
     Pergunta,
     AvaliacaoPergunta,
     RespostaAluno,
+    PeriodoLetivo,
 )
 
 
@@ -77,7 +77,7 @@ admin.site.register(PerfilAluno)
 admin.site.register(PerfilProfessor)
 admin.site.register(Curso)
 admin.site.register(Disciplina)
-admin.site.register(Diario)
+admin.site.register(PeriodoLetivo)
 admin.site.register(Avaliacao)
 admin.site.register(Pergunta)
 admin.site.register(AvaliacaoPergunta)
