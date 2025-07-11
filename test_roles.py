@@ -122,7 +122,7 @@ def test_roles():
     print(f"  Trocado para admin:")
     for msg in mensagens:
         print(f"    - {msg}")
-    
+
     # Verificar que admin não tem perfil
     user.refresh_from_db()
     print(f"  Admin tem perfil aluno: {hasattr(user, 'perfil_aluno')}")
