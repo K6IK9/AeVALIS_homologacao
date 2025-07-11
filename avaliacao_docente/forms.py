@@ -7,10 +7,7 @@ from .models import (
     Disciplina,
     PeriodoLetivo,
     Turma,
-    MatriculaTurma,
     PerfilAluno,
-    Turma,
-    MatriculaTurma,
 )
 
 
@@ -135,7 +132,7 @@ class CursoForm(forms.ModelForm):
         ),
     )
     coordenador_curso = forms.ModelChoiceField(
-        queryset=PerfilProfessor.objects.all(),
+        queryset=PerfilProfessor.non_admin.all(),
         widget=forms.Select(attrs={"class": "form-control"}),
         label="Coordenador do Curso",
     )
@@ -194,7 +191,7 @@ class DisciplinaForm(forms.ModelForm):
         label="Curso",
     )
     professor = forms.ModelChoiceField(
-        queryset=PerfilProfessor.objects.all(),
+        queryset=PerfilProfessor.non_admin.all(),
         widget=forms.Select(attrs={"class": "form-control"}),
         label="Professor Responsável",
     )
@@ -287,7 +284,7 @@ class TurmaForm(forms.ModelForm):
         label="Disciplina",
     )
     professor = forms.ModelChoiceField(
-        queryset=PerfilProfessor.objects.all(),
+        queryset=PerfilProfessor.non_admin.all(),
         widget=forms.Select(attrs={"class": "form-control"}),
         label="Professor",
     )
@@ -327,43 +324,6 @@ class TurmaForm(forms.ModelForm):
                 raise forms.ValidationError(
                     f"Já existe uma turma de {disciplina.disciplina_nome} "
                     f"no período {periodo_letivo} no turno {turno}."
-                )
-
-        return cleaned_data
-
-
-class MatriculaTurmaForm(forms.ModelForm):
-    """
-    Form para matricular aluno em turma
-    """
-
-    aluno = forms.ModelChoiceField(
-        queryset=PerfilAluno.objects.all(),
-        widget=forms.Select(attrs={"class": "form-control"}),
-        label="Aluno",
-    )
-    turma = forms.ModelChoiceField(
-        queryset=Turma.objects.filter(status="ativa"),
-        widget=forms.Select(attrs={"class": "form-control"}),
-        label="Turma",
-    )
-
-    class Meta:
-        model = MatriculaTurma
-        fields = ["aluno", "turma"]
-
-    def clean(self):
-        cleaned_data = super().clean()
-        aluno = cleaned_data.get("aluno")
-        turma = cleaned_data.get("turma")
-
-        if aluno and turma:
-            # Verifica se aluno já está matriculado na turma
-            if MatriculaTurma.objects.filter(
-                aluno=aluno, turma=turma, status="ativa"
-            ).exists():
-                raise forms.ValidationError(
-                    f"O aluno {aluno.user.get_full_name()} já está matriculado nesta turma."
                 )
 
         return cleaned_data

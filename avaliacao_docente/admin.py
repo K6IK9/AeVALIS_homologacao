@@ -41,6 +41,7 @@ class CustomUserAdmin(DefaultUserAdmin):
         "last_name",
         "email",
         "get_user_role",
+        "get_user_profile",
         "is_active",
         "date_joined",
     )
@@ -60,11 +61,32 @@ class CustomUserAdmin(DefaultUserAdmin):
 
     get_user_role.short_description = "Role"
 
+    def get_user_profile(self, obj):
+        """Retorna o tipo de perfil do usuário"""
+        # Admins não devem ter perfis específicos
+        if has_role(obj, "admin"):
+            return "Admin (sem perfil)"
+
+        profiles = []
+        if hasattr(obj, "perfil_aluno"):
+            profiles.append("Aluno")
+        if hasattr(obj, "perfil_professor"):
+            profiles.append("Professor")
+
+        if profiles:
+            return " + ".join(profiles)
+        return "Sem perfil"
+
+    get_user_profile.short_description = "Perfil"
+
     def get_inlines(self, request, obj):
         """
         Mostra o inline apropriado baseado na role do usuário
+        Admins não devem ter perfis específicos
         """
-        if obj and has_role(obj, "aluno"):
+        if obj and has_role(obj, "admin"):
+            return []  # Admins não têm perfis
+        elif obj and has_role(obj, "aluno"):
             return [PerfilAlunoInline]
         elif obj and (has_role(obj, "professor") or has_role(obj, "coordenador")):
             return [PerfilProfessorInline]

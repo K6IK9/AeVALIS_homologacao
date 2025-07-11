@@ -12,7 +12,6 @@ from .forms import (
     DisciplinaForm,
     PeriodoLetivoForm,
     TurmaForm,
-    MatriculaTurmaForm,
 )
 from .models import (
     Avaliacao,
@@ -22,7 +21,6 @@ from .models import (
     Disciplina,
     PeriodoLetivo,
     Turma,
-    MatriculaTurma,
 )
 from django.contrib.auth.models import User
 
@@ -57,13 +55,12 @@ def gerenciar_roles(request):
             # Atribui a nova role
             assign_role(usuario, nova_role)
 
-            # Cria o perfil específico se necessário
-            if nova_role == "aluno":
-                PerfilAluno.objects.get_or_create(user=usuario)
-            elif nova_role == "professor" or nova_role == "coordenador":
-                PerfilProfessor.objects.get_or_create(
-                    user=usuario, defaults={"registro_academico": usuario.username}
-                )
+            # Gerenciar perfis usando função utilitária
+            mensagens_perfil = gerenciar_perfil_usuario(usuario, nova_role)
+
+            # Adicionar mensagens informativas sobre mudanças de perfil
+            for msg in mensagens_perfil:
+                messages.info(request, msg)
 
             messages.success(
                 request,
@@ -256,33 +253,6 @@ def gerenciar_turmas(request):
     return render(request, "gerenciar_turmas.html", context)
 
 
-""" @login_required
-def matricular_aluno_turma(request):
-
-    if not (has_role(request.user, "coordenador") or has_role(request.user, "admin")):
-        messages.error(request, "Você não tem permissão para acessar esta página.")
-        return redirect("inicio")
-
-    if request.method == "POST":
-        form = MatriculaTurmaForm(request.POST)
-        if form.is_valid():
-            matricula = form.save()
-            messages.success(
-                request,
-                f"Aluno {matricula.aluno.user.get_full_name()} matriculado na turma {matricula.turma.codigo_turma}!",
-            )
-            return redirect("gerenciar_turmas")
-        else:
-            for field, errors in form.errors.items():
-                for error in errors:
-                    messages.error(request, f"Erro: {error}")
-    else:
-        form = MatriculaTurmaForm()
-
-    context = {"form": form}
-    return render(request, "matricular_aluno.html", context) """
-
-
 # Pagina admin_hub
 class AdminHubView(LoginRequiredMixin, TemplateView):
     template_name = "admin/admin_hub.html"
@@ -370,121 +340,48 @@ def buscar_alunos_ajax(request):
     return JsonResponse({"resultados": []})
 
 
-@login_required
-def buscar_alunos_turma(request):
+def gerenciar_perfil_usuario(usuario, nova_role):
     """
-    View para buscar alunos disponíveis para matrícula em turma via AJAX
+    Função utilitária para gerenciar perfis de usuário baseado na role
+    Remove perfis incompatíveis e cria os necessários
     """
-    if not (has_role(request.user, "coordenador") or has_role(request.user, "admin")):
-        return JsonResponse({"error": "Sem permissão"}, status=403)
+    mensagens = []
 
-    turma_id = request.GET.get("turma_id")
-    busca = request.GET.get("busca", "")
+    if nova_role == "aluno":
+        # Se tinha perfil de professor, remover
+        if hasattr(usuario, "perfil_professor"):
+            usuario.perfil_professor.delete()
+            mensagens.append(f"Perfil de professor removido de {usuario.username}")
 
-    if not turma_id:
-        return JsonResponse({"error": "Turma não especificada"}, status=400)
+        # Criar ou manter perfil de aluno
+        perfil_aluno, created = PerfilAluno.objects.get_or_create(user=usuario)
+        if created:
+            mensagens.append(f"Perfil de aluno criado para {usuario.username}")
 
-    try:
-        turma = Turma.objects.get(id=turma_id)
-    except Turma.DoesNotExist:
-        return JsonResponse({"error": "Turma não encontrada"}, status=404)
+    elif nova_role in ["professor", "coordenador"]:
+        # Se tinha perfil de aluno, remover
+        if hasattr(usuario, "perfil_aluno"):
+            usuario.perfil_aluno.delete()
+            mensagens.append(f"Perfil de aluno removido de {usuario.username}")
 
-    # Buscar alunos
-    alunos_query = PerfilAluno.objects.select_related("user").all()
-
-    # Aplicar busca se especificada
-    if busca:
-        alunos_query = alunos_query.filter(
-            Q(user__first_name__icontains=busca)
-            | Q(user__last_name__icontains=busca)
-            | Q(user__username__icontains=busca)
+        # Criar ou manter perfil de professor
+        perfil_professor, created = PerfilProfessor.objects.get_or_create(
+            user=usuario, defaults={"registro_academico": usuario.username}
         )
+        if created:
+            mensagens.append(f"Perfil de professor criado para {usuario.username}")
 
-    # IDs dos alunos já matriculados nesta turma
-    matriculados_ids = set(
-        MatriculaTurma.objects.filter(turma=turma).values_list("aluno_id", flat=True)
-    )
+    elif nova_role == "admin":
+        # Admin não deve ter nenhum perfil específico
+        # Remover qualquer perfil existente
+        if hasattr(usuario, "perfil_professor"):
+            usuario.perfil_professor.delete()
+            mensagens.append(
+                f"Perfil de professor removido de admin {usuario.username}"
+            )
 
-    # Preparar dados dos alunos
-    alunos_data = []
-    for aluno in alunos_query[:50]:  # Limitar para performance
-        alunos_data.append(
-            {
-                "id": aluno.id,
-                "nome": aluno.user.get_full_name() or aluno.user.username,
-                "username": aluno.user.username,
-                "email": aluno.user.email,
-                "matriculado": aluno.id in matriculados_ids,
-            }
-        )
+        if hasattr(usuario, "perfil_aluno"):
+            usuario.perfil_aluno.delete()
+            mensagens.append(f"Perfil de aluno removido de admin {usuario.username}")
 
-    return JsonResponse(
-        {
-            "alunos": alunos_data,
-            "turma": {
-                "id": turma.id,
-                "codigo": turma.codigo_turma,
-                "disciplina": turma.disciplina.disciplina_nome,
-                "professor": turma.professor.user.get_full_name(),
-            },
-        }
-    )
-
-
-@login_required
-def matricular_alunos_massa(request):
-    """
-    View para matricular/desmatricular alunos em massa em uma turma
-    """
-    if not (has_role(request.user, "coordenador") or has_role(request.user, "admin")):
-        return JsonResponse({"error": "Sem permissão"}, status=403)
-
-    if request.method != "POST":
-        return JsonResponse({"error": "Método não permitido"}, status=405)
-
-    turma_id = request.POST.get("turma_id")
-    alunos_ids = request.POST.getlist("alunos_ids[]")
-    acao = request.POST.get("acao")  # 'matricular' ou 'desmatricular'
-
-    try:
-        turma = Turma.objects.get(id=turma_id)
-    except Turma.DoesNotExist:
-        return JsonResponse({"error": "Turma não encontrada"}, status=404)
-
-    if acao == "matricular":
-        # Matricular alunos selecionados
-        matriculados = 0
-        for aluno_id in alunos_ids:
-            try:
-                aluno = PerfilAluno.objects.get(id=aluno_id)
-                matricula, created = MatriculaTurma.objects.get_or_create(
-                    turma=turma, aluno=aluno, defaults={"status": "ativa"}
-                )
-                if created:
-                    matriculados += 1
-            except PerfilAluno.DoesNotExist:
-                continue
-
-        return JsonResponse(
-            {
-                "success": True,
-                "message": f"{matriculados} aluno(s) matriculado(s) com sucesso!",
-                "matriculados": matriculados,
-            }
-        )
-
-    elif acao == "desmatricular":
-        # Desmatricular alunos selecionados
-        desmatriculados = MatriculaTurma.objects.filter(
-            turma=turma, aluno_id__in=alunos_ids
-        ).delete()[0]
-
-        return JsonResponse(
-            {
-                "success": True,
-                "message": f"{desmatriculados} aluno(s) desmatriculado(s) com sucesso!",
-                "desmatriculados": desmatriculados,
-            }
-        )
-
-    return JsonResponse({"error": "Ação inválida"}, status=400)
+    return mensagens

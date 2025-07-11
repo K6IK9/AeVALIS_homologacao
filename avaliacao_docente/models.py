@@ -2,6 +2,48 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
+class PerfilProfessorManager(models.Manager):
+    """Manager customizado para excluir usuários admin"""
+
+    def get_queryset(self):
+        from rolepermissions.checkers import has_role
+
+        return (
+            super()
+            .get_queryset()
+            .exclude(
+                user__id__in=[
+                    user.id for user in User.objects.all() if has_role(user, "admin")
+                ]
+            )
+        )
+
+    def non_admin(self):
+        """Retorna apenas professores que não são admin"""
+        return self.get_queryset()
+
+
+class PerfilAlunoManager(models.Manager):
+    """Manager customizado para excluir usuários admin"""
+
+    def get_queryset(self):
+        from rolepermissions.checkers import has_role
+
+        return (
+            super()
+            .get_queryset()
+            .exclude(
+                user__id__in=[
+                    user.id for user in User.objects.all() if has_role(user, "admin")
+                ]
+            )
+        )
+
+    def non_admin(self):
+        """Retorna apenas alunos que não são admin"""
+        return self.get_queryset()
+
+
 class PerfilAluno(models.Model):
     """
     Extensão do modelo User para dados específicos de alunos
@@ -11,6 +53,11 @@ class PerfilAluno(models.Model):
         User, on_delete=models.CASCADE, related_name="perfil_aluno"
     )
     situacao = models.CharField(max_length=45, default="Ativo")
+
+    objects = models.Manager()  # Manager padrão
+    non_admin = PerfilAlunoManager()  # Manager que exclui admins
+
+    objects = PerfilAlunoManager()
 
     def __str__(self):
         return f"{self.user.get_full_name()} - {self.user.username}"
@@ -37,6 +84,11 @@ class PerfilProfessor(models.Model):
         User, on_delete=models.CASCADE, related_name="perfil_professor"
     )
     registro_academico = models.CharField(max_length=45)
+
+    objects = models.Manager()  # Manager padrão
+    non_admin = PerfilProfessorManager()  # Manager que exclui admins
+
+    objects = PerfilProfessorManager()
 
     def __str__(self):
         return f"{self.user.get_full_name()} ({self.registro_academico})"
@@ -194,6 +246,18 @@ class Turma(models.Model):
 
     def __str__(self):
         return f"{self.codigo_turma} - {self.disciplina.disciplina_nome}"
+
+    def count_alunos_matriculados(self):
+        """
+        Conta apenas alunos matriculados (exclui admins)
+        """
+        from rolepermissions.checkers import has_role
+
+        count = 0
+        for matricula in self.matriculas.filter(status="ativa"):
+            if not has_role(matricula.aluno.user, "admin"):
+                count += 1
+        return count
 
 
 class MatriculaTurma(models.Model):
