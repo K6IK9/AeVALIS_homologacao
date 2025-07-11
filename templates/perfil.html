@@ -1,5 +1,6 @@
 {% block content %}
 {% load static %}
+{% load user_tags %}
 <!-- Modal de Perfil -->
 <div id="modalPerfilOverlay" style="display:none;">
     <div id="modalPerfil">
@@ -7,105 +8,158 @@
         <section id="dados_modal">
             <aside id="aside_perfil_modal">
                 <img src="{% static 'assets/perfil.svg' %}" alt="Perfil">
+                <div class="role-badge {{ user|get_user_role_class }}">
+                    {{ user|get_user_role }}
+                </div>
             </aside>
-            <label class="infos_modal">
-                <img src="{% static 'assets/perfil.svg' %}" alt="Nome Usuário">
-                <p id="nome_usuario_modal">Nome: {{ user.first_name }} {{ user.last_name }}</p>
-            </label>
-            <label class="infos_modal">
-                <img src="{% static 'assets/perfil.svg' %}" alt="Matrícula">
-                <p id="matricula_usuario_modal">Matrícula: {{ user.username }}</p>
-            </label>
-            <label class="infos_modal">
-                <img src="{% static 'assets/email.svg' %}" alt="Email">
-                <p id="email_usuario_modal">Email: {{ user.email }}</p>
-            </label>
-
             
+            <div class="profile-header">
+                <h3>{{ user.first_name }} {{ user.last_name }}</h3>
+                <span class="profile-type">{{ user|get_user_profile_type }}</span>
+            </div>
+
+            <div class="profile-info-grid">
+                <label class="infos_modal">
+                    <img src="{% static 'assets/perfil.svg' %}" alt="Nome Usuário">
+                    <p id="nome_usuario_modal">
+                        <span class="info-label">Nome:</span>
+                        <span class="info-value">{{ user.first_name }} {{ user.last_name }}</span>
+                    </p>
+                </label>
+                <label class="infos_modal">
+                    <img src="{% static 'assets/perfil.svg' %}" alt="Matrícula">
+                    <p id="matricula_usuario_modal">
+                        <span class="info-label">Matrícula:</span>
+                        <span class="info-value">{{ user.username }}</span>
+                    </p>
+                </label>
+                <label class="infos_modal">
+                    <img src="{% static 'assets/email.svg' %}" alt="Email">
+                    <p id="email_usuario_modal">
+                        <span class="info-label">Email:</span>
+                        <span class="info-value">{{ user.email|default:"Não informado" }}</span>
+                    </p>
+                </label>
+            </div>
+
             <form method="post" action="{% url 'logout' %}">
                 {% csrf_token %}
-                <button type="submit" id="logout_modal" >Sair</button>
+                <button type="submit" id="logout_modal">
+                    <span>🚪</span>
+                    Sair do Sistema
+                </button>
             </form>
         </section>
     </div>
 </div>
 
 <style>
+    :root {
+        --cor01: #f1f1f1;
+        --cor02: #00fd94;
+        --cor03: #376f6c;
+        --cor04: #1e3231;
+        --cor05: #090909;
+        --cor06: #00cafd;
+        --cor07: #ffffff;
+        --cor08: #ff3c3c;
+        --shadow: 4px 2px 8px rgba(0, 0, 0, 0.2);
+        --gradient-primary: linear-gradient(135deg, var(--cor03) 0%, var(--cor04) 100%);
+        --gradient-secondary: linear-gradient(135deg, var(--cor02) 0%, var(--cor06) 100%);
+    }
+
     #modalPerfilOverlay {
         position: fixed;
         top: 0;
         left: 0;
         width: 100vw;
         height: 100vh;
-        background: rgba(0, 0, 0, 0.45);
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(5px);
         z-index: 2000;
         display: flex;
         align-items: center;
         justify-content: center;
+        animation: overlayFadeIn 0.3s ease-out;
+    }
+
+    @keyframes overlayFadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
     }
 
     #modalPerfil {
-        background: var(--cor07, #fff);
-        border-radius: 22px;
-        box-shadow: 0 8px 32px rgba(55, 111, 108, 0.18);
-        padding: 0 0 32px 0;
-        width: 40%;
-        min-height: 350px;
+        background: var(--cor07);
+        border-radius: 24px;
+        box-shadow: 0 20px 60px rgba(55, 111, 108, 0.25);
+        padding: 0;
+        width: 45%;
+        max-width: 800px;
+        min-width: 400px;
+        min-height: 480px;
         position: relative;
         display: flex;
         flex-direction: column;
         align-items: center;
-        animation: modalShow 0.25s;
+        animation: modalShow 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        
     }
 
     @keyframes modalShow {
         from {
-            transform: translateY(-40px) scale(0.98);
+            transform: translateY(-60px) scale(0.9);
             opacity: 0;
         }
-
         to {
-            transform: none;
+            transform: translateY(0) scale(1);
             opacity: 1;
         }
     }
 
     #fecharPerfil {
         position: absolute;
-        top: 18px;
-        right: 24px;
-        background: none;
+        top: 20px;
+        right: 20px;
+        background: rgba(255, 255, 255, 0.9);
         border: none;
-        font-size: 2.2rem;
-        color: var(--cor03, #376f6c);
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        font-size: 1.8rem;
+        color: var(--cor08);
         cursor: pointer;
         z-index: 10;
-        transition: color 0.2s;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
 
     #fecharPerfil:hover {
-        color: var(--cor08, #ff3c3c);
+        background: var(--cor08);
+        color: white;
+        transform: scale(1.1) rotate(90deg);
     }
 
     #dados_modal {
-        width: 560px;
-        max-width: 80vw;
+        width: 100%;
         display: flex;
         flex-direction: column;
-        gap: 22px;
+        gap: 20px;
         align-items: center;
-        background: var(--cor03, #376f6c);
-        border-radius: 18px;
-        box-shadow: var(--shadow, 2px 2px 10px rgba(0, 0, 0, 0.2));
-        padding: 90px 30px 30px 30px;
+        background: var(--gradient-primary);
+        border-radius: 24px;
+        padding: 120px 40px 40px 40px;
         position: relative;
+        min-height: 480px;
     }
 
     #aside_perfil_modal {
-        width: 110px;
-        height: 110px;
+        width: 120px;
+        height: 120px;
         border-radius: 50%;
-        background: var(--cor07, #fff);
+        background: var(--cor07);
         display: flex;
         justify-content: center;
         align-items: center;
@@ -113,11 +167,65 @@
         top: 0;
         left: 50%;
         transform: translate(-50%, -50%);
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        border: 4px solid var(--cor02);
     }
 
     #aside_perfil_modal img {
         width: 60px;
+        filter: brightness(0) saturate(100%) invert(22%) sepia(25%) saturate(1088%) hue-rotate(151deg) brightness(94%) contrast(90%);
+    }
+
+    .role-badge {
+        position: absolute;
+        bottom: -8px;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: white;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        border: 2px solid white;
+    }
+
+    .role-admin { background: linear-gradient(45deg, #dc3545, #e74c3c); }
+    .role-coordenador { background: linear-gradient(45deg, #6f42c1, #8e44ad); }
+    .role-professor { background: linear-gradient(45deg, #fd7e14, #f39c12); }
+    .role-aluno { background: linear-gradient(45deg, #198754, #27ae60); }
+    .role-sem-role { background: linear-gradient(45deg, #6c757d, #95a5a6); }
+
+    .profile-header {
+        text-align: center;
+        margin-bottom: 20px;
+        color: white;
+    }
+
+    .profile-header h3 {
+        font-size: 1.8rem;
+        font-weight: 600;
+        margin: 0 0 8px 0;
+        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .profile-type {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .profile-info-grid {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 16px;
     }
 
     .infos_modal {
@@ -125,54 +233,146 @@
         display: flex;
         align-items: center;
         position: relative;
-        margin-top: 10px;
+        cursor: default;
     }
 
     .infos_modal img {
-        width: 15px;
+        width: 18px;
         position: absolute;
-        left: 10px;
+        left: 16px;
         top: 50%;
         transform: translateY(-50%);
+        filter: brightness(0) saturate(100%) invert(22%) sepia(25%) saturate(1088%) hue-rotate(151deg) brightness(94%) contrast(90%);
     }
 
     .infos_modal p {
         width: 100%;
-        padding: 10px 10px 10px 35px;
-        border-radius: 6px;
+        padding: 16px 20px 16px 50px;
+        border-radius: 12px;
         border: none;
-        box-shadow: var(--shadow, 2px 2px 10px rgba(0, 0, 0, 0.08));
-        background: var(--cor07, #fff);
-        color: var(--cor03, #376f6c);
-        font-size: 1rem;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        color: var(--cor03);
+        font-size: 0.95rem;
         margin: 0;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .infos_modal:hover p {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        background: rgba(255, 255, 255, 1);
+    }
+
+    .info-label {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--cor04);
+        opacity: 0.8;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .info-value {
+        font-size: 1rem;
+        font-weight: 500;
+        color: var(--cor03);
     }
 
     #logout_modal {
-        width: 110px;
-        padding: 8px 0;
-        border-radius: 10px;
+        width: 200px;
+        padding: 14px 24px;
+        border-radius: 12px;
         border: none;
-        box-shadow: var(--shadow, 2px 2px 10px rgba(0, 0, 0, 0.08));
-        background: var(--cor08, #ff3c3c);
-        color: var(--cor05, #090909);
-        font-weight: bold;
+        background: var(--gradient-secondary);
+        color: var(--cor05);
+        font-weight: 700;
+        font-size: 1rem;
         cursor: pointer;
-        margin-top: 18px;
-        transition: background 0.2s;
+        margin-top: 20px;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        box-shadow: 0 6px 20px rgba(255, 60, 60, 0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        position: relative;
+        overflow: hidden;
+    }
+
+    #logout_modal::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+        transition: left 0.5s;
+    }
+
+    #logout_modal:hover::before {
+        left: 100%;
     }
 
     #logout_modal:hover {
-        background: #e02d2d;
+        background: linear-gradient(135deg, #ff3c3c, #e74c3c);
+        color: white;
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(255, 60, 60, 0.4);
     }
 
-    @media (max-width: 500px) {
+    #logout_modal span {
+        font-size: 1.2rem;
+    }
 
-        #modalPerfil,
-        #dados_modal {
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        #modalPerfil {
+            width: 90%;
             min-width: unset;
-            width: 95vw;
-            padding: 70px 5vw 20px 5vw;
+            margin: 20px;
+        }
+
+        #dados_modal {
+            padding: 100px 25px 30px 25px;
+        }
+
+        #aside_perfil_modal {
+            width: 100px;
+            height: 100px;
+        }
+
+        #aside_perfil_modal img {
+            width: 50px;
+        }
+
+        .profile-header h3 {
+            font-size: 1.5rem;
+        }
+
+        #logout_modal {
+            width: 180px;
+            padding: 12px 20px;
+            font-size: 0.9rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        #modalPerfil {
+            width: 95%;
+            margin: 10px;
+        }
+
+        #dados_modal {
+            padding: 80px 20px 25px 20px;
         }
 
         #aside_perfil_modal {
@@ -182,6 +382,26 @@
 
         #aside_perfil_modal img {
             width: 40px;
+        }
+
+        .profile-header h3 {
+            font-size: 1.3rem;
+        }
+
+        .infos_modal p {
+            padding: 14px 16px 14px 45px;
+            font-size: 0.9rem;
+        }
+
+        .infos_modal img {
+            width: 16px;
+            left: 14px;
+        }
+
+        #logout_modal {
+            width: 160px;
+            padding: 10px 16px;
+            font-size: 0.85rem;
         }
     }
 </style>
