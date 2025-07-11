@@ -12,6 +12,13 @@ urlpatterns = [
         name="gerenciar_disciplinas",
     ),
     path("gerenciar-periodos/", views.gerenciar_periodos, name="gerenciar_periodos"),
+    path("gerenciar-turmas/", views.gerenciar_turmas, name="gerenciar_turmas"),
+    path("buscar-alunos-turma/", views.buscar_alunos_turma, name="buscar_alunos_turma"),
+    path(
+        "matricular-alunos-massa/",
+        views.matricular_alunos_massa,
+        name="matricular_alunos_massa",
+    ),
     path("admin-hub/", views.AdminHubView.as_view(), name="admin_hub"),
     path("", IndexView.as_view(), name="inicio"),
 ]

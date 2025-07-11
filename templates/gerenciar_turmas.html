@@ -1,0 +1,835 @@
+{% load static %}
+{% load permission_tags %}
+
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IF SADD - Gerenciar Turmas</title>
+    <link rel="stylesheet" href="{% static 'styles/inicial.css' %}">
+    <style>
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: var(--cor03, #376f6c);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .form-section {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--cor03, #376f6c);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--cor02, #00fd94);
+        }
+
+        .btn {
+            background: var(--cor02, #00fd94);
+            color: var(--cor05, #090909);
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            background: var(--cor06, #00cafd);
+            transform: translateY(-2px);
+        }
+
+        .turmas-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .turmas-table th,
+        .turmas-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .turmas-table th {
+            background: var(--cor03, #376f6c);
+            color: white;
+            font-weight: 600;
+        }
+
+        .turmas-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .messages {
+            margin-bottom: 20px;
+        }
+
+        .message {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+
+        .back-button {
+            background: var(--cor03, #376f6c);
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            display: inline-block;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+
+        .back-button:hover {
+            background: var(--cor04, #1e3231);
+            transform: translateY(-2px);
+        }
+
+        .turma-count {
+            font-size: 0.9em;
+            color: var(--cor03, #376f6c);
+            margin-top: 10px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+
+        .status-ativa {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-finalizada {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .turno-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: 600;
+            background: #e2e3e5;
+            color: #495057;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .filters-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #dee2e6;
+        }
+
+        .filter-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr auto;
+            gap: 15px;
+            align-items: end;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-group label {
+            font-size: 0.9em;
+            font-weight: 600;
+            color: var(--cor03, #376f6c);
+            margin-bottom: 5px;
+        }
+
+        .btn-filter {
+            background: var(--cor03, #376f6c);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-filter:hover {
+            background: var(--cor04, #1e3231);
+        }
+
+        .alunos-management {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .alunos-management.active {
+            display: block;
+        }
+
+        .alunos-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .search-box {
+            position: relative;
+            max-width: 300px;
+            width: 100%;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 8px 12px 8px 35px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .search-box::before {
+            content: "🔍";
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 14px;
+        }
+
+        .bulk-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 0 2px;
+        }
+
+        .btn-select-all {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-select-all:hover {
+            background: #218838;
+        }
+
+        .btn-deselect-all {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-deselect-all:hover {
+            background: #5a6268;
+        }
+
+        .btn-save-selection {
+            background: var(--cor02, #00fd94);
+            color: var(--cor05, #090909);
+            font-weight: 600;
+        }
+
+        .btn-save-selection:hover {
+            background: var(--cor06, #00cafd);
+        }
+
+        .alunos-list {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+        }
+
+        .aluno-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background-color 0.2s;
+        }
+
+        .aluno-item:hover {
+            background: #f8f9fa;
+        }
+
+        .aluno-item:last-child {
+            border-bottom: none;
+        }
+
+        .aluno-checkbox {
+            margin-right: 12px;
+            transform: scale(1.2);
+        }
+
+        .aluno-info {
+            flex: 1;
+        }
+
+        .aluno-nome {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .aluno-matricula {
+            font-size: 0.85em;
+            color: #666;
+            margin-top: 2px;
+        }
+
+        .aluno-status {
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.75em;
+            font-weight: 600;
+        }
+
+        .status-matriculado {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-disponivel {
+            background: #e2e3e5;
+            color: #495057;
+        }
+
+        .turma-selected-info {
+            background: linear-gradient(135deg, var(--cor03, #376f6c), var(--cor04, #1e3231));
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .turma-selected-info h3 {
+            margin: 0 0 5px 0;
+            font-size: 1.1em;
+        }
+
+        .turma-selected-info p {
+            margin: 0;
+            opacity: 0.9;
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-row {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .alunos-header {
+                flex-direction: column;
+                gap: 10px;
+                align-items: stretch;
+            }
+
+            .bulk-actions {
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            .turmas-table {
+                font-size: 0.9em;
+            }
+
+            .turmas-table th,
+            .turmas-table td {
+                padding: 10px;
+            }
+
+            .section-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: stretch;
+            }
+
+            .section-header .btn {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <a href="{% url 'admin_hub' %}" class="back-button">← Voltar ao Início</a>
+        
+        <div class="header">
+            <h1>Gerenciamento de Turmas</h1>
+            <p>Crie e visualize as turmas do sistema por período letivo</p>
+        </div>
+
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="message {{ message.tags }}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="form-section">
+            <h2>Criar Nova Turma</h2>
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="{{ form.disciplina.id_for_label }}">{{ form.disciplina.label }}</label>
+                        {{ form.disciplina }}
+                        {% if form.disciplina.errors %}
+                            <div style="color: #dc3545; font-size: 0.875em; margin-top: 5px;">
+                                {% for error in form.disciplina.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.professor.id_for_label }}">{{ form.professor.label }}</label>
+                        {{ form.professor }}
+                        {% if form.professor.errors %}
+                            <div style="color: #dc3545; font-size: 0.875em; margin-top: 5px;">
+                                {% for error in form.professor.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="{{ form.periodo_letivo.id_for_label }}">{{ form.periodo_letivo.label }}</label>
+                        {{ form.periodo_letivo }}
+                        {% if form.periodo_letivo.errors %}
+                            <div style="color: #dc3545; font-size: 0.875em; margin-top: 5px;">
+                                {% for error in form.periodo_letivo.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.turno.id_for_label }}">{{ form.turno.label }}</label>
+                        {{ form.turno }}
+                        {% if form.turno.errors %}
+                            <div style="color: #dc3545; font-size: 0.875em; margin-top: 5px;">
+                                {% for error in form.turno.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {% if form.non_field_errors %}
+                    <div style="color: #dc3545; font-size: 0.875em; margin-bottom: 15px;">
+                        {% for error in form.non_field_errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                
+                <button type="submit" class="btn">Criar Turma</button>
+            </form>
+        </div>
+
+        <div class="form-section">
+            <div class="section-header">
+                <h2>Turmas Cadastradas</h2>
+            </div>
+            
+            <!-- Filtros -->
+            <div class="filters-section">
+                <h3 style="margin: 0 0 15px 0; color: var(--cor03, #376f6c);">Filtros e Busca</h3>
+                <form method="get" id="filtros-form">
+                    <div class="filter-row">
+                        <div class="filter-group">
+                            <label for="turno">Filtrar por Turno:</label>
+                            <select name="turno" id="turno" class="form-control" onchange="aplicarFiltros()">
+                                <option value="">Todos os turnos</option>
+                                <option value="matutino" {% if filtro_turno == 'matutino' %}selected{% endif %}>Matutino</option>
+                                <option value="vespertino" {% if filtro_turno == 'vespertino' %}selected{% endif %}>Vespertino</option>
+                                <option value="noturno" {% if filtro_turno == 'noturno' %}selected{% endif %}>Noturno</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="periodo">Filtrar por Período:</label>
+                            <select name="periodo" id="periodo" class="form-control" onchange="aplicarFiltros()">
+                                <option value="">Todos os períodos</option>
+                                {% for periodo in periodos_disponiveis %}
+                                <option value="{{ periodo.id }}" {% if filtro_periodo == periodo.id|stringformat:"s" %}selected{% endif %}>
+                                    {{ periodo.ano }}.{{ periodo.semestre }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="status">Filtrar por Status:</label>
+                            <select name="status" id="status" class="form-control" onchange="aplicarFiltros()">
+                                <option value="">Todos os status</option>
+                                <option value="ativa" {% if filtro_status == 'ativa' %}selected{% endif %}>Ativa</option>
+                                <option value="finalizada" {% if filtro_status == 'finalizada' %}selected{% endif %}>Finalizada</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <button type="button" class="btn-filter" onclick="limparFiltros()">Limpar Filtros</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="turma-count">
+                Total de turmas: <span id="turmas-count">{{ turmas.count }}</span>
+            </div>
+            <table class="turmas-table">
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Disciplina</th>
+                        <th>Professor</th>
+                        <th>Período</th>
+                        <th>Turno</th>
+                        <th>Status</th>
+                        <th>Matrículas</th>
+                        <th>Data Criação</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for turma in turmas %}
+                    <tr>
+                        <td><strong>{{ turma.codigo_turma }}</strong></td>
+                        <td>{{ turma.disciplina.disciplina_nome }}</td>
+                        <td>{{ turma.professor.user.get_full_name }}</td>
+                        <td>{{ turma.periodo_letivo.ano }}.{{ turma.periodo_letivo.semestre }}</td>
+                        <td>
+                            <span class="turno-badge">{{ turma.get_turno_display }}</span>
+                        </td>
+                        <td>
+                            <span class="status-badge status-{{ turma.status }}">
+                                {{ turma.get_status_display }}
+                            </span>
+                        </td>
+                        <td>{{ turma.matriculas.count }} alunos</td>
+                        <td>{{ turma.data_criacao|date:"d/m/Y H:i" }}</td>
+                        <td>
+                            <button class="btn-small btn-select-all" onclick="gerenciarAlunos({{ turma.id }})">
+                                Gerenciar Alunos
+                            </button>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="9" style="text-align: center; padding: 40px;">
+                            Nenhuma turma encontrada.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Seção de Gerenciamento de Alunos -->
+        <div id="alunos-management" class="alunos-management">
+            <div class="alunos-header">
+                <h3>Gerenciar Alunos da Turma</h3>
+                <button type="button" class="btn-filter" onclick="fecharGerenciamentoAlunos()">✕ Fechar</button>
+            </div>
+
+            <div id="turma-selected-info" class="turma-selected-info">
+                <!-- Informações da turma selecionada serão carregadas aqui -->
+            </div>
+
+            <div class="alunos-header">
+                <div class="search-box">
+                    <input type="text" id="busca-alunos" placeholder="Buscar alunos..." onkeyup="buscarAlunos()">
+                </div>
+                <div class="bulk-actions">
+                    <button type="button" class="btn-small btn-select-all" onclick="selecionarTodos()">Selecionar Todos</button>
+                    <button type="button" class="btn-small btn-deselect-all" onclick="deselecionarTodos()">Deselecionar Todos</button>
+                    <button type="button" class="btn-small btn-save-selection" onclick="matricularSelecionados()">Matricular Selecionados</button>
+                    <button type="button" class="btn-small" style="background: #dc3545; color: white;" onclick="desmatricularSelecionados()">Desmatricular Selecionados</button>
+                </div>
+            </div>
+
+            <div id="alunos-list" class="alunos-list">
+                <div style="text-align: center; padding: 40px; color: #666;">
+                    Carregando alunos...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let turmaAtual = null;
+        let alunosData = [];
+
+        function aplicarFiltros() {
+            document.getElementById('filtros-form').submit();
+        }
+
+        function limparFiltros() {
+            document.getElementById('turno').value = '';
+            document.getElementById('periodo').value = '';
+            document.getElementById('status').value = '';
+            aplicarFiltros();
+        }
+
+        function gerenciarAlunos(turmaId) {
+            turmaAtual = turmaId;
+            document.getElementById('alunos-management').classList.add('active');
+            carregarAlunos();
+        }
+
+        function fecharGerenciamentoAlunos() {
+            document.getElementById('alunos-management').classList.remove('active');
+            turmaAtual = null;
+            alunosData = [];
+        }
+
+        function carregarAlunos(busca = '') {
+            if (!turmaAtual) return;
+
+            const url = `{% url 'buscar_alunos_turma' %}?turma_id=${turmaAtual}&busca=${encodeURIComponent(busca)}`;
+            
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        alert('Erro: ' + data.error);
+                        return;
+                    }
+                    
+                    alunosData = data.alunos;
+                    atualizarInfoTurma(data.turma);
+                    renderizarAlunos();
+                })
+                .catch(error => {
+                    console.error('Erro:', error);
+                    alert('Erro ao carregar alunos');
+                });
+        }
+
+        function atualizarInfoTurma(turma) {
+            const infoDiv = document.getElementById('turma-selected-info');
+            infoDiv.innerHTML = `
+                <h3>${turma.codigo} - ${turma.disciplina}</h3>
+                <p>Professor: ${turma.professor}</p>
+            `;
+        }
+
+        function renderizarAlunos() {
+            const container = document.getElementById('alunos-list');
+            
+            if (alunosData.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #666;">
+                        Nenhum aluno encontrado
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = alunosData.map(aluno => `
+                <div class="aluno-item">
+                    <input type="checkbox" class="aluno-checkbox" value="${aluno.id}" 
+                           ${aluno.matriculado ? 'checked' : ''} 
+                           onchange="atualizarSelecao(${aluno.id}, this.checked)">
+                    <div class="aluno-info">
+                        <div class="aluno-nome">${aluno.nome}</div>
+                        <div class="aluno-matricula">Username: ${aluno.username} | Email: ${aluno.email}</div>
+                    </div>
+                    <span class="aluno-status ${aluno.matriculado ? 'status-matriculado' : 'status-disponivel'}">
+                        ${aluno.matriculado ? 'Matriculado' : 'Disponível'}
+                    </span>
+                </div>
+            `).join('');
+        }
+
+        function buscarAlunos() {
+            const busca = document.getElementById('busca-alunos').value;
+            carregarAlunos(busca);
+        }
+
+        function selecionarTodos() {
+            const checkboxes = document.querySelectorAll('.aluno-checkbox');
+            checkboxes.forEach(cb => {
+                cb.checked = true;
+                const alunoId = parseInt(cb.value);
+                const aluno = alunosData.find(a => a.id === alunoId);
+                if (aluno) aluno.selecionado = true;
+            });
+        }
+
+        function deselecionarTodos() {
+            const checkboxes = document.querySelectorAll('.aluno-checkbox');
+            checkboxes.forEach(cb => {
+                cb.checked = false;
+                const alunoId = parseInt(cb.value);
+                const aluno = alunosData.find(a => a.id === alunoId);
+                if (aluno) aluno.selecionado = false;
+            });
+        }
+
+        function atualizarSelecao(alunoId, selecionado) {
+            const aluno = alunosData.find(a => a.id === alunoId);
+            if (aluno) {
+                aluno.selecionado = selecionado;
+            }
+        }
+
+        function matricularSelecionados() {
+            const selecionados = alunosData.filter(a => 
+                document.querySelector(`input[value="${a.id}"]`).checked && !a.matriculado
+            );
+            
+            if (selecionados.length === 0) {
+                alert('Selecione pelo menos um aluno não matriculado');
+                return;
+            }
+
+            if (!confirm(`Matricular ${selecionados.length} aluno(s)?`)) {
+                return;
+            }
+
+            executarAcaoMassa('matricular', selecionados.map(a => a.id));
+        }
+
+        function desmatricularSelecionados() {
+            const selecionados = alunosData.filter(a => 
+                document.querySelector(`input[value="${a.id}"]`).checked && a.matriculado
+            );
+            
+            if (selecionados.length === 0) {
+                alert('Selecione pelo menos um aluno matriculado');
+                return;
+            }
+
+            if (!confirm(`Desmatricular ${selecionados.length} aluno(s)?`)) {
+                return;
+            }
+
+            executarAcaoMassa('desmatricular', selecionados.map(a => a.id));
+        }
+
+        function executarAcaoMassa(acao, alunosIds) {
+            const formData = new FormData();
+            formData.append('turma_id', turmaAtual);
+            formData.append('acao', acao);
+            alunosIds.forEach(id => formData.append('alunos_ids[]', id));
+            formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+
+            fetch('{% url "matricular_alunos_massa" %}', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    carregarAlunos(); // Recarregar lista
+                    // Atualizar contagem na tabela principal
+                    location.reload();
+                } else {
+                    alert('Erro: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+                alert('Erro ao processar ação');
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,7 +1,17 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import Curso, PerfilProfessor, Disciplina, PeriodoLetivo
+from .models import (
+    Curso,
+    PerfilProfessor,
+    Disciplina,
+    PeriodoLetivo,
+    Turma,
+    MatriculaTurma,
+    PerfilAluno,
+    Turma,
+    MatriculaTurma,
+)
 
 
 class RegistroForm(UserCreationForm):
@@ -261,6 +271,99 @@ class PeriodoLetivoForm(forms.ModelForm):
             if PeriodoLetivo.objects.filter(ano=ano, semestre=semestre).exists():
                 raise forms.ValidationError(
                     f"Já existe um período cadastrado para {ano}.{semestre}"
+                )
+
+        return cleaned_data
+
+
+class TurmaForm(forms.ModelForm):
+    """
+    Form para criação e edição de turmas
+    """
+
+    disciplina = forms.ModelChoiceField(
+        queryset=Disciplina.objects.all(),
+        widget=forms.Select(attrs={"class": "form-control"}),
+        label="Disciplina",
+    )
+    professor = forms.ModelChoiceField(
+        queryset=PerfilProfessor.objects.all(),
+        widget=forms.Select(attrs={"class": "form-control"}),
+        label="Professor",
+    )
+    periodo_letivo = forms.ModelChoiceField(
+        queryset=PeriodoLetivo.objects.all(),
+        widget=forms.Select(attrs={"class": "form-control"}),
+        label="Período Letivo",
+    )
+    turno = forms.ChoiceField(
+        choices=[("", "--- Selecione ---")] + Turma.TURNO_CHOICES,
+        widget=forms.Select(attrs={"class": "form-control"}),
+        label="Turno",
+    )
+
+    class Meta:
+        model = Turma
+        fields = [
+            "disciplina",
+            "professor",
+            "periodo_letivo",
+            "turno",
+        ]
+
+    def clean(self):
+        cleaned_data = super().clean()
+        disciplina = cleaned_data.get("disciplina")
+        periodo_letivo = cleaned_data.get("periodo_letivo")
+        turno = cleaned_data.get("turno")
+
+        if disciplina and periodo_letivo and turno:
+            # Verifica se já existe uma turma para essa disciplina no mesmo período e turno
+            if Turma.objects.filter(
+                disciplina=disciplina,
+                periodo_letivo=periodo_letivo,
+                turno=turno,
+            ).exists():
+                raise forms.ValidationError(
+                    f"Já existe uma turma de {disciplina.disciplina_nome} "
+                    f"no período {periodo_letivo} no turno {turno}."
+                )
+
+        return cleaned_data
+
+
+class MatriculaTurmaForm(forms.ModelForm):
+    """
+    Form para matricular aluno em turma
+    """
+
+    aluno = forms.ModelChoiceField(
+        queryset=PerfilAluno.objects.all(),
+        widget=forms.Select(attrs={"class": "form-control"}),
+        label="Aluno",
+    )
+    turma = forms.ModelChoiceField(
+        queryset=Turma.objects.filter(status="ativa"),
+        widget=forms.Select(attrs={"class": "form-control"}),
+        label="Turma",
+    )
+
+    class Meta:
+        model = MatriculaTurma
+        fields = ["aluno", "turma"]
+
+    def clean(self):
+        cleaned_data = super().clean()
+        aluno = cleaned_data.get("aluno")
+        turma = cleaned_data.get("turma")
+
+        if aluno and turma:
+            # Verifica se aluno já está matriculado na turma
+            if MatriculaTurma.objects.filter(
+                aluno=aluno, turma=turma, status="ativa"
+            ).exists():
+                raise forms.ValidationError(
+                    f"O aluno {aluno.user.get_full_name()} já está matriculado nesta turma."
                 )
 
         return cleaned_data

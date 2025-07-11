@@ -149,3 +149,107 @@ class RespostaAluno(models.Model):
 
     def __str__(self):
         return f"{self.aluno} respondeu '{self.resposta_pergunta[:30]}...'"
+
+
+class Turma(models.Model):
+    """
+    Modelo principal para gerenciar turmas
+    """
+
+    TURNO_CHOICES = [
+        ("matutino", "Matutino"),
+        ("vespertino", "Vespertino"),
+        ("noturno", "Noturno"),
+    ]
+
+    STATUS_CHOICES = [
+        ("ativa", "Ativa"),
+        ("finalizada", "Finalizada"),
+    ]
+
+    codigo_turma = models.CharField(max_length=20, unique=True)  # Ex: "INFO3A-2024.1"
+    disciplina = models.ForeignKey(
+        Disciplina, on_delete=models.CASCADE, related_name="turmas"
+    )
+    professor = models.ForeignKey(
+        PerfilProfessor, on_delete=models.CASCADE, related_name="turmas"
+    )
+    periodo_letivo = models.ForeignKey(
+        PeriodoLetivo, on_delete=models.CASCADE, related_name="turmas"
+    )
+
+    turno = models.CharField(max_length=15, choices=TURNO_CHOICES)
+    status = models.CharField(max_length=15, choices=STATUS_CHOICES, default="ativa")
+    data_criacao = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ["disciplina", "periodo_letivo", "turno"]
+        ordering = ["periodo_letivo", "disciplina__disciplina_nome"]
+
+    def save(self, *args, **kwargs):
+        # Auto-gera código da turma se não existir
+        if not self.codigo_turma:
+            self.codigo_turma = f"{self.disciplina.disciplina_sigla}-{self.periodo_letivo.ano}.{self.periodo_letivo.semestre}-{self.turno[:3].upper()}"
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.codigo_turma} - {self.disciplina.disciplina_nome}"
+
+
+class MatriculaTurma(models.Model):
+    """
+    Relacionamento entre alunos e turmas (matrícula)
+    """
+
+    STATUS_MATRICULA_CHOICES = [
+        ("ativa", "Ativa"),
+        ("trancada", "Trancada"),
+        ("cancelada", "Cancelada"),
+        ("concluida", "Concluída"),
+    ]
+
+    aluno = models.ForeignKey(
+        PerfilAluno, on_delete=models.CASCADE, related_name="matriculas"
+    )
+    turma = models.ForeignKey(
+        Turma, on_delete=models.CASCADE, related_name="matriculas"
+    )
+
+    data_matricula = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(
+        max_length=15, choices=STATUS_MATRICULA_CHOICES, default="ativa"
+    )
+
+    class Meta:
+        unique_together = ["aluno", "turma"]
+        ordering = ["data_matricula"]
+
+    def __str__(self):
+        return f"{self.aluno.user.get_full_name()} em {self.turma.codigo_turma}"
+
+
+class HorarioTurma(models.Model):
+    """
+    Horários das aulas da turma
+    """
+
+    DIAS_SEMANA_CHOICES = [
+        (1, "Segunda-feira"),
+        (2, "Terça-feira"),
+        (3, "Quarta-feira"),
+        (4, "Quinta-feira"),
+        (5, "Sexta-feira"),
+        (6, "Sábado"),
+    ]
+
+    turma = models.ForeignKey(Turma, on_delete=models.CASCADE, related_name="horarios")
+    dia_semana = models.IntegerField(choices=DIAS_SEMANA_CHOICES)
+    hora_inicio = models.TimeField()
+    hora_fim = models.TimeField()
+
+    class Meta:
+        unique_together = ["turma", "dia_semana", "hora_inicio"]
+        ordering = ["dia_semana", "hora_inicio"]
+
+    def __str__(self):
+        return f"{self.turma.codigo_turma} - {self.get_dia_semana_display()} {self.hora_inicio}-{self.hora_fim}"

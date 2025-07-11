@@ -12,6 +12,9 @@ from .models import (
     AvaliacaoPergunta,
     RespostaAluno,
     PeriodoLetivo,
+    Turma,
+    MatriculaTurma,
+    HorarioTurma,
 )
 
 
@@ -78,6 +81,9 @@ admin.site.register(PerfilProfessor)
 admin.site.register(Curso)
 admin.site.register(Disciplina)
 admin.site.register(PeriodoLetivo)
+admin.site.register(Turma)
+admin.site.register(MatriculaTurma)
+admin.site.register(HorarioTurma)
 admin.site.register(Avaliacao)
 admin.site.register(Pergunta)
 admin.site.register(AvaliacaoPergunta)

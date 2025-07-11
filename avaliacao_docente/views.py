@@ -11,6 +11,8 @@ from .forms import (
     CursoForm,
     DisciplinaForm,
     PeriodoLetivoForm,
+    TurmaForm,
+    MatriculaTurmaForm,
 )
 from .models import (
     Avaliacao,
@@ -19,10 +21,13 @@ from .models import (
     Curso,
     Disciplina,
     PeriodoLetivo,
+    Turma,
+    MatriculaTurma,
 )
 from django.contrib.auth.models import User
 
 from django.http import JsonResponse
+from django.db.models import Q
 from rolepermissions.roles import assign_role, remove_role
 from rolepermissions.checkers import has_role
 from django.contrib import messages
@@ -184,6 +189,100 @@ def gerenciar_periodos(request):
     return render(request, "gerenciar_periodos.html", context)
 
 
+@login_required
+def gerenciar_turmas(request):
+    """
+    View para gerenciar turmas com filtros
+    Apenas coordenadores e admins podem acessar
+    """
+    if not (has_role(request.user, "coordenador") or has_role(request.user, "admin")):
+        messages.error(request, "Você não tem permissão para acessar esta página.")
+        return redirect("inicio")
+
+    # Filtros da requisição
+    filtro_turno = request.GET.get("turno", "")
+    filtro_periodo = request.GET.get("periodo", "")
+    filtro_status = request.GET.get("status", "")
+
+    if request.method == "POST":
+        form = TurmaForm(request.POST)
+        if form.is_valid():
+            turma = form.save()
+            messages.success(
+                request,
+                f"Turma '{turma.codigo_turma}' criada com sucesso!",
+            )
+            return redirect("gerenciar_turmas")
+        else:
+            # Debug: Mostra os erros do formulário
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"Erro no campo {field}: {error}")
+            messages.error(request, "Verifique os dados do formulário.")
+    else:
+        form = TurmaForm()
+
+    # Base queryset
+    turmas = (
+        Turma.objects.select_related("disciplina", "professor", "periodo_letivo")
+        .prefetch_related("matriculas")
+        .order_by(
+            "-periodo_letivo__ano",
+            "-periodo_letivo__semestre",
+            "disciplina__disciplina_nome",
+        )
+    )
+
+    # Aplicar filtros
+    if filtro_turno:
+        turmas = turmas.filter(turno=filtro_turno)
+    if filtro_periodo:
+        turmas = turmas.filter(periodo_letivo_id=filtro_periodo)
+    if filtro_status:
+        turmas = turmas.filter(status=filtro_status)
+
+    # Períodos disponíveis para o filtro
+    periodos_disponiveis = PeriodoLetivo.objects.all().order_by("-ano", "-semestre")
+
+    context = {
+        "form": form,
+        "turmas": turmas,
+        "periodos_disponiveis": periodos_disponiveis,
+        "filtro_turno": filtro_turno,
+        "filtro_periodo": filtro_periodo,
+        "filtro_status": filtro_status,
+    }
+
+    return render(request, "gerenciar_turmas.html", context)
+
+
+""" @login_required
+def matricular_aluno_turma(request):
+
+    if not (has_role(request.user, "coordenador") or has_role(request.user, "admin")):
+        messages.error(request, "Você não tem permissão para acessar esta página.")
+        return redirect("inicio")
+
+    if request.method == "POST":
+        form = MatriculaTurmaForm(request.POST)
+        if form.is_valid():
+            matricula = form.save()
+            messages.success(
+                request,
+                f"Aluno {matricula.aluno.user.get_full_name()} matriculado na turma {matricula.turma.codigo_turma}!",
+            )
+            return redirect("gerenciar_turmas")
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"Erro: {error}")
+    else:
+        form = MatriculaTurmaForm()
+
+    context = {"form": form}
+    return render(request, "matricular_aluno.html", context) """
+
+
 # Pagina admin_hub
 class AdminHubView(LoginRequiredMixin, TemplateView):
     template_name = "admin/admin_hub.html"
@@ -242,3 +341,150 @@ def get_perfil_aluno_from_user(user):
         return user.perfil_aluno
     except PerfilAluno.DoesNotExist:
         return None
+
+
+@login_required
+def buscar_alunos_ajax(request):
+    """
+    View para buscar alunos via AJAX
+    """
+    if request.is_ajax and request.method == "GET":
+        termo = request.GET.get("termo", "")
+        alunos = (
+            PerfilAluno.objects.filter(
+                Q(user__first_name__icontains=termo)
+                | Q(user__last_name__icontains=termo)
+                | Q(user__username__icontains=termo)
+            )
+            .select_related("user")
+            .distinct()
+        )
+
+        resultados = [
+            {"id": aluno.user.id, "nome": aluno.user.get_full_name()}
+            for aluno in alunos
+        ]
+
+        return JsonResponse({"resultados": resultados})
+
+    return JsonResponse({"resultados": []})
+
+
+@login_required
+def buscar_alunos_turma(request):
+    """
+    View para buscar alunos disponíveis para matrícula em turma via AJAX
+    """
+    if not (has_role(request.user, "coordenador") or has_role(request.user, "admin")):
+        return JsonResponse({"error": "Sem permissão"}, status=403)
+
+    turma_id = request.GET.get("turma_id")
+    busca = request.GET.get("busca", "")
+
+    if not turma_id:
+        return JsonResponse({"error": "Turma não especificada"}, status=400)
+
+    try:
+        turma = Turma.objects.get(id=turma_id)
+    except Turma.DoesNotExist:
+        return JsonResponse({"error": "Turma não encontrada"}, status=404)
+
+    # Buscar alunos
+    alunos_query = PerfilAluno.objects.select_related("user").all()
+
+    # Aplicar busca se especificada
+    if busca:
+        alunos_query = alunos_query.filter(
+            Q(user__first_name__icontains=busca)
+            | Q(user__last_name__icontains=busca)
+            | Q(user__username__icontains=busca)
+        )
+
+    # IDs dos alunos já matriculados nesta turma
+    matriculados_ids = set(
+        MatriculaTurma.objects.filter(turma=turma).values_list("aluno_id", flat=True)
+    )
+
+    # Preparar dados dos alunos
+    alunos_data = []
+    for aluno in alunos_query[:50]:  # Limitar para performance
+        alunos_data.append(
+            {
+                "id": aluno.id,
+                "nome": aluno.user.get_full_name() or aluno.user.username,
+                "username": aluno.user.username,
+                "email": aluno.user.email,
+                "matriculado": aluno.id in matriculados_ids,
+            }
+        )
+
+    return JsonResponse(
+        {
+            "alunos": alunos_data,
+            "turma": {
+                "id": turma.id,
+                "codigo": turma.codigo_turma,
+                "disciplina": turma.disciplina.disciplina_nome,
+                "professor": turma.professor.user.get_full_name(),
+            },
+        }
+    )
+
+
+@login_required
+def matricular_alunos_massa(request):
+    """
+    View para matricular/desmatricular alunos em massa em uma turma
+    """
+    if not (has_role(request.user, "coordenador") or has_role(request.user, "admin")):
+        return JsonResponse({"error": "Sem permissão"}, status=403)
+
+    if request.method != "POST":
+        return JsonResponse({"error": "Método não permitido"}, status=405)
+
+    turma_id = request.POST.get("turma_id")
+    alunos_ids = request.POST.getlist("alunos_ids[]")
+    acao = request.POST.get("acao")  # 'matricular' ou 'desmatricular'
+
+    try:
+        turma = Turma.objects.get(id=turma_id)
+    except Turma.DoesNotExist:
+        return JsonResponse({"error": "Turma não encontrada"}, status=404)
+
+    if acao == "matricular":
+        # Matricular alunos selecionados
+        matriculados = 0
+        for aluno_id in alunos_ids:
+            try:
+                aluno = PerfilAluno.objects.get(id=aluno_id)
+                matricula, created = MatriculaTurma.objects.get_or_create(
+                    turma=turma, aluno=aluno, defaults={"status": "ativa"}
+                )
+                if created:
+                    matriculados += 1
+            except PerfilAluno.DoesNotExist:
+                continue
+
+        return JsonResponse(
+            {
+                "success": True,
+                "message": f"{matriculados} aluno(s) matriculado(s) com sucesso!",
+                "matriculados": matriculados,
+            }
+        )
+
+    elif acao == "desmatricular":
+        # Desmatricular alunos selecionados
+        desmatriculados = MatriculaTurma.objects.filter(
+            turma=turma, aluno_id__in=alunos_ids
+        ).delete()[0]
+
+        return JsonResponse(
+            {
+                "success": True,
+                "message": f"{desmatriculados} aluno(s) desmatriculado(s) com sucesso!",
+                "desmatriculados": desmatriculados,
+            }
+        )
+
+    return JsonResponse({"error": "Ação inválida"}, status=400)
