@@ -21,6 +21,7 @@ from .models import (
     Disciplina,
     PeriodoLetivo,
     Turma,
+    MatriculaTurma,
 )
 from django.contrib.auth.models import User
 
@@ -385,3 +386,139 @@ def gerenciar_perfil_usuario(usuario, nova_role):
             mensagens.append(f"Perfil de aluno removido de admin {usuario.username}")
 
     return mensagens
+
+
+@login_required
+def buscar_alunos_turma(request):
+    """
+    View para buscar alunos para gerenciamento de turmas via AJAX
+    """
+    if not (has_role(request.user, "coordenador") or has_role(request.user, "admin")):
+        return JsonResponse({"error": "Sem permissão"}, status=403)
+
+    turma_id = request.GET.get("turma_id")
+    busca = request.GET.get("busca", "")
+
+    try:
+        turma = get_object_or_404(Turma, id=turma_id)
+
+        # Buscar todos os alunos
+        alunos_query = PerfilAluno.objects.select_related("user").all()
+
+        if busca:
+            alunos_query = alunos_query.filter(
+                Q(user__first_name__icontains=busca)
+                | Q(user__last_name__icontains=busca)
+                | Q(user__username__icontains=busca)
+                | Q(user__email__icontains=busca)
+            )
+
+        # Verificar quais alunos estão matriculados na turma
+        matriculas_ativas = MatriculaTurma.objects.filter(
+            turma=turma, status="ativa"
+        ).values_list("aluno_id", flat=True)
+
+        alunos_data = []
+        for aluno in alunos_query.order_by("user__first_name", "user__last_name"):
+            alunos_data.append(
+                {
+                    "id": aluno.user.id,
+                    "nome": aluno.user.get_full_name() or aluno.user.username,
+                    "username": aluno.user.username,
+                    "email": aluno.user.email or "Não informado",
+                    "matriculado": aluno.id in matriculas_ativas,
+                }
+            )
+
+        turma_data = {
+            "codigo": turma.codigo_turma,
+            "disciplina": turma.disciplina.disciplina_nome,
+            "professor": turma.professor.user.get_full_name(),
+        }
+
+        return JsonResponse(
+            {
+                "success": True,
+                "alunos": alunos_data,
+                "turma": turma_data,
+            }
+        )
+
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
+
+
+@login_required
+def matricular_alunos_massa(request):
+    """
+    View para matricular/desmatricular alunos em massa via AJAX
+    """
+    if not (has_role(request.user, "coordenador") or has_role(request.user, "admin")):
+        return JsonResponse({"error": "Sem permissão"}, status=403)
+
+    if request.method != "POST":
+        return JsonResponse({"error": "Método não permitido"}, status=405)
+
+    try:
+        turma_id = request.POST.get("turma_id")
+        acao = request.POST.get("acao")  # 'matricular' ou 'desmatricular'
+        alunos_ids = request.POST.getlist("alunos_ids[]")
+
+        if not turma_id or not acao or not alunos_ids:
+            return JsonResponse({"error": "Dados incompletos"}, status=400)
+
+        turma = get_object_or_404(Turma, id=turma_id)
+
+        # Buscar os perfis de aluno pelos IDs dos usuários
+        usuarios = User.objects.filter(id__in=alunos_ids)
+        alunos = PerfilAluno.objects.filter(user__in=usuarios)
+
+        sucesso_count = 0
+        erro_count = 0
+
+        for aluno in alunos:
+            try:
+                if acao == "matricular":
+                    matricula, created = MatriculaTurma.objects.get_or_create(
+                        aluno=aluno, turma=turma, defaults={"status": "ativa"}
+                    )
+                    if created:
+                        sucesso_count += 1
+                    else:
+                        # Se já existe, ativar se estiver inativa
+                        if matricula.status != "ativa":
+                            matricula.status = "ativa"
+                            matricula.save()
+                            sucesso_count += 1
+
+                elif acao == "desmatricular":
+                    matriculas = MatriculaTurma.objects.filter(
+                        aluno=aluno, turma=turma, status="ativa"
+                    )
+                    if matriculas.exists():
+                        matriculas.update(status="cancelada")
+                        sucesso_count += 1
+
+            except Exception as e:
+                erro_count += 1
+                print(f"Erro ao processar aluno {aluno.user.username}: {e}")
+
+        if acao == "matricular":
+            message = f"{sucesso_count} aluno(s) matriculado(s) com sucesso"
+        else:
+            message = f"{sucesso_count} aluno(s) desmatriculado(s) com sucesso"
+
+        if erro_count > 0:
+            message += f" ({erro_count} erro(s))"
+
+        return JsonResponse(
+            {
+                "success": True,
+                "message": message,
+                "sucesso_count": sucesso_count,
+                "erro_count": erro_count,
+            }
+        )
+
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)

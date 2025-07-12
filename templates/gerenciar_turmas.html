@@ -227,6 +227,231 @@
             background: var(--cor04, #1e3231);
         }
 
+        /* Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            backdrop-filter: blur(3px);
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .alunos-management {
+            background: white;
+            border-radius: 15px;
+            padding: 0;
+            margin: 20px;
+            max-width: 900px;
+            width: 90%;
+            max-height: 90vh;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { 
+                opacity: 0;
+                transform: translateY(-30px) scale(0.95);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .alunos-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 20px 20px 15px 20px;
+            border-bottom: 1px solid #dee2e6;
+            background: linear-gradient(135deg, var(--cor03, #376f6c), var(--cor04, #1e3231));
+            color: white;
+            border-radius: 15px 15px 0 0;
+        }
+
+        .alunos-header h3 {
+            margin: 0;
+            font-size: 1.2em;
+        }
+
+        .btn-close-modal {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .btn-close-modal:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.05);
+        }
+
+        .modal-content {
+            padding: 20px;
+            max-height: calc(90vh - 140px);
+            overflow-y: auto;
+        }
+
+        .alunos-header.controls {
+            background: #f8f9fa;
+            color: #333;
+            border-radius: 0;
+            border-top: 1px solid #dee2e6;
+            margin-bottom: 0;
+            padding: 15px 20px;
+        }
+
+        .search-box {
+            position: relative;
+            max-width: 300px;
+            width: 100%;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 8px 12px 8px 35px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .search-box::before {
+            content: "🔍";
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 14px;
+        }
+
+        .bulk-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 0 2px;
+        }
+
+        .btn-save-selection {
+            background: var(--cor02, #00fd94);
+            color: var(--cor05, #090909);
+            font-weight: 600;
+        }
+
+        .btn-save-selection:hover {
+            background: var(--cor06, #00cafd);
+        }
+
+        .alunos-list {
+            max-height: 350px;
+            overflow-y: auto;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            margin-bottom: 0;
+        }
+
+        .aluno-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background-color 0.2s;
+        }
+
+        .aluno-item:hover {
+            background: #f8f9fa;
+        }
+
+        .aluno-item:last-child {
+            border-bottom: none;
+        }
+
+        .aluno-checkbox {
+            margin-right: 12px;
+            transform: scale(1.2);
+        }
+
+        .aluno-info {
+            flex: 1;
+        }
+
+        .aluno-nome {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .aluno-matricula {
+            font-size: 0.85em;
+            color: #666;
+            margin-top: 2px;
+        }
+
+        .aluno-status {
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.75em;
+            font-weight: 600;
+        }
+
+        .status-matriculado {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-disponivel {
+            background: #e2e3e5;
+            color: #495057;
+        }
+
+        .turma-selected-info {
+            background: linear-gradient(135deg, var(--cor03, #376f6c), var(--cor04, #1e3231));
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .turma-selected-info h3 {
+            margin: 0 0 5px 0;
+            font-size: 1.1em;
+        }
+
+        .turma-selected-info p {
+            margin: 0;
+            opacity: 0.9;
+            font-size: 0.9em;
+        }
+
         @media (max-width: 768px) {
             .form-row {
                 grid-template-columns: 1fr;
@@ -235,6 +460,34 @@
             .filter-row {
                 grid-template-columns: 1fr;
                 gap: 10px;
+            }
+
+            .alunos-header {
+                flex-direction: column;
+                gap: 10px;
+                align-items: stretch;
+                padding: 15px;
+            }
+
+            .alunos-header.controls {
+                padding: 15px;
+            }
+
+            .bulk-actions {
+                justify-content: center;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            .alunos-management {
+                margin: 10px;
+                width: calc(100% - 20px);
+                max-height: 95vh;
+            }
+
+            .modal-content {
+                max-height: calc(95vh - 120px);
+                padding: 15px;
             }
 
             .turmas-table {
@@ -405,6 +658,7 @@
                         <th>Status</th>
                         <th>Matrículas</th>
                         <th>Data Criação</th>
+                        <th>Ações</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -422,12 +676,17 @@
                                 {{ turma.get_status_display }}
                             </span>
                         </td>
-                        <td>{{ turma.count_alunos_matriculados }} alunos</td>
+                        <td>{{ turma.matriculas.count }} alunos</td>
                         <td>{{ turma.data_criacao|date:"d/m/Y H:i" }}</td>
+                        <td>
+                            <button class="btn-small btn-select-all" onclick="gerenciarAlunos({{ turma.id }})">
+                                Gerenciar Alunos
+                            </button>
+                        </td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="8" style="text-align: center; padding: 40px;">
+                        <td colspan="9" style="text-align: center; padding: 40px;">
                             Nenhuma turma encontrada.
                         </td>
                     </tr>
@@ -435,9 +694,53 @@
                 </tbody>
             </table>
         </div>
+
+        <!-- Modal de Gerenciamento de Alunos -->
+        <div id="modal-overlay" class="modal-overlay" onclick="fecharGerenciamentoAlunos(event)">
+            <div id="alunos-management" class="alunos-management" onclick="event.stopPropagation()">
+                <div class="alunos-header">
+                    <h3>Gerenciar Alunos da Turma</h3>
+                    <button type="button" class="btn-close-modal" onclick="fecharGerenciamentoAlunos()">
+                        ✕ Fechar
+                    </button>
+                </div>
+
+                <div class="modal-content">
+                    <div id="turma-selected-info" class="turma-selected-info">
+                        <!-- Informações da turma selecionada serão carregadas aqui -->
+                    </div>
+
+                    <div class="alunos-header controls">
+                        <div class="search-box">
+                            <input type="text" id="busca-alunos" placeholder="Buscar alunos..." onkeyup="buscarAlunos()">
+                        </div>
+                        <div class="bulk-actions">
+                            <button type="button" class="btn-small btn-save-selection" onclick="matricularSelecionados()">Matricular Selecionados</button>
+                            <button type="button" class="btn-small" style="background: #dc3545; color: white;" onclick="desmatricularSelecionados()">Desmatricular Selecionados</button>
+                        </div>
+                    </div>
+
+                    <div id="alunos-list" class="alunos-list">
+                        <div style="text-align: center; padding: 40px; color: #666;">
+                            Carregando alunos...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
+        let turmaAtual = null;
+        let alunosData = [];
+
+        // Fechar modal com tecla Escape
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                fecharGerenciamentoAlunos();
+            }
+        });
+
         function aplicarFiltros() {
             document.getElementById('filtros-form').submit();
         }
@@ -447,6 +750,159 @@
             document.getElementById('periodo').value = '';
             document.getElementById('status').value = '';
             aplicarFiltros();
+        }
+
+        function gerenciarAlunos(turmaId) {
+            turmaAtual = turmaId;
+            document.getElementById('modal-overlay').classList.add('active');
+            carregarAlunos();
+        }
+
+        function fecharGerenciamentoAlunos(event) {
+            // Se o evento for fornecido e não for clique no overlay, não fechar
+            if (event && event.target !== event.currentTarget && !event.target.classList.contains('btn-close-modal')) {
+                return;
+            }
+            
+            document.getElementById('modal-overlay').classList.remove('active');
+            turmaAtual = null;
+            alunosData = [];
+            
+            // Limpar busca
+            document.getElementById('busca-alunos').value = '';
+        }
+
+        function carregarAlunos(busca = '') {
+            if (!turmaAtual) return;
+
+            const url = `{% url 'buscar_alunos_turma' %}?turma_id=${turmaAtual}&busca=${encodeURIComponent(busca)}`;
+            
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        alert('Erro: ' + data.error);
+                        return;
+                    }
+                    
+                    alunosData = data.alunos;
+                    atualizarInfoTurma(data.turma);
+                    renderizarAlunos();
+                })
+                .catch(error => {
+                    console.error('Erro:', error);
+                    alert('Erro ao carregar alunos');
+                });
+        }
+
+        function atualizarInfoTurma(turma) {
+            const infoDiv = document.getElementById('turma-selected-info');
+            infoDiv.innerHTML = `
+                <h3>${turma.codigo} - ${turma.disciplina}</h3>
+                <p>Professor: ${turma.professor}</p>
+            `;
+        }
+
+        function renderizarAlunos() {
+            const container = document.getElementById('alunos-list');
+            
+            if (alunosData.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #666;">
+                        Nenhum aluno encontrado
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = alunosData.map(aluno => `
+                <div class="aluno-item">
+                    <input type="checkbox" class="aluno-checkbox" value="${aluno.id}" 
+                           ${aluno.matriculado ? 'checked' : ''} 
+                           onchange="atualizarSelecao(${aluno.id}, this.checked)">
+                    <div class="aluno-info">
+                        <div class="aluno-nome">${aluno.nome}</div>
+                        <div class="aluno-matricula">Username: ${aluno.username} | Email: ${aluno.email}</div>
+                    </div>
+                    <span class="aluno-status ${aluno.matriculado ? 'status-matriculado' : 'status-disponivel'}">
+                        ${aluno.matriculado ? 'Matriculado' : 'Disponível'}
+                    </span>
+                </div>
+            `).join('');
+        }
+
+        function buscarAlunos() {
+            const busca = document.getElementById('busca-alunos').value;
+            carregarAlunos(busca);
+        }
+
+        function atualizarSelecao(alunoId, selecionado) {
+            const aluno = alunosData.find(a => a.id === alunoId);
+            if (aluno) {
+                aluno.selecionado = selecionado;
+            }
+        }
+
+        function matricularSelecionados() {
+            const selecionados = alunosData.filter(a => 
+                document.querySelector(`input[value="${a.id}"]`).checked && !a.matriculado
+            );
+            
+            if (selecionados.length === 0) {
+                alert('Selecione pelo menos um aluno não matriculado');
+                return;
+            }
+
+            if (!confirm(`Matricular ${selecionados.length} aluno(s)?`)) {
+                return;
+            }
+
+            executarAcaoMassa('matricular', selecionados.map(a => a.id));
+        }
+
+        function desmatricularSelecionados() {
+            const selecionados = alunosData.filter(a => 
+                document.querySelector(`input[value="${a.id}"]`).checked && a.matriculado
+            );
+            
+            if (selecionados.length === 0) {
+                alert('Selecione pelo menos um aluno matriculado');
+                return;
+            }
+
+            if (!confirm(`Desmatricular ${selecionados.length} aluno(s)?`)) {
+                return;
+            }
+
+            executarAcaoMassa('desmatricular', selecionados.map(a => a.id));
+        }
+
+        function executarAcaoMassa(acao, alunosIds) {
+            const formData = new FormData();
+            formData.append('turma_id', turmaAtual);
+            formData.append('acao', acao);
+            alunosIds.forEach(id => formData.append('alunos_ids[]', id));
+            formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+
+            fetch('{% url "matricular_alunos_massa" %}', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    carregarAlunos(); // Recarregar lista
+                    // Não recarregar a página toda, apenas atualizar a contagem se necessário
+                    // location.reload();
+                } else {
+                    alert('Erro: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+                alert('Erro ao processar ação');
+            });
         }
     </script>
 </body>
