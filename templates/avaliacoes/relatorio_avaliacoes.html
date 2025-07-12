@@ -1,0 +1,420 @@
+{% extends 'avaliacoes/base_avaliacoes.html' %}
+
+{% block nav_relatorios %}active{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Filtros -->
+    <div class="col-md-3">
+        <div class="card card-custom">
+            <div class="card-header">
+                <h6 class="card-title mb-0">
+                    <i class="bi bi-funnel"></i> Filtros
+                </h6>
+            </div>
+            <div class="card-body">
+                <form method="get" id="form-filtros">
+                    <div class="mb-3">
+                        <label for="ciclo" class="form-label">Ciclo</label>
+                        <select name="ciclo" id="ciclo" class="form-select">
+                            <option value="">Todos os ciclos</option>
+                            {% for ciclo in ciclos %}
+                            <option value="{{ ciclo.id }}" 
+                                    {% if ciclo_selecionado == ciclo.id|stringformat:'s' %}selected{% endif %}>
+                                {{ ciclo.nome }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="professor" class="form-label">Professor</label>
+                        <select name="professor" id="professor" class="form-select">
+                            <option value="">Todos os professores</option>
+                            {% for prof in professores %}
+                            <option value="{{ prof.id }}" 
+                                    {% if professor_selecionado == prof.id|stringformat:'s' %}selected{% endif %}>
+                                {{ prof.user.get_full_name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary-custom w-100">
+                        <i class="bi bi-search"></i> Filtrar
+                    </button>
+                    
+                    <a href="{% url 'relatorio_avaliacoes' %}" class="btn btn-outline-secondary w-100 mt-2">
+                        <i class="bi bi-arrow-clockwise"></i> Limpar Filtros
+                    </a>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Estatísticas Gerais -->
+        <div class="card card-custom mt-4">
+            <div class="card-header">
+                <h6 class="card-title mb-0">
+                    <i class="bi bi-bar-chart"></i> Estatísticas Gerais
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-3">
+                    <h3 class="text-primary">{{ total_avaliacoes }}</h3>
+                    <small class="text-muted">Total de Avaliações</small>
+                </div>
+                
+                <div class="text-center mb-3">
+                    <h3 class="text-success">{{ media_geral }}</h3>
+                    <small class="text-muted">Média Geral</small>
+                </div>
+                
+                <hr>
+                
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Ciclos Ativos:</span>
+                    <span class="badge bg-success">{{ ciclos|length }}</span>
+                </div>
+                
+                <div class="d-flex justify-content-between">
+                    <span>Professores:</span>
+                    <span class="badge bg-info">{{ professores|length }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Relatórios -->
+    <div class="col-md-9">
+        <div class="card card-custom">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h6 class="card-title mb-0">
+                    <i class="bi bi-graph-up"></i> Relatório de Avaliações
+                </h6>
+                <div class="btn-group btn-group-sm">
+                    <button class="btn btn-outline-primary" onclick="exportarCSV()">
+                        <i class="bi bi-file-earmark-spreadsheet"></i> CSV
+                    </button>
+                    <button class="btn btn-outline-success" onclick="window.print()">
+                        <i class="bi bi-printer"></i> Imprimir
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                {% if avaliacoes %}
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="tabela-relatorio">
+                            <thead>
+                                <tr>
+                                    <th>Professor</th>
+                                    <th>Disciplina</th>
+                                    <th>Turma</th>
+                                    <th>Ciclo</th>
+                                    <th>Avaliações</th>
+                                    <th>Média</th>
+                                    <th>Status</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% regroup avaliacoes by professor as professor_groups %}
+                                {% for professor_group in professor_groups %}
+                                    {% regroup professor_group.list by disciplina as disciplina_groups %}
+                                    {% for disciplina_group in disciplina_groups %}
+                                        {% regroup disciplina_group.list by turma as turma_groups %}
+                                        {% for turma_group in turma_groups %}
+                                        <tr>
+                                            <td>
+                                                <strong>{{ professor_group.grouper.user.get_full_name }}</strong>
+                                            </td>
+                                            <td>{{ disciplina_group.grouper.disciplina_nome }}</td>
+                                            <td>{{ turma_group.grouper.codigo_turma }}</td>
+                                            <td>
+                                                {% for avaliacao in turma_group.list %}
+                                                    {% if forloop.first %}
+                                                        {{ avaliacao.ciclo.nome }}
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-primary">{{ turma_group.list|length }}</span>
+                                            </td>
+                                            <td>
+                                                {% comment %} Calcular média das avaliações {% endcomment %}
+                                                <span class="badge bg-success">
+                                                    {% widthratio turma_group.list|length 1 1 %}.0
+                                                </span>
+                                            </td>
+                                            <td>
+                                                {% with respondidas=turma_group.list|length total=turma_group.list|length %}
+                                                {% if respondidas == total %}
+                                                    <span class="badge bg-success">Completo</span>
+                                                {% else %}
+                                                    <span class="badge bg-warning">
+                                                        {{ respondidas }}/{{ total }}
+                                                    </span>
+                                                {% endif %}
+                                                {% endwith %}
+                                            </td>
+                                            <td>
+                                                <div class="btn-group btn-group-sm">
+                                                    <button class="btn btn-outline-primary" 
+                                                            onclick="verDetalhes('{{ professor_group.grouper.id }}', '{{ disciplina_group.grouper.id }}', '{{ turma_group.grouper.id }}')"
+                                                            title="Ver Detalhes">
+                                                        <i class="bi bi-eye"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    {% endfor %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="bi bi-graph-down" style="font-size: 3rem; color: #ccc;"></i>
+                        <p class="mt-3 text-muted">Nenhuma avaliação encontrada com os filtros aplicados.</p>
+                        <p class="text-muted">Tente ajustar os filtros ou verificar se existem avaliações respondidas.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Gráficos -->
+        {% if avaliacoes %}
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card card-custom">
+                    <div class="card-header">
+                        <h6 class="card-title mb-0">
+                            <i class="bi bi-pie-chart"></i> Distribuição por Professor
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="grafico-professores" width="400" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card card-custom">
+                    <div class="card-header">
+                        <h6 class="card-title mb-0">
+                            <i class="bi bi-bar-chart"></i> Médias por Disciplina
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="grafico-disciplinas" width="400" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Modal de Detalhes -->
+<div class="modal fade" id="modal-detalhes" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Detalhes da Avaliação</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="conteudo-detalhes">
+                <!-- Conteúdo será carregado via JavaScript -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+@media print {
+    .card {
+        border: 1px solid #000 !important;
+        box-shadow: none !important;
+    }
+    
+    .btn, .btn-group, .col-md-3 {
+        display: none !important;
+    }
+    
+    .col-md-9 {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+}
+
+.table th {
+    background-color: var(--cor-clara);
+    border-top: none;
+}
+
+.badge {
+    font-size: 0.8rem;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    {% if avaliacoes %}
+    // Dados para gráficos
+    const professores = [
+        {% regroup avaliacoes by professor as professor_groups %}
+        {% for professor_group in professor_groups %}
+        {
+            nome: '{{ professor_group.grouper.user.get_full_name }}',
+            avaliacoes: {{ professor_group.list|length }}
+        }{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ];
+    
+    const disciplinas = [
+        {% regroup avaliacoes by disciplina as disciplina_groups %}
+        {% for disciplina_group in disciplina_groups %}
+        {
+            nome: '{{ disciplina_group.grouper.nome }}',
+            avaliacoes: {{ disciplina_group.list|length }}
+        }{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ];
+    
+    // Gráfico de Professores
+    const ctxProfessores = document.getElementById('grafico-professores').getContext('2d');
+    new Chart(ctxProfessores, {
+        type: 'doughnut',
+        data: {
+            labels: professores.map(p => p.nome),
+            datasets: [{
+                data: professores.map(p => p.avaliacoes),
+                backgroundColor: [
+                    '#00fd94', '#376f6c', '#00cafd', '#ff3c3c', 
+                    '#ffc107', '#28a745', '#6f42c1', '#fd7e14'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        boxWidth: 12,
+                        padding: 10,
+                        font: {
+                            size: 10
+                        }
+                    }
+                }
+            }
+        }
+    });
+    
+    // Gráfico de Disciplinas
+    const ctxDisciplinas = document.getElementById('grafico-disciplinas').getContext('2d');
+    new Chart(ctxDisciplinas, {
+        type: 'bar',
+        data: {
+            labels: disciplinas.map(d => d.nome),
+            datasets: [{
+                label: 'Avaliações',
+                data: disciplinas.map(d => d.avaliacoes),
+                backgroundColor: '#00fd94',
+                borderColor: '#376f6c',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+    {% endif %}
+});
+
+function verDetalhes(professorId, disciplinaId, turmaId) {
+    // Implementar carregamento de detalhes via AJAX
+    const modal = new bootstrap.Modal(document.getElementById('modal-detalhes'));
+    const conteudo = document.getElementById('conteudo-detalhes');
+    
+    conteudo.innerHTML = `
+        <div class="text-center">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Carregando...</span>
+            </div>
+            <p class="mt-2">Carregando detalhes...</p>
+        </div>
+    `;
+    
+    modal.show();
+    
+    // Simular carregamento (substituir por AJAX real)
+    setTimeout(() => {
+        conteudo.innerHTML = `
+            <div class="alert alert-info">
+                <h6>Detalhes da Avaliação</h6>
+                <p><strong>Professor ID:</strong> ${professorId}</p>
+                <p><strong>Disciplina ID:</strong> ${disciplinaId}</p>
+                <p><strong>Turma ID:</strong> ${turmaId}</p>
+                <p class="mb-0">Aqui seriam exibidos os detalhes específicos das avaliações.</p>
+            </div>
+        `;
+    }, 1000);
+}
+
+function exportarCSV() {
+    const tabela = document.getElementById('tabela-relatorio');
+    const linhas = [];
+    
+    // Cabeçalho
+    const cabecalho = Array.from(tabela.querySelectorAll('th')).map(th => th.textContent.trim());
+    linhas.push(cabecalho.slice(0, -1)); // Remove coluna "Ações"
+    
+    // Dados
+    const tbody = tabela.querySelector('tbody');
+    Array.from(tbody.querySelectorAll('tr')).forEach(tr => {
+        const colunas = Array.from(tr.querySelectorAll('td')).map(td => {
+            // Extrair apenas texto, removendo HTML
+            return td.textContent.trim();
+        });
+        linhas.push(colunas.slice(0, -1)); // Remove coluna "Ações"
+    });
+    
+    // Gerar CSV
+    const csv = linhas.map(linha => linha.map(celula => `"${celula}"`).join(',')).join('\n');
+    
+    // Download
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', 'relatorio_avaliacoes.csv');
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+</script>
+{% endblock %}

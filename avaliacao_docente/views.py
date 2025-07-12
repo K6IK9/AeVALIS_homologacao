@@ -12,6 +12,9 @@ from .forms import (
     DisciplinaForm,
     PeriodoLetivoForm,
     TurmaForm,
+    QuestionarioAvaliacaoForm,
+    PerguntaAvaliacaoForm,
+    CicloAvaliacaoForm,
 )
 from .models import (
     Avaliacao,
@@ -22,14 +25,24 @@ from .models import (
     PeriodoLetivo,
     Turma,
     MatriculaTurma,
+    QuestionarioAvaliacao,
+    CategoriaPergunta,
+    PerguntaAvaliacao,
+    QuestionarioPergunta,
+    CicloAvaliacao,
+    AvaliacaoDocente,
+    RespostaAvaliacao,
+    ComentarioAvaliacao,
 )
 from django.contrib.auth.models import User
 
 from django.http import JsonResponse
-from django.db.models import Q
+from django.db.models import Q, Avg
+from django.utils import timezone
 from rolepermissions.roles import assign_role, remove_role
 from rolepermissions.checkers import has_role
 from django.contrib import messages
+from django.core.paginator import Paginator
 
 
 @login_required
@@ -522,3 +535,363 @@ def matricular_alunos_massa(request):
 
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
+
+
+# ============= VIEWS PARA AVALIAÇÃO DOCENTE =============
+
+
+@login_required
+def listar_avaliacoes(request):
+    """
+    View para listar todas as avaliações disponíveis
+    """
+    avaliacoes = QuestionarioAvaliacao.objects.filter(ativo=True).order_by(
+        "-data_criacao"
+    )
+    ciclos = CicloAvaliacao.objects.filter(ativo=True).order_by("-data_inicio")
+
+    # Paginação
+    paginator = Paginator(avaliacoes, 10)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        "avaliacoes": page_obj,
+        "ciclos": ciclos,
+        "titulo": "Avaliações Docentes",
+    }
+    return render(request, "avaliacoes/listar_avaliacoes.html", context)
+
+
+@login_required
+def criar_questionario_avaliacao(request):
+    """
+    View para criar um novo questionário de avaliação
+    Apenas coordenadores e admins podem criar
+    """
+    if not (has_role(request.user, "coordenador") or has_role(request.user, "admin")):
+        messages.error(request, "Você não tem permissão para criar questionários.")
+        return redirect("listar_avaliacoes")
+
+    if request.method == "POST":
+        form = QuestionarioAvaliacaoForm(request.POST)
+        if form.is_valid():
+            questionario = form.save(commit=False)
+            questionario.criado_por = request.user
+            questionario.save()
+            messages.success(request, "Questionário criado com sucesso!")
+            return redirect(
+                "editar_questionario_perguntas", questionario_id=questionario.id
+            )
+    else:
+        form = QuestionarioAvaliacaoForm()
+
+    return render(
+        request,
+        "avaliacoes/criar_questionario.html",
+        {"form": form, "titulo": "Criar Questionário de Avaliação"},
+    )
+
+
+@login_required
+def editar_questionario_perguntas(request, questionario_id):
+    """
+    View para editar as perguntas de um questionário
+    """
+    if not (has_role(request.user, "coordenador") or has_role(request.user, "admin")):
+        messages.error(request, "Você não tem permissão para editar questionários.")
+        return redirect("listar_avaliacoes")
+
+    questionario = get_object_or_404(QuestionarioAvaliacao, id=questionario_id)
+    perguntas_existentes = QuestionarioPergunta.objects.filter(
+        questionario=questionario
+    ).order_by("ordem")
+
+    categorias = CategoriaPergunta.objects.all()
+
+    if request.method == "POST":
+        if "adicionar_pergunta" in request.POST:
+            form = PerguntaAvaliacaoForm(request.POST)
+            if form.is_valid():
+                pergunta = form.save()
+                # Adicionar ao questionário
+                ordem = perguntas_existentes.count() + 1
+                QuestionarioPergunta.objects.create(
+                    questionario=questionario, pergunta=pergunta, ordem=ordem
+                )
+                messages.success(request, "Pergunta adicionada com sucesso!")
+                return redirect(
+                    "editar_questionario_perguntas", questionario_id=questionario.id
+                )
+
+        elif "remover_pergunta" in request.POST:
+            pergunta_id = request.POST.get("pergunta_id")
+            QuestionarioPergunta.objects.filter(
+                questionario=questionario, pergunta_id=pergunta_id
+            ).delete()
+            # Reordenar perguntas
+            perguntas_restantes = QuestionarioPergunta.objects.filter(
+                questionario=questionario
+            ).order_by("ordem")
+            for i, qp in enumerate(perguntas_restantes, 1):
+                qp.ordem = i
+                qp.save()
+            messages.success(request, "Pergunta removida com sucesso!")
+            return redirect(
+                "editar_questionario_perguntas", questionario_id=questionario.id
+            )
+    else:
+        form = PerguntaAvaliacaoForm()
+
+    context = {
+        "questionario": questionario,
+        "perguntas_existentes": perguntas_existentes,
+        "form": form,
+        "categorias": categorias,
+        "titulo": f"Editar Perguntas - {questionario.nome}",
+    }
+    return render(request, "avaliacoes/editar_questionario_perguntas.html", context)
+
+
+@login_required
+def criar_ciclo_avaliacao(request):
+    """
+    View para criar um novo ciclo de avaliação
+    """
+    if not (has_role(request.user, "coordenador") or has_role(request.user, "admin")):
+        messages.error(
+            request, "Você não tem permissão para criar ciclos de avaliação."
+        )
+        return redirect("listar_avaliacoes")
+
+    if request.method == "POST":
+        form = CicloAvaliacaoForm(request.POST)
+        if form.is_valid():
+            ciclo = form.save(commit=False)
+            ciclo.criado_por = request.user
+            ciclo.save()
+            messages.success(request, "Ciclo de avaliação criado com sucesso!")
+            return redirect("detalhe_ciclo_avaliacao", ciclo_id=ciclo.id)
+    else:
+        form = CicloAvaliacaoForm()
+
+    return render(
+        request,
+        "avaliacoes/criar_ciclo.html",
+        {"form": form, "titulo": "Criar Ciclo de Avaliação"},
+    )
+
+
+@login_required
+def detalhe_ciclo_avaliacao(request, ciclo_id):
+    """
+    View para visualizar detalhes de um ciclo de avaliação
+    """
+    ciclo = get_object_or_404(CicloAvaliacao, id=ciclo_id)
+    avaliacoes_docentes = AvaliacaoDocente.objects.filter(ciclo=ciclo)
+
+    # Estatísticas do ciclo
+    total_avaliacoes = avaliacoes_docentes.count()
+
+    # Contar avaliações que têm pelo menos uma resposta
+    avaliacoes_com_respostas = (
+        avaliacoes_docentes.filter(respostas__isnull=False).distinct().count()
+    )
+
+    context = {
+        "ciclo": ciclo,
+        "avaliacoes_docentes": avaliacoes_docentes,
+        "total_avaliacoes": total_avaliacoes,
+        "avaliacoes_respondidas": avaliacoes_com_respostas,
+        "percentual_respondidas": (
+            (avaliacoes_com_respostas / total_avaliacoes * 100)
+            if total_avaliacoes > 0
+            else 0
+        ),
+        "titulo": f"Ciclo: {ciclo.nome}",
+    }
+    return render(request, "avaliacoes/detalhe_ciclo.html", context)
+
+
+@login_required
+def responder_avaliacao(request, avaliacao_id):
+    """
+    View para um aluno responder uma avaliação docente
+    """
+    avaliacao = get_object_or_404(AvaliacaoDocente, id=avaliacao_id)
+
+    # Verificar se o usuário pode responder esta avaliação
+    if not hasattr(request.user, "perfil_aluno"):
+        messages.error(request, "Apenas alunos podem responder avaliações.")
+        return redirect("listar_avaliacoes")
+
+    # Verificar se a avaliação já foi respondida
+    respostas_existentes = RespostaAvaliacao.objects.filter(
+        avaliacao=avaliacao, aluno=request.user.perfil_aluno
+    ).exists()
+
+    if respostas_existentes:
+        messages.warning(request, "Esta avaliação já foi respondida.")
+        return redirect("visualizar_avaliacao", avaliacao_id=avaliacao.id)
+
+    # Verificar se o ciclo está ativo
+    if not avaliacao.ciclo.ativo:
+        messages.error(request, "Este ciclo de avaliação não está mais ativo.")
+        return redirect("listar_avaliacoes")
+
+    # Pegar perguntas do questionário
+    perguntas_questionario = QuestionarioPergunta.objects.filter(
+        questionario=avaliacao.ciclo.questionario
+    ).order_by("ordem_no_questionario")
+
+    if request.method == "POST":
+        # Processar respostas
+        respostas_validas = True
+
+        for qp in perguntas_questionario:
+            campo_resposta = f"pergunta_{qp.pergunta.id}"
+            valor_resposta = request.POST.get(campo_resposta)
+
+            if not valor_resposta and qp.pergunta.obrigatoria:
+                messages.error(
+                    request, f'A pergunta "{qp.pergunta.enunciado}" é obrigatória.'
+                )
+                respostas_validas = False
+                continue
+
+            if valor_resposta:
+                # Criar resposta baseada no tipo
+                resposta_data = {
+                    "avaliacao": avaliacao,
+                    "aluno": request.user.perfil_aluno,
+                    "pergunta": qp.pergunta,
+                    "anonima": avaliacao.ciclo.permite_avaliacao_anonima,
+                }
+
+                if qp.pergunta.tipo in ["likert", "nps"]:
+                    resposta_data["valor_numerico"] = int(valor_resposta)
+                elif qp.pergunta.tipo == "sim_nao":
+                    resposta_data["valor_boolean"] = valor_resposta.lower() == "sim"
+                else:
+                    resposta_data["valor_texto"] = valor_resposta
+
+                RespostaAvaliacao.objects.create(**resposta_data)
+
+        # Processar comentário geral se houver
+        comentario_geral = request.POST.get("comentario_geral", "").strip()
+        if comentario_geral:
+            ComentarioAvaliacao.objects.create(
+                avaliacao=avaliacao,
+                aluno=request.user.perfil_aluno,
+                elogios=comentario_geral,
+                anonimo=avaliacao.ciclo.permite_avaliacao_anonima,
+            )
+
+        if respostas_validas:
+            messages.success(request, "Avaliação respondida com sucesso!")
+            return redirect("visualizar_avaliacao", avaliacao_id=avaliacao.id)
+
+    context = {
+        "avaliacao": avaliacao,
+        "perguntas_questionario": perguntas_questionario,
+        "titulo": f"Responder Avaliação - {avaliacao.professor.user.get_full_name()}",
+    }
+    return render(request, "avaliacoes/responder_avaliacao.html", context)
+
+
+@login_required
+def visualizar_avaliacao(request, avaliacao_id):
+    """
+    View para visualizar uma avaliação respondida
+    """
+    avaliacao = get_object_or_404(AvaliacaoDocente, id=avaliacao_id)
+
+    # Verificar permissões
+    pode_visualizar = False
+    if hasattr(request.user, "perfil_aluno"):
+        # Verificar se há respostas do aluno para esta avaliação
+        respostas_aluno = RespostaAvaliacao.objects.filter(
+            avaliacao=avaliacao, aluno=request.user.perfil_aluno
+        ).exists()
+        if respostas_aluno:
+            pode_visualizar = True
+    elif (
+        hasattr(request.user, "perfil_professor")
+        and avaliacao.professor == request.user.perfil_professor
+    ):
+        pode_visualizar = True
+    elif has_role(request.user, "coordenador") or has_role(request.user, "admin"):
+        pode_visualizar = True
+
+    if not pode_visualizar:
+        messages.error(
+            request, "Você não tem permissão para visualizar esta avaliação."
+        )
+        return redirect("listar_avaliacoes")
+
+    # Pegar respostas
+    respostas = RespostaAvaliacao.objects.filter(avaliacao=avaliacao).order_by(
+        "pergunta__ordem"
+    )
+    comentarios = ComentarioAvaliacao.objects.filter(avaliacao=avaliacao)
+
+    context = {
+        "avaliacao": avaliacao,
+        "respostas": respostas,
+        "comentarios": comentarios,
+        "titulo": f"Avaliação - {avaliacao.professor.user.get_full_name()}",
+    }
+    return render(request, "avaliacoes/visualizar_avaliacao.html", context)
+
+
+@login_required
+def relatorio_avaliacoes(request):
+    """
+    View para gerar relatórios de avaliações
+    Apenas coordenadores e admins podem acessar
+    """
+    if not (has_role(request.user, "coordenador") or has_role(request.user, "admin")):
+        messages.error(request, "Você não tem permissão para acessar relatórios.")
+        return redirect("listar_avaliacoes")
+
+    ciclos = CicloAvaliacao.objects.all().order_by("-data_inicio")
+    professores = PerfilProfessor.objects.all().order_by("user__first_name")
+
+    # Filtros
+    ciclo_selecionado = request.GET.get("ciclo")
+    professor_selecionado = request.GET.get("professor")
+
+    # Buscar avaliações que têm respostas
+    avaliacoes = AvaliacaoDocente.objects.filter(respostas__isnull=False).distinct()
+
+    if ciclo_selecionado:
+        avaliacoes = avaliacoes.filter(ciclo_id=ciclo_selecionado)
+
+    if professor_selecionado:
+        avaliacoes = avaliacoes.filter(professor_id=professor_selecionado)
+
+    # Estatísticas
+    total_avaliacoes = avaliacoes.count()
+
+    # Calcular média simples das respostas numéricas
+    media_geral = 0
+    if total_avaliacoes > 0:
+        respostas_numericas = RespostaAvaliacao.objects.filter(
+            avaliacao__in=avaliacoes, valor_numerico__isnull=False
+        )
+        if respostas_numericas.exists():
+            media_geral = (
+                respostas_numericas.aggregate(media=Avg("valor_numerico"))["media"] or 0
+            )
+
+    context = {
+        "ciclos": ciclos,
+        "professores": professores,
+        "avaliacoes": avaliacoes,
+        "total_avaliacoes": total_avaliacoes,
+        "media_geral": round(media_geral, 2),
+        "ciclo_selecionado": ciclo_selecionado,
+        "professor_selecionado": professor_selecionado,
+        "titulo": "Relatórios de Avaliação",
+    }
+    return render(request, "avaliacoes/relatorio_avaliacoes.html", context)

@@ -20,5 +20,42 @@ urlpatterns = [
         name="matricular_alunos_massa",
     ),
     path("admin-hub/", views.AdminHubView.as_view(), name="admin_hub"),
+    # URLs para Avaliação Docente
+    path("avaliacoes/", views.listar_avaliacoes, name="listar_avaliacoes"),
+    path(
+        "avaliacoes/criar-questionario/",
+        views.criar_questionario_avaliacao,
+        name="criar_questionario_avaliacao",
+    ),
+    path(
+        "avaliacoes/questionario/<int:questionario_id>/perguntas/",
+        views.editar_questionario_perguntas,
+        name="editar_questionario_perguntas",
+    ),
+    path(
+        "avaliacoes/criar-ciclo/",
+        views.criar_ciclo_avaliacao,
+        name="criar_ciclo_avaliacao",
+    ),
+    path(
+        "avaliacoes/ciclo/<int:ciclo_id>/",
+        views.detalhe_ciclo_avaliacao,
+        name="detalhe_ciclo_avaliacao",
+    ),
+    path(
+        "avaliacoes/responder/<int:avaliacao_id>/",
+        views.responder_avaliacao,
+        name="responder_avaliacao",
+    ),
+    path(
+        "avaliacoes/visualizar/<int:avaliacao_id>/",
+        views.visualizar_avaliacao,
+        name="visualizar_avaliacao",
+    ),
+    path(
+        "avaliacoes/relatorios/",
+        views.relatorio_avaliacoes,
+        name="relatorio_avaliacoes",
+    ),
     path("", IndexView.as_view(), name="inicio"),
 ]

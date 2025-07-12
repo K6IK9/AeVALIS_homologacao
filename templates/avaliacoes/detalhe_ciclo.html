@@ -1,0 +1,261 @@
+{% extends 'avaliacoes/base_avaliacoes.html' %}
+
+{% block content %}
+<div class="row">
+    <!-- Informações do Ciclo -->
+    <div class="col-md-4">
+        <div class="card card-custom">
+            <div class="card-header">
+                <h6 class="card-title mb-0">
+                    <i class="bi bi-calendar-check"></i> Informações do Ciclo
+                </h6>
+            </div>
+            <div class="card-body">
+                <h5>{{ ciclo.nome }}</h5>
+                <p class="text-muted">{{ ciclo.descricao }}</p>
+                
+                <hr>
+                
+                <div class="d-flex justify-content-between mb-2">
+                    <span><strong>Status:</strong></span>
+                    {% if ciclo.ativo %}
+                        <span class="badge bg-success">Ativo</span>
+                    {% else %}
+                        <span class="badge bg-secondary">Inativo</span>
+                    {% endif %}
+                </div>
+                
+                <div class="d-flex justify-content-between mb-2">
+                    <span><strong>Tipo:</strong></span>
+                    {% if ciclo.permite_avaliacao_anonima %}
+                        <span class="badge bg-info">Anônima</span>
+                    {% else %}
+                        <span class="badge bg-warning">Identificada</span>
+                    {% endif %}
+                </div>
+                
+                <div class="d-flex justify-content-between mb-2">
+                    <span><strong>Início:</strong></span>
+                    <span>{{ ciclo.data_inicio|date:"d/m/Y" }}</span>
+                </div>
+                
+                <div class="d-flex justify-content-between mb-2">
+                    <span><strong>Fim:</strong></span>
+                    <span>{{ ciclo.data_fim|date:"d/m/Y" }}</span>
+                </div>
+                
+                <div class="d-flex justify-content-between mb-2">
+                    <span><strong>Período:</strong></span>
+                    <span>{{ ciclo.periodo_letivo.nome }}</span>
+                </div>
+                
+                <div class="d-flex justify-content-between mb-2">
+                    <span><strong>Questionário:</strong></span>
+                    <span>{{ ciclo.questionario.titulo }}</span>
+                </div>
+                
+                <hr>
+                
+                <div class="d-flex justify-content-between mb-2">
+                    <span><strong>Criado por:</strong></span>
+                    <span>{{ ciclo.criado_por.get_full_name|default:ciclo.criado_por.username }}</span>
+                </div>
+                
+                <div class="d-flex justify-content-between mb-2">
+                    <span><strong>Criado em:</strong></span>
+                    <small>{{ ciclo.data_criacao|date:"d/m/Y H:i" }}</small>
+                </div>
+                
+                <hr>
+                
+                <a href="{% url 'listar_avaliacoes' %}" class="btn btn-outline-secondary btn-sm w-100">
+                    <i class="bi bi-arrow-left"></i> Voltar para Lista
+                </a>
+            </div>
+        </div>
+
+        <!-- Estatísticas -->
+        <div class="card card-custom mt-4">
+            <div class="card-header">
+                <h6 class="card-title mb-0">
+                    <i class="bi bi-graph-up"></i> Estatísticas
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-6">
+                        <div class="border-end">
+                            <h3 class="text-primary">{{ total_avaliacoes }}</h3>
+                            <small class="text-muted">Total de Avaliações</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <h3 class="text-success">{{ avaliacoes_respondidas }}</h3>
+                        <small class="text-muted">Respondidas</small>
+                    </div>
+                </div>
+                
+                <div class="mt-3">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span>Progresso</span>
+                        <span>{{ percentual_respondidas|floatformat:1 }}%</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar bg-success" role="progressbar" 
+                             style="width: {{ percentual_respondidas }}%" 
+                             aria-valuenow="{{ percentual_respondidas }}" 
+                             aria-valuemin="0" aria-valuemax="100">
+                        </div>
+                    </div>
+                </div>
+                
+                {% if user|has_role:"coordenador" or user|has_role:"admin" %}
+                <div class="mt-3">
+                    <a href="{% url 'relatorio_avaliacoes' %}?ciclo={{ ciclo.id }}" 
+                       class="btn btn-outline-primary btn-sm w-100">
+                        <i class="bi bi-graph-up"></i> Ver Relatório Completo
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de Avaliações -->
+    <div class="col-md-8">
+        <div class="card card-custom">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h6 class="card-title mb-0">
+                    <i class="bi bi-list-check"></i> Avaliações do Ciclo
+                </h6>
+                <div class="btn-group btn-group-sm">
+                    <button class="btn btn-outline-secondary" onclick="filtrarAvaliacoes('todas')">
+                        Todas
+                    </button>
+                    <button class="btn btn-outline-success" onclick="filtrarAvaliacoes('respondidas')">
+                        Respondidas
+                    </button>
+                    <button class="btn btn-outline-warning" onclick="filtrarAvaliacoes('pendentes')">
+                        Pendentes
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                {% if avaliacoes_docentes %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Professor</th>
+                                    <th>Disciplina</th>
+                                    <th>Turma</th>
+                                    <th>Aluno</th>
+                                    <th>Status</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="avaliacoes-tbody">
+                                {% for avaliacao in avaliacoes_docentes %}
+                                <tr class="avaliacao-row" 
+                                    data-status="{% if avaliacao.respostas.exists %}respondida{% else %}pendente{% endif %}">
+                                    <td>
+                                        <strong>{{ avaliacao.professor.user.get_full_name }}</strong>
+                                    </td>
+                                    <td>
+                                        {{ avaliacao.disciplina.disciplina_nome }}
+                                    </td>
+                                    <td>
+                                        {{ avaliacao.turma.codigo_turma }}
+                                    </td>
+                                    <td>
+                                        {% if not ciclo.permite_avaliacao_anonima %}
+                                            <span class="text-muted">Multiple Students</span>
+                                        {% else %}
+                                            <span class="text-muted">Anônima</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if avaliacao.respostas.exists %}
+                                            <span class="badge bg-success">
+                                                <i class="bi bi-check-circle"></i> Respondida
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-warning">
+                                                <i class="bi bi-clock"></i> Pendente
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            {% if avaliacao.respostas.exists %}
+                                                <a href="{% url 'visualizar_avaliacao' avaliacao.id %}" 
+                                                   class="btn btn-outline-primary" title="Visualizar">
+                                                    <i class="bi bi-eye"></i>
+                                                </a>
+                                            {% else %}
+                                                {% if user.perfil_aluno %}
+                                                    <a href="{% url 'responder_avaliacao' avaliacao.id %}" 
+                                                       class="btn btn-outline-success" title="Responder">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </a>
+                                                {% endif %}
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="bi bi-clipboard-x" style="font-size: 3rem; color: #ccc;"></i>
+                        <p class="mt-3 text-muted">Nenhuma avaliação encontrada para este ciclo.</p>
+                        {% if user|has_role:"coordenador" or user|has_role:"admin" %}
+                        <p class="text-muted">
+                            As avaliações são criadas automaticamente quando alunos são matriculados em turmas 
+                            que têm professores atribuídos durante o período do ciclo.
+                        </p>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function filtrarAvaliacoes(status) {
+    const rows = document.querySelectorAll('.avaliacao-row');
+    const buttons = document.querySelectorAll('.btn-group .btn');
+    
+    // Remover classe ativa de todos os botões
+    buttons.forEach(btn => btn.classList.remove('active'));
+    
+    rows.forEach(row => {
+        if (status === 'todas') {
+            row.style.display = '';
+        } else if (status === 'respondidas' && row.dataset.status === 'respondida') {
+            row.style.display = '';
+        } else if (status === 'pendentes' && row.dataset.status === 'pendente') {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+    
+    // Adicionar classe ativa ao botão clicado
+    event.target.classList.add('active');
+}
+
+// Definir filtro padrão
+document.addEventListener('DOMContentLoaded', function() {
+    const primeiroBtn = document.querySelector('.btn-group .btn');
+    if (primeiroBtn) {
+        primeiroBtn.classList.add('active');
+    }
+});
+</script>
+{% endblock %}

@@ -9,11 +9,11 @@ from .models import (
     Turma,
     PerfilAluno,
     QuestionarioAvaliacao,
-    CategoriaPergunta, 
+    CategoriaPergunta,
     PerguntaAvaliacao,
     CicloAvaliacao,
     RespostaAvaliacao,
-    ComentarioAvaliacao
+    ComentarioAvaliacao,
 )
 
 
@@ -337,34 +337,61 @@ class TurmaForm(forms.ModelForm):
 
 # ============ FORMS PARA NOVO SISTEMA DE AVALIAÇÃO ============
 
+
 class CicloAvaliacaoForm(forms.ModelForm):
     """
     Formulário para criar/editar ciclos de avaliação
     """
+
     class Meta:
         model = CicloAvaliacao
-        fields = ['nome', 'periodo_letivo', 'questionario', 'data_inicio', 'data_fim', 
-                 'permite_avaliacao_anonima', 'permite_multiplas_respostas', 'enviar_lembrete_email']
+        fields = [
+            "nome",
+            "periodo_letivo",
+            "questionario",
+            "data_inicio",
+            "data_fim",
+            "permite_avaliacao_anonima",
+            "permite_multiplas_respostas",
+            "enviar_lembrete_email",
+        ]
         widgets = {
-            'nome': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ex: Avaliação Docente 2024.1'}),
-            'periodo_letivo': forms.Select(attrs={'class': 'form-control'}),
-            'questionario': forms.Select(attrs={'class': 'form-control'}),
-            'data_inicio': forms.DateTimeInput(attrs={'class': 'form-control', 'type': 'datetime-local'}),
-            'data_fim': forms.DateTimeInput(attrs={'class': 'form-control', 'type': 'datetime-local'}),
-            'permite_avaliacao_anonima': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-            'permite_multiplas_respostas': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-            'enviar_lembrete_email': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            "nome": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Ex: Avaliação Docente 2024.1",
+                }
+            ),
+            "periodo_letivo": forms.Select(attrs={"class": "form-control"}),
+            "questionario": forms.Select(attrs={"class": "form-control"}),
+            "data_inicio": forms.DateTimeInput(
+                attrs={"class": "form-control", "type": "datetime-local"}
+            ),
+            "data_fim": forms.DateTimeInput(
+                attrs={"class": "form-control", "type": "datetime-local"}
+            ),
+            "permite_avaliacao_anonima": forms.CheckboxInput(
+                attrs={"class": "form-check-input"}
+            ),
+            "permite_multiplas_respostas": forms.CheckboxInput(
+                attrs={"class": "form-check-input"}
+            ),
+            "enviar_lembrete_email": forms.CheckboxInput(
+                attrs={"class": "form-check-input"}
+            ),
         }
-    
+
     def clean(self):
         cleaned_data = super().clean()
-        data_inicio = cleaned_data.get('data_inicio')
-        data_fim = cleaned_data.get('data_fim')
-        
+        data_inicio = cleaned_data.get("data_inicio")
+        data_fim = cleaned_data.get("data_fim")
+
         if data_inicio and data_fim:
             if data_inicio >= data_fim:
-                raise forms.ValidationError('A data de início deve ser anterior à data de fim.')
-        
+                raise forms.ValidationError(
+                    "A data de início deve ser anterior à data de fim."
+                )
+
         return cleaned_data
 
 
@@ -372,13 +399,22 @@ class QuestionarioAvaliacaoForm(forms.ModelForm):
     """
     Formulário para criar/editar questionários
     """
+
     class Meta:
         model = QuestionarioAvaliacao
-        fields = ['titulo', 'descricao', 'ativo']
+        fields = ["titulo", "descricao", "ativo"]
         widgets = {
-            'titulo': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Título do questionário'}),
-            'descricao': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Descrição opcional'}),
-            'ativo': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            "titulo": forms.TextInput(
+                attrs={"class": "form-control", "placeholder": "Título do questionário"}
+            ),
+            "descricao": forms.Textarea(
+                attrs={
+                    "class": "form-control",
+                    "rows": 3,
+                    "placeholder": "Descrição opcional",
+                }
+            ),
+            "ativo": forms.CheckboxInput(attrs={"class": "form-check-input"}),
         }
 
 
@@ -386,14 +422,26 @@ class CategoriaPerguntaForm(forms.ModelForm):
     """
     Formulário para criar/editar categorias de perguntas
     """
+
     class Meta:
         model = CategoriaPergunta
-        fields = ['nome', 'descricao', 'ordem', 'ativa']
+        fields = ["nome", "descricao", "ordem", "ativa"]
         widgets = {
-            'nome': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ex: Didática, Relacionamento'}),
-            'descricao': forms.Textarea(attrs={'class': 'form-control', 'rows': 2, 'placeholder': 'Descrição da categoria'}),
-            'ordem': forms.NumberInput(attrs={'class': 'form-control', 'min': 0}),
-            'ativa': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            "nome": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Ex: Didática, Relacionamento",
+                }
+            ),
+            "descricao": forms.Textarea(
+                attrs={
+                    "class": "form-control",
+                    "rows": 2,
+                    "placeholder": "Descrição da categoria",
+                }
+            ),
+            "ordem": forms.NumberInput(attrs={"class": "form-control", "min": 0}),
+            "ativa": forms.CheckboxInput(attrs={"class": "form-check-input"}),
         }
 
 
@@ -401,44 +449,67 @@ class PerguntaAvaliacaoForm(forms.ModelForm):
     """
     Formulário para criar/editar perguntas de avaliação
     """
+
     class Meta:
         model = PerguntaAvaliacao
-        fields = ['enunciado', 'tipo', 'categoria', 'ordem', 'obrigatoria', 'ativa', 'opcoes_multipla_escolha']
+        fields = [
+            "enunciado",
+            "tipo",
+            "categoria",
+            "ordem",
+            "obrigatoria",
+            "ativa",
+            "opcoes_multipla_escolha",
+        ]
         widgets = {
-            'enunciado': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Digite a pergunta...'}),
-            'tipo': forms.Select(attrs={'class': 'form-control'}),
-            'categoria': forms.Select(attrs={'class': 'form-control'}),
-            'ordem': forms.NumberInput(attrs={'class': 'form-control', 'min': 0}),
-            'obrigatoria': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-            'ativa': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-            'opcoes_multipla_escolha': forms.Textarea(attrs={
-                'class': 'form-control', 
-                'rows': 3,
-                'placeholder': 'Para múltipla escolha, insira as opções separadas por linha (JSON será gerado automaticamente)'
-            }),
+            "enunciado": forms.Textarea(
+                attrs={
+                    "class": "form-control",
+                    "rows": 3,
+                    "placeholder": "Digite a pergunta...",
+                }
+            ),
+            "tipo": forms.Select(attrs={"class": "form-control"}),
+            "categoria": forms.Select(attrs={"class": "form-control"}),
+            "ordem": forms.NumberInput(attrs={"class": "form-control", "min": 0}),
+            "obrigatoria": forms.CheckboxInput(attrs={"class": "form-check-input"}),
+            "ativa": forms.CheckboxInput(attrs={"class": "form-check-input"}),
+            "opcoes_multipla_escolha": forms.Textarea(
+                attrs={
+                    "class": "form-control",
+                    "rows": 3,
+                    "placeholder": "Para múltipla escolha, insira as opções separadas por linha (JSON será gerado automaticamente)",
+                }
+            ),
         }
-    
+
     def clean_opcoes_multipla_escolha(self):
-        opcoes = self.cleaned_data.get('opcoes_multipla_escolha')
-        tipo = self.cleaned_data.get('tipo')
-        
-        if tipo == 'multipla_escolha':
+        opcoes = self.cleaned_data.get("opcoes_multipla_escolha")
+        tipo = self.cleaned_data.get("tipo")
+
+        if tipo == "multipla_escolha":
             if not opcoes:
-                raise forms.ValidationError('Opções são obrigatórias para perguntas de múltipla escolha.')
-            
+                raise forms.ValidationError(
+                    "Opções são obrigatórias para perguntas de múltipla escolha."
+                )
+
             # Converte texto em lista para JSON
             try:
                 if isinstance(opcoes, str):
                     # Se for string, separa por linhas
-                    opcoes_lista = [linha.strip() for linha in opcoes.split('\n') if linha.strip()]
+                    opcoes_lista = [
+                        linha.strip() for linha in opcoes.split("\n") if linha.strip()
+                    ]
                     if len(opcoes_lista) < 2:
-                        raise forms.ValidationError('É necessário pelo menos 2 opções para múltipla escolha.')
+                        raise forms.ValidationError(
+                            "É necessário pelo menos 2 opções para múltipla escolha."
+                        )
                     return opcoes_lista
                 else:
                     return opcoes
             except Exception:
-                raise forms.ValidationError('Formato inválido para as opções.')
-        
+                raise forms.ValidationError("Formato inválido para as opções.")
+
         return opcoes
 
 
@@ -446,101 +517,106 @@ class RespostaAvaliacaoForm(forms.Form):
     """
     Formulário dinâmico para responder avaliações
     """
+
     def __init__(self, avaliacao, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.avaliacao = avaliacao
-        
+
         # Busca as perguntas do questionário do ciclo
-        perguntas = avaliacao.ciclo.questionario.perguntas.select_related('pergunta', 'pergunta__categoria').order_by('ordem_no_questionario')
-        
+        perguntas = avaliacao.ciclo.questionario.perguntas.select_related(
+            "pergunta", "pergunta__categoria"
+        ).order_by("ordem_no_questionario")
+
         for questionario_pergunta in perguntas:
             pergunta = questionario_pergunta.pergunta
-            field_name = f'pergunta_{pergunta.id}'
-            
-            if pergunta.tipo == 'likert':
+            field_name = f"pergunta_{pergunta.id}"
+
+            if pergunta.tipo == "likert":
                 self.fields[field_name] = forms.ChoiceField(
                     label=pergunta.enunciado,
                     choices=[
-                        (1, '1 - Discordo totalmente'),
-                        (2, '2 - Discordo parcialmente'),
-                        (3, '3 - Neutro'),
-                        (4, '4 - Concordo parcialmente'),
-                        (5, '5 - Concordo totalmente'),
+                        (1, "1 - Discordo totalmente"),
+                        (2, "2 - Discordo parcialmente"),
+                        (3, "3 - Neutro"),
+                        (4, "4 - Concordo parcialmente"),
+                        (5, "5 - Concordo totalmente"),
                     ],
-                    widget=forms.RadioSelect(attrs={'class': 'form-check-input'}),
-                    required=pergunta.obrigatoria
+                    widget=forms.RadioSelect(attrs={"class": "form-check-input"}),
+                    required=pergunta.obrigatoria,
                 )
-            
-            elif pergunta.tipo == 'nps':
+
+            elif pergunta.tipo == "nps":
                 self.fields[field_name] = forms.ChoiceField(
                     label=pergunta.enunciado,
                     choices=[(i, str(i)) for i in range(11)],
-                    widget=forms.RadioSelect(attrs={'class': 'form-check-input'}),
-                    required=pergunta.obrigatoria
+                    widget=forms.RadioSelect(attrs={"class": "form-check-input"}),
+                    required=pergunta.obrigatoria,
                 )
-            
-            elif pergunta.tipo == 'sim_nao':
+
+            elif pergunta.tipo == "sim_nao":
                 self.fields[field_name] = forms.ChoiceField(
                     label=pergunta.enunciado,
-                    choices=[('true', 'Sim'), ('false', 'Não')],
-                    widget=forms.RadioSelect(attrs={'class': 'form-check-input'}),
-                    required=pergunta.obrigatoria
+                    choices=[("true", "Sim"), ("false", "Não")],
+                    widget=forms.RadioSelect(attrs={"class": "form-check-input"}),
+                    required=pergunta.obrigatoria,
                 )
-            
-            elif pergunta.tipo == 'multipla_escolha':
+
+            elif pergunta.tipo == "multipla_escolha":
                 if pergunta.opcoes_multipla_escolha:
-                    choices = [(opcao, opcao) for opcao in pergunta.opcoes_multipla_escolha]
+                    choices = [
+                        (opcao, opcao) for opcao in pergunta.opcoes_multipla_escolha
+                    ]
                     self.fields[field_name] = forms.ChoiceField(
                         label=pergunta.enunciado,
                         choices=choices,
-                        widget=forms.RadioSelect(attrs={'class': 'form-check-input'}),
-                        required=pergunta.obrigatoria
+                        widget=forms.RadioSelect(attrs={"class": "form-check-input"}),
+                        required=pergunta.obrigatoria,
                     )
-            
+
             else:  # texto_livre
                 self.fields[field_name] = forms.CharField(
                     label=pergunta.enunciado,
-                    widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
-                    required=pergunta.obrigatoria
+                    widget=forms.Textarea(attrs={"class": "form-control", "rows": 3}),
+                    required=pergunta.obrigatoria,
                 )
-    
+
     def save(self, aluno=None, session_key=None, anonima=False):
         """
         Salva as respostas da avaliação
         """
         respostas_salvas = []
-        
+
         for field_name, valor in self.cleaned_data.items():
-            if field_name.startswith('pergunta_'):
-                pergunta_id = int(field_name.split('_')[1])
+            if field_name.startswith("pergunta_"):
+                pergunta_id = int(field_name.split("_")[1])
                 pergunta = PerguntaAvaliacao.objects.get(id=pergunta_id)
-                
+
                 # Cria a resposta
                 resposta = RespostaAvaliacao(
                     avaliacao=self.avaliacao,
                     pergunta=pergunta,
                     anonima=anonima,
-                    session_key=session_key or ''
+                    session_key=session_key or "",
                 )
-                
+
                 # Define o aluno se não for anônima
                 if not anonima and aluno:
                     resposta.aluno = aluno
-                
+
                 # Define o valor baseado no tipo da pergunta
-                if pergunta.tipo in ['likert', 'nps', 'multipla_escolha']:
-                    if pergunta.tipo == 'multipla_escolha':
+                if pergunta.tipo in ["likert", "nps", "multipla_escolha"]:
+                    if pergunta.tipo == "multipla_escolha":
                         resposta.valor_texto = valor
                     else:
                         resposta.valor_numerico = int(valor)
-                elif pergunta.tipo == 'sim_nao':
-                    resposta.valor_boolean = valor == 'true'
+                elif pergunta.tipo == "sim_nao":
+                    resposta.valor_boolean = valor == "true"
                 else:  # texto_livre
                     resposta.valor_texto = valor
-                
+
                 resposta.save()
                 respostas_salvas.append(resposta)
-        
+
         return respostas_salvas
 
 
@@ -548,37 +624,44 @@ class ComentarioAvaliacaoForm(forms.ModelForm):
     """
     Formulário para comentários adicionais na avaliação
     """
+
     class Meta:
         model = ComentarioAvaliacao
-        fields = ['elogios', 'sugestoes', 'criticas_construtivas']
+        fields = ["elogios", "sugestoes", "criticas_construtivas"]
         widgets = {
-            'elogios': forms.Textarea(attrs={
-                'class': 'form-control', 
-                'rows': 3, 
-                'placeholder': 'Deixe seus elogios e pontos positivos...'
-            }),
-            'sugestoes': forms.Textarea(attrs={
-                'class': 'form-control', 
-                'rows': 3, 
-                'placeholder': 'Deixe suas sugestões de melhoria...'
-            }),
-            'criticas_construtivas': forms.Textarea(attrs={
-                'class': 'form-control', 
-                'rows': 3, 
-                'placeholder': 'Deixe críticas construtivas...'
-            }),
+            "elogios": forms.Textarea(
+                attrs={
+                    "class": "form-control",
+                    "rows": 3,
+                    "placeholder": "Deixe seus elogios e pontos positivos...",
+                }
+            ),
+            "sugestoes": forms.Textarea(
+                attrs={
+                    "class": "form-control",
+                    "rows": 3,
+                    "placeholder": "Deixe suas sugestões de melhoria...",
+                }
+            ),
+            "criticas_construtivas": forms.Textarea(
+                attrs={
+                    "class": "form-control",
+                    "rows": 3,
+                    "placeholder": "Deixe críticas construtivas...",
+                }
+            ),
         }
-    
+
     def save(self, avaliacao, aluno=None, session_key=None, anonimo=False, commit=True):
         comentario = super().save(commit=False)
         comentario.avaliacao = avaliacao
         comentario.anonimo = anonimo
-        comentario.session_key = session_key or ''
-        
+        comentario.session_key = session_key or ""
+
         if not anonimo and aluno:
             comentario.aluno = aluno
-        
+
         if commit:
             comentario.save()
-        
+
         return comentario
