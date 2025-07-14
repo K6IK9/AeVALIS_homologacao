@@ -2,10 +2,8 @@
 
 /* Variáveis específicas do login */
 :root {
-    --cor01: var(--cor01-alt);
-    /* Usando a variação definida no base.css */
-    --shadow: var(--shadow-alt);
-    /* Usando sombra alternativa do base.css */
+    --cor01: var(--cor01-alt); /* Usando a variação definida no base.css */
+    --shadow: var(--shadow-alt); /* Usando sombra alternativa do base.css */
 }
 
 /* Aplicando classes base */
@@ -33,8 +31,7 @@ header {
         margin-right: 20px;
     }
 
-    h1,
-    p {
+    h1, p {
         color: var(--cor01);
     }
 }

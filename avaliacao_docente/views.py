@@ -569,7 +569,7 @@ def criar_questionario_avaliacao(request):
     View para criar um novo questionário de avaliação
     Apenas coordenadores e admins podem criar
     """
-    if not (has_role(request.user, "coordenador") or has_role(request.user, "admin")):
+    if not (check_user_permission(request.user, ["coordenador", "admin"])):
         messages.error(request, "Você não tem permissão para criar questionários.")
         return redirect("listar_avaliacoes")
 
@@ -598,7 +598,7 @@ def editar_questionario_perguntas(request, questionario_id):
     """
     View para editar as perguntas de um questionário
     """
-    if not (has_role(request.user, "coordenador") or has_role(request.user, "admin")):
+    if not (check_user_permission(request.user, ["coordenador", "admin"])):
         messages.error(request, "Você não tem permissão para editar questionários.")
         return redirect("listar_avaliacoes")
 
@@ -658,7 +658,7 @@ def criar_ciclo_avaliacao(request):
     """
     View para criar um novo ciclo de avaliação
     """
-    if not (has_role(request.user, "coordenador") or has_role(request.user, "admin")):
+    if not (check_user_permission(request.user, ["coordenador", "admin"])):
         messages.error(
             request, "Você não tem permissão para criar ciclos de avaliação."
         )
@@ -820,7 +820,7 @@ def visualizar_avaliacao(request, avaliacao_id):
         and avaliacao.professor == request.user.perfil_professor
     ):
         pode_visualizar = True
-    elif has_role(request.user, "coordenador") or has_role(request.user, "admin"):
+    elif check_user_permission(request.user, ["coordenador", "admin"]):
         pode_visualizar = True
 
     if not pode_visualizar:
@@ -850,7 +850,7 @@ def relatorio_avaliacoes(request):
     View para gerar relatórios de avaliações
     Apenas coordenadores e admins podem acessar
     """
-    if not (has_role(request.user, "coordenador") or has_role(request.user, "admin")):
+    if not (check_user_permission(request.user, ["coordenador", "admin"])):
         messages.error(request, "Você não tem permissão para acessar relatórios.")
         return redirect("listar_avaliacoes")
 

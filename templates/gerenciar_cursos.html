@@ -8,144 +8,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IF SADD - Gerenciar Cursos</title>
-    <link rel="stylesheet" href="{% static 'styles/inicial.css' %}">
-    <style>
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .header {
-            background: var(--cor03, #376f6c);
-            color: white;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-            text-align: center;
-        }
-
-        .form-section {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            margin-bottom: 30px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: var(--cor03, #376f6c);
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: border-color 0.3s;
-        }
-
-        .form-control:focus {
-            outline: none;
-            border-color: var(--cor02, #00fd94);
-        }
-
-        .btn {
-            background: var(--cor02, #00fd94);
-            color: var(--cor05, #090909);
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .btn:hover {
-            background: var(--cor06, #00cafd);
-            transform: translateY(-2px);
-        }
-
-        .cursos-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            background: white;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        .cursos-table th,
-        .cursos-table td {
-            padding: 15px;
-            text-align: left;
-            border-bottom: 1px solid #f0f0f0;
-        }
-
-        .cursos-table th {
-            background: var(--cor03, #376f6c);
-            color: white;
-            font-weight: 600;
-        }
-
-        .cursos-table tbody tr:hover {
-            background: #f8f9fa;
-        }
-
-        .messages {
-            margin-bottom: 20px;
-        }
-
-        .message {
-            padding: 12px 16px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-        }
-
-        .message.success {
-            background: #d4edda;
-            color: #155724;
-            border-left: 4px solid #28a745;
-        }
-
-        .message.error {
-            background: #f8d7da;
-            color: #721c24;
-            border-left: 4px solid #dc3545;
-        }
-
-        .back-button {
-            background: var(--cor03, #376f6c);
-            color: white;
-            text-decoration: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            display: inline-block;
-            margin-bottom: 20px;
-            transition: all 0.3s;
-        }
-
-        .back-button:hover {
-            background: var(--cor04, #1e3231);
-            transform: translateY(-2px);
-        }
-
-        .course-count {
-            font-size: 0.9em;
-            color: var(--cor03, #376f6c);
-            margin-top: 10px;
-        }
-    </style>
+    <link rel="stylesheet" href="{% static 'styles/gerenciamento.css' %}">
 </head>
 
 <body>
@@ -196,10 +59,10 @@
 
         <div class="form-section">
             <h2>Cursos Cadastrados</h2>
-            <div class="course-count">
+            <div class="item-count">
                 Total de cursos: {{ cursos.count }}
             </div>
-            <table class="cursos-table">
+            <table class="data-table">
                 <thead>
                     <tr>
                         <th>ID</th>

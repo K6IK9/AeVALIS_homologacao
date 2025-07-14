@@ -8,36 +8,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IF SADD - Central de Administração</title>
-
+    <link rel="stylesheet" href="{% static 'styles/gerenciamento.css' %}">
+    
     <style>
+        /* Estilos específicos do admin hub */
         body {
             margin: 0;
             padding: 0;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 40px 20px 20px 20px;
-        }
-
-        .header {
-            background: var(--cor03, #376f6c);
-            color: white;
-            padding: 30px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-            text-align: center;
-        }
-
-        .header h1 {
-            margin: 0 0 10px 0;
-            font-size: 2.2em;
-        }
-
-        .header p {
-            margin: 0;
-            opacity: 0.9;
+            background: var(--cor01);
         }
 
         .admin-grid {
@@ -48,17 +26,22 @@
         }
 
         .admin-card {
-            background: white;
+            background: var(--cor07);
             padding: 25px;
-            border-radius: 15px;
+            border-radius: var(--border-radius-medium);
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s;
-            border-top: 5px solid var(--cor02, #00fd94);
+            transition: all var(--transition-medium);
+            border-top: 5px solid var(--cor02);
             height: 400px;
             display: flex;
             flex-direction: column;
             overflow: hidden;
             box-sizing: border-box;
+        }
+
+        .admin-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
         }
 
         .card-content {
@@ -68,7 +51,7 @@
         }
 
         .admin-card h3 {
-            color: var(--cor03, #376f6c);
+            color: var(--cor03);
             margin-bottom: 12px;
             font-size: 1.3em;
             display: flex;
@@ -87,85 +70,35 @@
         .card-actions {
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 8px;
             margin-top: 15px;
             flex-shrink: 0;
             align-items: center;
             width: 100%;
         }
 
-        .btn {
-            background: var(--cor02, #00fd94);
-            color: var(--cor05, #090909);
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            text-decoration: none;
-            display: block;
-            text-align: center;
-            transition: all 0.3s;
+        .card-actions .btn {
             width: 90%;
-            max-width: 300px;
-        }
-
-        .btn:hover {
-            background: var(--cor06, #00cafd);
-            transform: translateY(-2px);
-        }
-
-        .btn-secondary {
-            background: var(--cor03, #376f6c);
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            background: var(--cor04, #1e3231);
-        }
-
-        .btn-danger {
-            background: #dc3545;
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background: #c82333;
+            text-align: center;
+            font-size: 0.9em;
+            padding: 10px;
         }
 
         .icon {
             font-size: 1.5em;
         }
 
-        .back-button {
-            background: var(--cor03, #376f6c);
-            color: white;
-            text-decoration: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            display: inline-block;
-            margin-bottom: 20px;
-            transition: all 0.3s;
-            font-weight: 500;
-        }
-
-        .back-button:hover {
-            background: var(--cor04, #1e3231);
-            transform: translateY(-2px);
-        }
-
         .stats-section {
-            background: white;
+            background: var(--cor07);
             padding: 30px;
-            border-radius: 15px;
+            border-radius: var(--border-radius-medium);
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             margin-bottom: 30px;
         }
 
         .stats-section h2 {
             margin: 0 0 20px 0;
-            color: var(--cor03, #376f6c);
+            color: var(--cor03);
         }
 
         .stats-grid {
@@ -177,15 +110,15 @@
         .stat-item {
             text-align: center;
             padding: 20px;
-            background: #f8f9fa;
-            border-radius: 10px;
-            border-left: 4px solid var(--cor02, #00fd94);
+            background: var(--cor01);
+            border-radius: var(--border-radius-small);
+            border-left: 4px solid var(--cor02);
         }
 
         .stat-number {
             font-size: 2em;
             font-weight: bold;
-            color: var(--cor03, #376f6c);
+            color: var(--cor03);
             display: block;
         }
 
@@ -196,10 +129,6 @@
         }
 
         @media (max-width: 768px) {
-            .container {
-                padding: 20px 15px;
-            }
-            
             .admin-grid {
                 grid-template-columns: 1fr;
                 gap: 20px;
@@ -210,8 +139,13 @@
             }
 
             .admin-card {
-                padding: 25px;
+                padding: 20px;
                 min-height: auto;
+                height: auto;
+            }
+
+            .card-actions .btn {
+                width: 100%;
             }
         }
     </style>
