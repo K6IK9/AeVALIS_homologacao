@@ -1,5 +1,5 @@
-{% load static %}
 {% load permission_tags %}
+{% load static %}
 
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -8,9 +8,311 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IF SADD - Gerenciar Turmas</title>
-    <link rel="stylesheet" href="{% static 'styles/gerenciamento.css' %}">
-    <style>
 
+    <style>
+        /* Importação das fontes */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Vidaloka&display=swap');
+
+        /* Variáveis CSS comuns */
+        :root {
+            /* Cores principais */
+            --cor01: #f0f0f0;
+            --cor01-alt: #f1f1f1;
+            --cor02: #00fd94;
+            --cor03: #376f6c;
+            --cor04: #1e3231;
+            --cor05: #090909;
+            --cor06: #00cafd;
+            --cor07: #ffffff;
+            --cor08: #ff3c3c;
+
+            /* Fontes */
+            --font01: "Poppins", sans-serif;
+            --font02: "Vidaloka", serif;
+
+            /* Sombras */
+            --shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+            --shadow-alt: 4px 2px 8px rgba(0, 0, 0, 0.2);
+
+            /* Bordas e raios */
+            --border-radius-small: 5px;
+            --border-radius-medium: 15px;
+            --border-radius-large: 25px;
+            --border-radius-xl: 35px;
+            --border-radius-circle: 50%;
+
+            /* Espaçamentos */
+            --spacing-xs: 5px;
+            --spacing-sm: 10px;
+            --spacing-md: 15px;
+            --spacing-lg: 20px;
+            --spacing-xl: 25px;
+            --spacing-2xl: 40px;
+            --spacing-3xl: 50px;
+
+            /* Transições */
+            --transition-fast: 0.2s;
+            --transition-medium: 0.3s;
+        }
+
+        /* Reset global */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: var(--font01);
+        }
+
+        body {
+            background: var(--cor01);
+        }
+
+        /* Layout base para páginas de gerenciamento */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: var(--cor03);
+            color: white;
+            padding: 20px;
+            border-radius: var(--border-radius-medium);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0 0 10px 0;
+            font-size: 2.2em;
+        }
+
+        .header p {
+            margin: 0;
+            opacity: 0.9;
+        }
+
+        /* Seções de formulário */
+        .form-section {
+            background: var(--cor07);
+            padding: 30px;
+            border-radius: var(--border-radius-medium);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .form-section h2 {
+            color: var(--cor03);
+            margin-bottom: 20px;
+            font-size: 1.4em;
+        }
+
+        /* Grupos de formulário */
+        .form-group {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--cor03);
+        }
+
+        /* Controles de formulário */
+        .form-control,
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+        }
+
+        .form-control:focus,
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--cor02);
+        }
+
+        /* Botões */
+        .btn {
+            background: var(--cor02);
+            color: var(--cor05);
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            background: var(--cor06);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--cor03);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: var(--cor04);
+        }
+
+        .btn-danger {
+            background: var(--cor08);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        /* Botão de voltar */
+        .back-button {
+            background: var(--cor03);
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            display: inline-block;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+
+        .back-button:hover {
+            background: var(--cor04);
+            transform: translateY(-2px);
+            color: white;
+            text-decoration: none;
+        }
+
+        /* Tabelas */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: var(--cor07);
+            border-radius: var(--border-radius-medium);
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .data-table th {
+            background: var(--cor03);
+            color: white;
+            font-weight: 600;
+        }
+
+        .data-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .data-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Mensagens */
+        .messages {
+            margin-bottom: 20px;
+        }
+
+        .message {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+
+        .message.warning {
+            background: #fff3cd;
+            color: #856404;
+            border-left: 4px solid #ffc107;
+        }
+
+        .message.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border-left: 4px solid #17a2b8;
+        }
+
+        /* Informações adicionais */
+        .item-count {
+            font-size: 0.9em;
+            color: var(--cor03);
+            margin-top: 10px;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .form-section {
+                padding: 20px;
+            }
+
+            .data-table {
+                font-size: 0.9em;
+            }
+
+            .data-table th,
+            .data-table td {
+                padding: 10px;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.6em;
+            }
+
+            .btn {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+
+            .back-button {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+    <style>
         .form-group label {
             display: block;
             margin-bottom: 8px;
@@ -171,16 +473,22 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
         }
 
         @keyframes slideIn {
-            from { 
+            from {
                 opacity: 0;
                 transform: translateY(-30px) scale(0.95);
             }
-            to { 
+
+            to {
                 opacity: 1;
                 transform: translateY(0) scale(1);
             }
@@ -415,7 +723,7 @@
                 align-items: stretch;
             }
 
-            .section-header 
+            .section-header
         }
     </style>
 </head>
@@ -423,7 +731,7 @@
 <body>
     <div class="container">
         <a href="{% url 'admin_hub' %}" class="back-button">← Voltar ao Início</a>
-        
+
         <div class="header">
             <h1>Gerenciamento de Turmas</h1>
             <p>Crie e visualize as turmas do sistema por período letivo</p>
@@ -448,11 +756,11 @@
                         <label for="{{ form.disciplina.id_for_label }}">{{ form.disciplina.label }}</label>
                         {{ form.disciplina }}
                         {% if form.disciplina.errors %}
-                            <div style="color: #dc3545; font-size: 0.875em; margin-top: 5px;">
-                                {% for error in form.disciplina.errors %}
-                                    {{ error }}
-                                {% endfor %}
-                            </div>
+                        <div style="color: #dc3545; font-size: 0.875em; margin-top: 5px;">
+                            {% for error in form.disciplina.errors %}
+                            {{ error }}
+                            {% endfor %}
+                        </div>
                         {% endif %}
                     </div>
 
@@ -460,11 +768,11 @@
                         <label for="{{ form.professor.id_for_label }}">{{ form.professor.label }}</label>
                         {{ form.professor }}
                         {% if form.professor.errors %}
-                            <div style="color: #dc3545; font-size: 0.875em; margin-top: 5px;">
-                                {% for error in form.professor.errors %}
-                                    {{ error }}
-                                {% endfor %}
-                            </div>
+                        <div style="color: #dc3545; font-size: 0.875em; margin-top: 5px;">
+                            {% for error in form.professor.errors %}
+                            {{ error }}
+                            {% endfor %}
+                        </div>
                         {% endif %}
                     </div>
                 </div>
@@ -474,11 +782,11 @@
                         <label for="{{ form.periodo_letivo.id_for_label }}">{{ form.periodo_letivo.label }}</label>
                         {{ form.periodo_letivo }}
                         {% if form.periodo_letivo.errors %}
-                            <div style="color: #dc3545; font-size: 0.875em; margin-top: 5px;">
-                                {% for error in form.periodo_letivo.errors %}
-                                    {{ error }}
-                                {% endfor %}
-                            </div>
+                        <div style="color: #dc3545; font-size: 0.875em; margin-top: 5px;">
+                            {% for error in form.periodo_letivo.errors %}
+                            {{ error }}
+                            {% endfor %}
+                        </div>
                         {% endif %}
                     </div>
 
@@ -486,23 +794,23 @@
                         <label for="{{ form.turno.id_for_label }}">{{ form.turno.label }}</label>
                         {{ form.turno }}
                         {% if form.turno.errors %}
-                            <div style="color: #dc3545; font-size: 0.875em; margin-top: 5px;">
-                                {% for error in form.turno.errors %}
-                                    {{ error }}
-                                {% endfor %}
-                            </div>
+                        <div style="color: #dc3545; font-size: 0.875em; margin-top: 5px;">
+                            {% for error in form.turno.errors %}
+                            {{ error }}
+                            {% endfor %}
+                        </div>
                         {% endif %}
                     </div>
                 </div>
 
                 {% if form.non_field_errors %}
-                    <div style="color: #dc3545; font-size: 0.875em; margin-bottom: 15px;">
-                        {% for error in form.non_field_errors %}
-                            {{ error }}
-                        {% endfor %}
-                    </div>
+                <div style="color: #dc3545; font-size: 0.875em; margin-bottom: 15px;">
+                    {% for error in form.non_field_errors %}
+                    {{ error }}
+                    {% endfor %}
+                </div>
                 {% endif %}
-                
+
                 <button type="submit" class="btn">Criar Turma</button>
             </form>
         </div>
@@ -511,7 +819,7 @@
             <div class="section-header">
                 <h2>Turmas Cadastradas</h2>
             </div>
-            
+
             <!-- Filtros -->
             <div class="filters-section">
                 <h3 style="margin: 0 0 15px 0; color: var(--cor03, #376f6c);">Filtros e Busca</h3>
@@ -521,9 +829,12 @@
                             <label for="turno">Filtrar por Turno:</label>
                             <select name="turno" id="turno" class="form-control" onchange="aplicarFiltros()">
                                 <option value="">Todos os turnos</option>
-                                <option value="matutino" {% if filtro_turno == 'matutino' %}selected{% endif %}>Matutino</option>
-                                <option value="vespertino" {% if filtro_turno == 'vespertino' %}selected{% endif %}>Vespertino</option>
-                                <option value="noturno" {% if filtro_turno == 'noturno' %}selected{% endif %}>Noturno</option>
+                                <option value="matutino" {% if filtro_turno=='matutino' %}selected{% endif %}>Matutino
+                                </option>
+                                <option value="vespertino" {% if filtro_turno=='vespertino' %}selected{% endif %}>
+                                    Vespertino</option>
+                                <option value="noturno" {% if filtro_turno=='noturno' %}selected{% endif %}>Noturno
+                                </option>
                             </select>
                         </div>
                         <div class="filter-group">
@@ -531,7 +842,8 @@
                             <select name="periodo" id="periodo" class="form-control" onchange="aplicarFiltros()">
                                 <option value="">Todos os períodos</option>
                                 {% for periodo in periodos_disponiveis %}
-                                <option value="{{ periodo.id }}" {% if filtro_periodo == periodo.id|stringformat:"s" %}selected{% endif %}>
+                                <option value="{{ periodo.id }}" {% if filtro_periodo==periodo.id|stringformat:"s"
+                                    %}selected{% endif %}>
                                     {{ periodo.ano }}.{{ periodo.semestre }}
                                 </option>
                                 {% endfor %}
@@ -541,8 +853,9 @@
                             <label for="status">Filtrar por Status:</label>
                             <select name="status" id="status" class="form-control" onchange="aplicarFiltros()">
                                 <option value="">Todos os status</option>
-                                <option value="ativa" {% if filtro_status == 'ativa' %}selected{% endif %}>Ativa</option>
-                                <option value="finalizada" {% if filtro_status == 'finalizada' %}selected{% endif %}>Finalizada</option>
+                                <option value="ativa" {% if filtro_status=='ativa' %}selected{% endif %}>Ativa</option>
+                                <option value="finalizada" {% if filtro_status=='finalizada' %}selected{% endif %}>
+                                    Finalizada</option>
                             </select>
                         </div>
                         <div class="filter-group">
@@ -620,11 +933,14 @@
 
                     <div class="alunos-header controls">
                         <div class="search-box">
-                            <input type="text" id="busca-alunos" placeholder="Buscar alunos..." onkeyup="buscarAlunos()">
+                            <input type="text" id="busca-alunos" placeholder="Buscar alunos..."
+                                onkeyup="buscarAlunos()">
                         </div>
                         <div class="bulk-actions">
-                            <button type="button" class="btn-small btn-save-selection" onclick="matricularSelecionados()">Matricular Selecionados</button>
-                            <button type="button" class="btn-small" style="background: #dc3545; color: white;" onclick="desmatricularSelecionados()">Desmatricular Selecionados</button>
+                            <button type="button" class="btn-small btn-save-selection"
+                                onclick="matricularSelecionados()">Matricular Selecionados</button>
+                            <button type="button" class="btn-small" style="background: #dc3545; color: white;"
+                                onclick="desmatricularSelecionados()">Desmatricular Selecionados</button>
                         </div>
                     </div>
 
@@ -643,7 +959,7 @@
         let alunosData = [];
 
         // Fechar modal com tecla Escape
-        document.addEventListener('keydown', function(event) {
+        document.addEventListener('keydown', function (event) {
             if (event.key === 'Escape') {
                 fecharGerenciamentoAlunos();
             }
@@ -671,11 +987,11 @@
             if (event && event.target !== event.currentTarget && !event.target.classList.contains('btn-close-modal')) {
                 return;
             }
-            
+
             document.getElementById('modal-overlay').classList.remove('active');
             turmaAtual = null;
             alunosData = [];
-            
+
             // Limpar busca
             document.getElementById('busca-alunos').value = '';
         }
@@ -684,7 +1000,7 @@
             if (!turmaAtual) return;
 
             const url = `{% url 'buscar_alunos_turma' %}?turma_id=${turmaAtual}&busca=${encodeURIComponent(busca)}`;
-            
+
             fetch(url)
                 .then(response => response.json())
                 .then(data => {
@@ -692,7 +1008,7 @@
                         alert('Erro: ' + data.error);
                         return;
                     }
-                    
+
                     alunosData = data.alunos;
                     atualizarInfoTurma(data.turma);
                     renderizarAlunos();
@@ -713,7 +1029,7 @@
 
         function renderizarAlunos() {
             const container = document.getElementById('alunos-list');
-            
+
             if (alunosData.length === 0) {
                 container.innerHTML = `
                     <div style="text-align: center; padding: 40px; color: #666;">
@@ -752,10 +1068,10 @@
         }
 
         function matricularSelecionados() {
-            const selecionados = alunosData.filter(a => 
+            const selecionados = alunosData.filter(a =>
                 document.querySelector(`input[value="${a.id}"]`).checked && !a.matriculado
             );
-            
+
             if (selecionados.length === 0) {
                 alert('Selecione pelo menos um aluno não matriculado');
                 return;
@@ -769,10 +1085,10 @@
         }
 
         function desmatricularSelecionados() {
-            const selecionados = alunosData.filter(a => 
+            const selecionados = alunosData.filter(a =>
                 document.querySelector(`input[value="${a.id}"]`).checked && a.matriculado
             );
-            
+
             if (selecionados.length === 0) {
                 alert('Selecione pelo menos um aluno matriculado');
                 return;
@@ -796,22 +1112,23 @@
                 method: 'POST',
                 body: formData
             })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert(data.message);
-                    carregarAlunos(); // Recarregar lista
-                    // Não recarregar a página toda, apenas atualizar a contagem se necessário
-                    // location.reload();
-                } else {
-                    alert('Erro: ' + data.error);
-                }
-            })
-            .catch(error => {
-                console.error('Erro:', error);
-                alert('Erro ao processar ação');
-            });
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        carregarAlunos(); // Recarregar lista
+                        // Não recarregar a página toda, apenas atualizar a contagem se necessário
+                        // location.reload();
+                    } else {
+                        alert('Erro: ' + data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro:', error);
+                    alert('Erro ao processar ação');
+                });
         }
     </script>
 </body>
+
 </html>

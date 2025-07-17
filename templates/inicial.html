@@ -1,5 +1,5 @@
-{% load static %}
 {% load permission_tags %}
+{% load static %}
 
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -8,7 +8,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IF SADD - Home</title>
-    <!-- <link rel="stylesheet" href="{% static 'styles/home_estu.css' %}"> -->
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Vidaloka&display=swap');
 
@@ -163,42 +163,52 @@
 
 
         {% if user|has_role:'admin' %}
-            <h1>Seja bem-vindo(a) Administrador: <span id="alunoAtual"> {{ user.first_name }} {{ user.last_name }}</span></h1>
-            <section id="opcoes">
-                <h2>Opções Disponíveis</h2>
-                <button onclick="window.location.href='{% url 'listar_avaliacoes' %}'" id="realizar_avaliacao">Gerenciar Avaliações Docentes</button>
-                <button onclick="window.location.href='{% url 'relatorio_avaliacoes' %}'" id="relatorio_avaliacoes">Relatórios de Avaliações</button>
-                <button onclick="window.location.href='{% url 'admin_hub' %}'" id="admin_hub">Acessar Hub
-                    Administrativo</button>
-            </section>
+        <h1>Seja bem-vindo(a) Administrador: <span id="alunoAtual"> {{ user.first_name }} {{ user.last_name }}</span>
+        </h1>
+        <section id="opcoes">
+            <h2>Opções Disponíveis</h2>
+            <button onclick="window.location.href='{% url 'listar_avaliacoes' %}'" id="realizar_avaliacao">Gerenciar
+                Avaliações Docentes</button>
+            <button onclick="window.location.href='{% url 'relatorio_avaliacoes' %}'"
+                id="relatorio_avaliacoes">Relatórios de Avaliações</button>
+            <button onclick="window.location.href='{% url 'admin_hub' %}'" id="admin_hub">Acessar Hub
+                Administrativo</button>
+        </section>
 
- 
+
         {% elif user|has_role:'coordenador' %}
-            <h1>Seja bem-vindo(a) Coordenador: <span id="alunoAtual"> {{ user.first_name }} {{ user.last_name }}</span></h1>
-            <section id="opcoes">
-                <h2>Opções Disponíveis</h2>
-                <button onclick="window.location.href='{% url 'listar_avaliacoes' %}'" id="realizar_avaliacao">Gerenciar Avaliações Docentes</button>
-                <button onclick="window.location.href='{% url 'relatorio_avaliacoes' %}'" id="relatorio_avaliacoes">Relatórios de Avaliações</button>
-            </section>
+        <h1>Seja bem-vindo(a) Coordenador: <span id="alunoAtual"> {{ user.first_name }} {{ user.last_name }}</span></h1>
+        <section id="opcoes">
+            <h2>Opções Disponíveis</h2>
+            <button onclick="window.location.href='{% url 'listar_avaliacoes' %}'" id="realizar_avaliacao">Gerenciar
+                Avaliações Docentes</button>
+            <button onclick="window.location.href='{% url 'relatorio_avaliacoes' %}'"
+                id="relatorio_avaliacoes">Relatórios de Avaliações</button>
+        </section>
         {% elif user|has_role:'professor' %}
-            <h1>Seja bem-vindo(a) Professor: <span id="alunoAtual"> {{ user.first_name }} {{ user.last_name }}</span></h1>
-            <section id="opcoes">
-                <h2>Opções Disponíveis</h2>
-                <button onclick="window.location.href='{% url 'listar_avaliacoes' %}'" id="realizar_avaliacao">Ver Minhas Avaliações</button>
-                <button onclick="window.location.href='{% url 'relatorio_avaliacoes' %}'" id="relatorio_avaliacoes">Histórico de Avaliações</button>
-            </section>
+        <h1>Seja bem-vindo(a) Professor: <span id="alunoAtual"> {{ user.first_name }} {{ user.last_name }}</span></h1>
+        <section id="opcoes">
+            <h2>Opções Disponíveis</h2>
+            <button onclick="window.location.href='{% url 'listar_avaliacoes' %}'" id="realizar_avaliacao">Ver Minhas
+                Avaliações</button>
+            <button onclick="window.location.href='{% url 'relatorio_avaliacoes' %}'"
+                id="relatorio_avaliacoes">Histórico de Avaliações</button>
+        </section>
         {% elif user|has_role:'aluno' %}
-            <h1>Seja bem-vindo(a) Aluno: <span id="alunoAtual"> {{ user.first_name }} {{ user.last_name }}</span></h1>
-            <section id="opcoes">
-                <h2>Opções Disponíveis</h2>
-                <button onclick="window.location.href='{% url 'listar_avaliacoes' %}'" id="realizar_avaliacao">Realizar Avaliação Docente</button>
-                <button onclick="window.location.href='{% url 'listar_avaliacoes' %}'" id="relatorio_avaliacoes">Minhas Avaliações</button>
-            </section>
+        <h1>Seja bem-vindo(a) Aluno: <span id="alunoAtual"> {{ user.first_name }} {{ user.last_name }}</span></h1>
+        <section id="opcoes">
+            <h2>Opções Disponíveis</h2>
+            <button onclick="window.location.href='{% url 'listar_avaliacoes' %}'" id="realizar_avaliacao">Realizar
+                Avaliação Docente</button>
+            <button onclick="window.location.href='{% url 'listar_avaliacoes' %}'" id="relatorio_avaliacoes">Minhas
+                Avaliações</button>
+        </section>
         {% else %}
-        <h1>Seja bem-vindo(a) <span id="alunoAtual"> {{ user.first_name }} {{ user.last_name }}</span></h1>     
-        <h2 style="color:rgb(255, 0, 0);">Por favor, entre em contato com o administrador do sistema para definir seu perfil de usuario.</h2>
+        <h1>Seja bem-vindo(a) <span id="alunoAtual"> {{ user.first_name }} {{ user.last_name }}</span></h1>
+        <h2 style="color:rgb(255, 0, 0);">Por favor, entre em contato com o administrador do sistema para definir seu
+            perfil de usuario.</h2>
         {% endif %}
-            
+
     </main>
 
 
