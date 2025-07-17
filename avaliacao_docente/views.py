@@ -164,6 +164,73 @@ def gerenciar_cursos(request):
 
 
 @login_required
+def editar_curso(request, curso_id):
+    """
+    View para editar um curso existente
+    """
+    if not check_user_permission(request.user, ["coordenador", "admin"]):
+        messages.error(request, "Você não tem permissão para editar cursos.")
+        return redirect("inicio")
+
+    curso = get_object_or_404(Curso, id=curso_id)
+
+    if request.method == "POST":
+        form = CursoForm(request.POST, instance=curso)
+        if form.is_valid():
+            form.save()
+            messages.success(
+                request, f"Curso '{curso.curso_nome}' atualizado com sucesso!"
+            )
+            return redirect("gerenciar_cursos")
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"Erro no campo {field}: {error}")
+    else:
+        form = CursoForm(instance=curso)
+
+    context = {"form": form, "curso": curso, "editing": True}
+    return render(request, "gerenciar_cursos.html", context)
+
+
+@login_required
+def excluir_curso(request, curso_id):
+    """
+    View para excluir um curso
+    """
+    if not check_user_permission(request.user, ["coordenador", "admin"]):
+        return JsonResponse({"error": "Sem permissão"}, status=403)
+
+    if request.method == "POST":
+        try:
+            curso = get_object_or_404(Curso, id=curso_id)
+
+            # Verificar se há disciplinas relacionadas
+            if curso.disciplinas.exists():
+                return JsonResponse(
+                    {
+                        "error": f"Não é possível excluir o curso '{curso.curso_nome}' pois existem disciplinas vinculadas a ele."
+                    },
+                    status=400,
+                )
+
+            nome_curso = curso.curso_nome
+            curso.delete()
+
+            return JsonResponse(
+                {
+                    "success": True,
+                    "message": f"Curso '{nome_curso}' excluído com sucesso!",
+                }
+            )
+
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+
+    return JsonResponse({"error": "Método não permitido"}, status=405)
+
+
+@login_required
 def gerenciar_disciplinas(request):
     """
     View para gerenciar disciplinas
@@ -200,6 +267,79 @@ def gerenciar_disciplinas(request):
 
 
 @login_required
+def editar_disciplina(request, disciplina_id):
+    """
+    View para editar uma disciplina existente
+    """
+    if not check_user_permission(request.user, ["coordenador", "admin"]):
+        messages.error(request, "Você não tem permissão para editar disciplinas.")
+        return redirect("inicio")
+
+    disciplina = get_object_or_404(Disciplina, id=disciplina_id)
+
+    if request.method == "POST":
+        form = DisciplinaForm(request.POST, instance=disciplina)
+        if form.is_valid():
+            form.save()
+            messages.success(
+                request,
+                f"Disciplina '{disciplina.disciplina_nome}' atualizada com sucesso!",
+            )
+            return redirect("gerenciar_disciplinas")
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"Erro no campo {field}: {error}")
+    else:
+        form = DisciplinaForm(instance=disciplina)
+
+    context = {
+        "form": form,
+        "disciplina": disciplina,
+        "disciplinas": Disciplina.objects.all().order_by("disciplina_nome"),
+        "editing": True,
+    }
+    return render(request, "gerenciar_disciplinas.html", context)
+
+
+@login_required
+def excluir_disciplina(request, disciplina_id):
+    """
+    View para excluir uma disciplina
+    """
+    if not check_user_permission(request.user, ["coordenador", "admin"]):
+        return JsonResponse({"error": "Sem permissão"}, status=403)
+
+    if request.method == "POST":
+        try:
+            disciplina = get_object_or_404(Disciplina, id=disciplina_id)
+
+            # Verificar se há turmas relacionadas
+            if disciplina.turmas.exists():
+                return JsonResponse(
+                    {
+                        "error": f"Não é possível excluir a disciplina '{disciplina.disciplina_nome}' pois existem turmas vinculadas a ela."
+                    },
+                    status=400,
+                )
+
+            nome_disciplina = disciplina.disciplina_nome
+            disciplina.delete()
+
+            return JsonResponse(
+                {
+                    "success": True,
+                    "message": f"Disciplina '{nome_disciplina}' excluída com sucesso!",
+                }
+            )
+
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+
+    return JsonResponse({"error": "Método não permitido"}, status=405)
+
+
+@login_required
 def gerenciar_periodos(request):
     """
     View para gerenciar períodos letivos
@@ -227,6 +367,86 @@ def gerenciar_periodos(request):
     context = {"form": form, "periodos": periodos}
 
     return render(request, "gerenciar_periodos.html", context)
+
+
+@login_required
+def editar_periodo(request, periodo_id):
+    """
+    View para editar um período letivo existente
+    """
+    if not check_user_permission(request.user, ["coordenador", "admin"]):
+        messages.error(request, "Você não tem permissão para editar períodos.")
+        return redirect("inicio")
+
+    periodo = get_object_or_404(PeriodoLetivo, id=periodo_id)
+
+    if request.method == "POST":
+        form = PeriodoLetivoForm(request.POST, instance=periodo)
+        if form.is_valid():
+            form.save()
+            messages.success(
+                request, f"Período '{periodo.nome}' atualizado com sucesso!"
+            )
+            return redirect("gerenciar_periodos")
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"Erro no campo {field}: {error}")
+    else:
+        form = PeriodoLetivoForm(instance=periodo)
+
+    context = {
+        "form": form,
+        "periodo": periodo,
+        "periodos": PeriodoLetivo.objects.all().order_by("-ano", "-semestre"),
+        "editing": True,
+    }
+    return render(request, "gerenciar_periodos.html", context)
+
+
+@login_required
+def excluir_periodo(request, periodo_id):
+    """
+    View para excluir um período letivo
+    """
+    if not check_user_permission(request.user, ["coordenador", "admin"]):
+        return JsonResponse({"error": "Sem permissão"}, status=403)
+
+    if request.method == "POST":
+        try:
+            periodo = get_object_or_404(PeriodoLetivo, id=periodo_id)
+
+            # Verificar se há turmas ou disciplinas relacionadas
+            if periodo.turmas.exists():
+                return JsonResponse(
+                    {
+                        "error": f"Não é possível excluir o período '{periodo.nome}' pois existem turmas vinculadas a ele."
+                    },
+                    status=400,
+                )
+
+            if periodo.disciplinas.exists():
+                return JsonResponse(
+                    {
+                        "error": f"Não é possível excluir o período '{periodo.nome}' pois existem disciplinas vinculadas a ele."
+                    },
+                    status=400,
+                )
+
+            nome_periodo = periodo.nome
+            periodo.delete()
+
+            return JsonResponse(
+                {
+                    "success": True,
+                    "message": f"Período '{nome_periodo}' excluído com sucesso!",
+                }
+            )
+
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+
+    return JsonResponse({"error": "Método não permitido"}, status=405)
 
 
 @login_required
@@ -296,7 +516,89 @@ def gerenciar_turmas(request):
     return render(request, "gerenciar_turmas.html", context)
 
 
-# Pagina admin_hub
+@login_required
+def editar_turma(request, turma_id):
+    """
+    View para editar uma turma existente
+    """
+    if not check_user_permission(request.user, ["coordenador", "admin"]):
+        messages.error(request, "Você não tem permissão para editar turmas.")
+        return redirect("inicio")
+
+    turma = get_object_or_404(Turma, id=turma_id)
+
+    if request.method == "POST":
+        form = TurmaForm(request.POST, instance=turma)
+        if form.is_valid():
+            form.save()
+            messages.success(
+                request, f"Turma '{turma.codigo_turma}' atualizada com sucesso!"
+            )
+            return redirect("gerenciar_turmas")
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"Erro no campo {field}: {error}")
+    else:
+        form = TurmaForm(instance=turma)
+
+    # Períodos disponíveis para o filtro
+    periodos_disponiveis = PeriodoLetivo.objects.all().order_by("-ano", "-semestre")
+
+    context = {
+        "form": form,
+        "turma": turma,
+        "turmas": Turma.objects.select_related(
+            "disciplina", "professor", "periodo_letivo"
+        ).order_by(
+            "-periodo_letivo__ano",
+            "-periodo_letivo__semestre",
+            "disciplina__disciplina_nome",
+        ),
+        "periodos_disponiveis": periodos_disponiveis,
+        "editing": True,
+    }
+    return render(request, "gerenciar_turmas.html", context)
+
+
+@login_required
+def excluir_turma(request, turma_id):
+    """
+    View para excluir uma turma
+    """
+    if not check_user_permission(request.user, ["coordenador", "admin"]):
+        return JsonResponse({"error": "Sem permissão"}, status=403)
+
+    if request.method == "POST":
+        try:
+            turma = get_object_or_404(Turma, id=turma_id)
+
+            # Verificar se há matrículas ativas
+            matriculas_ativas = turma.matriculas.filter(status="ativa").count()
+            if matriculas_ativas > 0:
+                return JsonResponse(
+                    {
+                        "error": f"Não é possível excluir a turma '{turma.codigo_turma}' pois existem {matriculas_ativas} aluno(s) matriculado(s)."
+                    },
+                    status=400,
+                )
+
+            codigo_turma = turma.codigo_turma
+            turma.delete()
+
+            return JsonResponse(
+                {
+                    "success": True,
+                    "message": f"Turma '{codigo_turma}' excluída com sucesso!",
+                }
+            )
+
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+
+    return JsonResponse({"error": "Método não permitido"}, status=405)
+
+
 class AdminHubView(LoginRequiredMixin, TemplateView):
     template_name = "admin/admin_hub.html"
 
@@ -656,7 +958,7 @@ def editar_questionario_perguntas(request, questionario_id):
     questionario = get_object_or_404(QuestionarioAvaliacao, id=questionario_id)
     perguntas_existentes = QuestionarioPergunta.objects.filter(
         questionario=questionario
-    ).order_by("ordem")
+    ).order_by("ordem_no_questionario")
 
     categorias = CategoriaPergunta.objects.all()
 
@@ -668,7 +970,9 @@ def editar_questionario_perguntas(request, questionario_id):
                 # Adicionar ao questionário
                 ordem = perguntas_existentes.count() + 1
                 QuestionarioPergunta.objects.create(
-                    questionario=questionario, pergunta=pergunta, ordem=ordem
+                    questionario=questionario,
+                    pergunta=pergunta,
+                    ordem_no_questionario=ordem,
                 )
                 messages.success(request, "Pergunta adicionada com sucesso!")
                 return redirect(
@@ -683,9 +987,9 @@ def editar_questionario_perguntas(request, questionario_id):
             # Reordenar perguntas
             perguntas_restantes = QuestionarioPergunta.objects.filter(
                 questionario=questionario
-            ).order_by("ordem")
+            ).order_by("ordem_no_questionario")
             for i, qp in enumerate(perguntas_restantes, 1):
-                qp.ordem = i
+                qp.ordem_no_questionario = i
                 qp.save()
             messages.success(request, "Pergunta removida com sucesso!")
             return redirect(
@@ -880,9 +1184,9 @@ def visualizar_avaliacao(request, avaliacao_id):
         )
         return redirect("listar_avaliacoes")
 
-    # Pegar respostas
-    respostas = RespostaAvaliacao.objects.filter(avaliacao=avaliacao).order_by(
-        "pergunta__ordem"
+    # Pegar respostas ordenadas pela ordem das perguntas no questionário
+    respostas = RespostaAvaliacao.objects.filter(avaliacao=avaliacao).select_related(
+        "pergunta"
     )
     comentarios = ComentarioAvaliacao.objects.filter(avaliacao=avaliacao)
 

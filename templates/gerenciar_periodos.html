@@ -295,6 +295,139 @@
             color: #856404;
         }
 
+        /* Estilos para botões de ação */
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .btn-action {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85em;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.2s ease;
+            min-width: 70px;
+            justify-content: center;
+        }
+
+        .btn-edit {
+            background: var(--cor06);
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background: #0099cc;
+            transform: translateY(-1px);
+        }
+
+        .btn-delete {
+            background: var(--cor08);
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #c82333;
+            transform: translateY(-1px);
+        }
+
+        /* Estilos para modais */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(2px);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            position: relative;
+            box-shadow: var(--shadow-alt);
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .close-modal {
+            position: absolute;
+            right: 15px;
+            top: 15px;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #aaa;
+            transition: color 0.2s;
+        }
+
+        .close-modal:hover {
+            color: #000;
+        }
+
+        .modal h2,
+        .modal h3 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            color: var(--cor04);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 25px;
+        }
+
+        .modal-actions .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .modal-actions .btn-primary {
+            background: var(--cor02);
+            color: var(--cor04);
+        }
+
+        .modal-actions .btn-secondary {
+            background: var(--cor03);
+            color: white;
+        }
+
+        .modal-actions .btn-danger {
+            background: var(--cor08);
+            color: white;
+        }
+
         /* Responsividade */
         @media (max-width: 768px) {
             .container {
@@ -434,6 +567,7 @@
                         <th>Ano</th>
                         <th>Semestre</th>
                         <th>Identificação</th>
+                        <th>Ações</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -444,10 +578,22 @@
                         <td>{{ periodo.ano }}</td>
                         <td>{{ periodo.get_semestre_display }}</td>
                         <td><strong>{{ periodo.ano }}.{{ periodo.semestre }}</strong></td>
+                        <td>
+                            <div class="action-buttons">
+                                <button type="button" class="btn-action btn-edit"
+                                    onclick="editarPeriodo({{ periodo.id }}, '{{ periodo.nome }}', {{ periodo.ano }}, '{{ periodo.semestre }}')">
+                                    Editar
+                                </button>
+                                <button type="button" class="btn-action btn-delete"
+                                    onclick="excluirPeriodo({{ periodo.id }}, '{{ periodo.nome }}')">
+                                    Excluir
+                                </button>
+                            </div>
+                        </td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="5" style="text-align: center; padding: 40px;">
+                        <td colspan="6" style="text-align: center; padding: 40px;">
                             Nenhum período letivo encontrado.
                         </td>
                     </tr>
@@ -456,6 +602,160 @@
             </table>
         </div>
     </div>
+
+    <!-- Modal de Edição -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Editar Período Letivo</h2>
+            <form id="editForm" method="post">
+                {% csrf_token %}
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="edit_nome">Nome do Período:</label>
+                        <input type="text" id="edit_nome" name="nome" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit_ano">Ano:</label>
+                        <input type="number" id="edit_ano" name="ano" min="2000" max="2099" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="edit_semestre">Semestre:</label>
+                        <select id="edit_semestre" name="semestre" required>
+                            <option value="1">1º Semestre</option>
+                            <option value="2">2º Semestre</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmação de Exclusão -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <h3>Confirmar Exclusão</h3>
+            <p>Tem certeza que deseja excluir este período letivo?</p>
+            <p><strong>Atenção:</strong> Esta ação não pode ser desfeita e pode afetar outros dados relacionados.</p>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeDeleteModal()">Cancelar</button>
+                <button type="button" class="btn btn-danger" onclick="confirmDelete()">Excluir</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variáveis globais para controle dos modais
+        let currentEditId = null;
+        let currentDeleteId = null;
+
+        // Função para abrir modal de edição
+        function editarPeriodo(id, nome, ano, semestre) {
+            currentEditId = id;
+            document.getElementById('edit_nome').value = nome;
+            document.getElementById('edit_ano').value = ano;
+            document.getElementById('edit_semestre').value = semestre;
+
+            // Atualiza a action do formulário
+            document.getElementById('editForm').action = `/editar-periodo/${id}/`;
+
+            document.getElementById('editModal').style.display = 'block';
+        }
+
+        // Função para fechar modal de edição
+        function closeEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+            currentEditId = null;
+        }
+
+        // Função para abrir modal de exclusão
+        function excluirPeriodo(id, nome) {
+            currentDeleteId = id;
+            const confirmText = document.querySelector('#deleteModal p');
+            confirmText.innerHTML = `Tem certeza que deseja excluir o período "<strong>${nome}</strong>"?`;
+            document.getElementById('deleteModal').style.display = 'block';
+        }
+
+        // Função para fechar modal de exclusão
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').style.display = 'none';
+            currentDeleteId = null;
+        }
+
+        // Função para confirmar exclusão
+        function confirmDelete() {
+            if (currentDeleteId) {
+                fetch(`/excluir-periodo/${currentDeleteId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                        'Content-Type': 'application/json',
+                    },
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            location.reload();
+                        } else {
+                            alert('Erro ao excluir período: ' + (data.error || 'Erro desconhecido'));
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erro:', error);
+                        alert('Erro ao excluir período');
+                    });
+
+                closeDeleteModal();
+            }
+        }
+
+        // Fechar modais ao clicar no X ou fora do modal
+        document.querySelector('.close-modal').onclick = closeEditModal;
+
+        window.onclick = function (event) {
+            const editModal = document.getElementById('editModal');
+            const deleteModal = document.getElementById('deleteModal');
+
+            if (event.target == editModal) {
+                closeEditModal();
+            }
+            if (event.target == deleteModal) {
+                closeDeleteModal();
+            }
+        }
+
+        // Tratar envio do formulário de edição via AJAX (opcional)
+        document.getElementById('editForm').onsubmit = function (e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+
+            fetch(this.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': formData.get('csrfmiddlewaretoken'),
+                },
+            })
+                .then(response => {
+                    if (response.ok) {
+                        location.reload();
+                    } else {
+                        alert('Erro ao editar período');
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro:', error);
+                    alert('Erro ao editar período');
+                });
+        };
+    </script>
 </body>
 
 </html>
