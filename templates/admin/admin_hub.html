@@ -378,16 +378,22 @@
 
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
         }
 
         .stat-item {
             text-align: center;
-            padding: 20px;
+            padding: 15px;
             background: var(--cor01);
             border-radius: var(--border-radius-small);
             border-left: 4px solid var(--cor02);
+            transition: all 0.3s;
+        }
+
+        .stat-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
         .stat-number {
@@ -482,6 +488,22 @@
                 <div class="stat-item">
                     <span class="stat-number">{{ total_disciplinas|default:"0" }}</span>
                     <span class="stat-label">Disciplinas</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">{{ total_turmas|default:"0" }}</span>
+                    <span class="stat-label">Turmas Ativas</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">{{ total_professores|default:"0" }}</span>
+                    <span class="stat-label">Professores</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">{{ total_alunos|default:"0" }}</span>
+                    <span class="stat-label">Alunos</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">{{ total_periodos|default:"0" }}</span>
+                    <span class="stat-label">Períodos Letivos</span>
                 </div>
                 <div class="stat-item">
                     <span class="stat-number">{{ total_avaliacoes|default:"0" }}</span>

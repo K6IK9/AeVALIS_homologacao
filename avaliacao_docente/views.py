@@ -5,6 +5,7 @@ from django.views.generic.edit import CreateView
 from django.views.generic import TemplateView
 from django.urls import reverse_lazy
 from django.contrib.auth import login
+from django.db.models import Q
 from .forms import (
     RegistroForm,
     GerenciarRoleForm,
@@ -85,13 +86,49 @@ def gerenciar_roles(request):
     else:
         form = GerenciarRoleForm()
 
+    # Obter parâmetros de filtro da URL
+    busca = request.GET.get("busca", "").strip()
+    filtro_role = request.GET.get("role", "")
+
+    # Iniciar com todos os usuários
+    usuarios_queryset = User.objects.all()
+
+    # Aplicar filtro de busca por nome ou matrícula
+    if busca:
+        usuarios_queryset = usuarios_queryset.filter(
+            Q(first_name__icontains=busca)
+            | Q(last_name__icontains=busca)
+            | Q(username__icontains=busca)
+        )
+
     # Lista todos os usuários com suas roles
     usuarios_com_roles = []
-    for user in User.objects.all().order_by("username"):
+    for user in usuarios_queryset.order_by("username"):
         role_atual = get_user_role_name(user)
+
+        # Aplicar filtro por role
+        if filtro_role:
+            # Mapeamento dos filtros para os nomes das roles
+            filtros_map = {
+                "admin": "Administrador",
+                "coordenador": "Coordenador",
+                "professor": "Professor",
+                "aluno": "Aluno",
+                "sem_role": "Sem role",
+            }
+
+            role_esperada = filtros_map.get(filtro_role, filtro_role)
+            if role_atual != role_esperada:
+                continue
+
         usuarios_com_roles.append({"usuario": user, "role": role_atual})
 
-    context = {"form": form, "usuarios_com_roles": usuarios_com_roles}
+    context = {
+        "form": form,
+        "usuarios_com_roles": usuarios_com_roles,
+        "filtro_busca": busca,
+        "filtro_role": filtro_role,
+    }
 
     return render(request, "gerenciar_roles.html", context)
 
@@ -262,6 +299,28 @@ def gerenciar_turmas(request):
 # Pagina admin_hub
 class AdminHubView(LoginRequiredMixin, TemplateView):
     template_name = "admin/admin_hub.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        """Verifica se o usuário tem permissão para acessar o admin hub"""
+        if not check_user_permission(request.user, ["coordenador", "admin"]):
+            messages.error(request, "Você não tem permissão para acessar esta página.")
+            return redirect("inicio")
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Estatísticas do sistema
+        context["total_usuarios"] = User.objects.count()
+        context["total_cursos"] = Curso.objects.count()
+        context["total_disciplinas"] = Disciplina.objects.count()
+        context["total_avaliacoes"] = Avaliacao.objects.count()
+        context["total_turmas"] = Turma.objects.count()
+        context["total_professores"] = PerfilProfessor.objects.count()
+        context["total_alunos"] = PerfilAluno.objects.count()
+        context["total_periodos"] = PeriodoLetivo.objects.count()
+
+        return context
 
 
 # Painel principal
