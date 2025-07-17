@@ -8,15 +8,16 @@ class PerfilProfessorManager(models.Manager):
     def get_queryset(self):
         from rolepermissions.checkers import has_role
 
-        return (
-            super()
-            .get_queryset()
-            .exclude(
-                user__id__in=[
-                    user.id for user in User.objects.all() if has_role(user, "admin")
-                ]
-            )
-        )
+        # Obter IDs de admins de forma lazy
+        try:
+            admin_ids = [
+                user.id for user in User.objects.all() if has_role(user, "admin")
+            ]
+        except Exception:
+            # Se houver erro (tabelas não existem), retorna queryset vazio de exclusão
+            admin_ids = []
+
+        return super().get_queryset().exclude(user__id__in=admin_ids)
 
     def non_admin(self):
         """Retorna apenas professores que não são admin"""
@@ -29,15 +30,16 @@ class PerfilAlunoManager(models.Manager):
     def get_queryset(self):
         from rolepermissions.checkers import has_role
 
-        return (
-            super()
-            .get_queryset()
-            .exclude(
-                user__id__in=[
-                    user.id for user in User.objects.all() if has_role(user, "admin")
-                ]
-            )
-        )
+        # Obter IDs de admins de forma lazy
+        try:
+            admin_ids = [
+                user.id for user in User.objects.all() if has_role(user, "admin")
+            ]
+        except Exception:
+            # Se houver erro (tabelas não existem), retorna queryset vazio de exclusão
+            admin_ids = []
+
+        return super().get_queryset().exclude(user__id__in=admin_ids)
 
     def non_admin(self):
         """Retorna apenas alunos que não são admin"""

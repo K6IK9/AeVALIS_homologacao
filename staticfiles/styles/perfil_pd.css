@@ -2,8 +2,10 @@
 
 /* Sobrescrever variáveis específicas do perfil */
 :root {
-    --cor01: #f1f1f1; /* Variação específica para perfil */
-    --shadow: var(--shadow-alt); /* Usando sombra alternativa do base.css */
+    --cor01: #f1f1f1;
+    /* Variação específica para perfil */
+    --shadow: var(--shadow-alt);
+    /* Usando sombra alternativa do base.css */
 }
 
 /* Aplicando classes base do body */

@@ -2,7 +2,8 @@
 
 /* Sobrescrever variáveis específicas do login registro */
 :root {
-    --cor01: #f0f0f0; /* Cor específica para login registro */
+    --cor01: #f0f0f0;
+    /* Cor específica para login registro */
 }
 
 /* Aplicando classes base e sobrescrições */
@@ -110,7 +111,7 @@ form label .icon {
 
 form #btn-login {
     position: absolute;
-    
+
     left: 50%;
     transform: translateX(-50%);
 
@@ -182,7 +183,7 @@ footer a {
     }
 
     .back_lines {
-        
+
         max-height: 35vh;
     }
 }
@@ -197,7 +198,7 @@ footer a {
     }
 
     .back_lines {
-        
+
         max-height: 25vh;
     }
 }
@@ -227,7 +228,7 @@ footer a {
     }
 
     .back_lines {
-        
+
         max-height: 15vh;
     }
 }

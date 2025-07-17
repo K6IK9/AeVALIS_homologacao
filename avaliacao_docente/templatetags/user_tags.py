@@ -1,5 +1,5 @@
 from django import template
-from rolepermissions.checkers import has_role
+from rolepermissions.checkers import has_role as check_role
 
 register = template.Library()
 
@@ -9,13 +9,13 @@ def get_user_role(user):
     """
     Template filter para obter a role do usuário
     """
-    if has_role(user, "admin"):
+    if check_role(user, "admin"):
         return "Administrador"
-    elif has_role(user, "coordenador"):
+    elif check_role(user, "coordenador"):
         return "Coordenador"
-    elif has_role(user, "professor"):
+    elif check_role(user, "professor"):
         return "Professor"
-    elif has_role(user, "aluno"):
+    elif check_role(user, "aluno"):
         return "Aluno"
     else:
         return "Sem role definida"
@@ -26,13 +26,13 @@ def get_user_role_class(user):
     """
     Template filter para obter a classe CSS baseada na role do usuário
     """
-    if has_role(user, "admin"):
+    if check_role(user, "admin"):
         return "role-admin"
-    elif has_role(user, "coordenador"):
+    elif check_role(user, "coordenador"):
         return "role-coordenador"
-    elif has_role(user, "professor"):
+    elif check_role(user, "professor"):
         return "role-professor"
-    elif has_role(user, "aluno"):
+    elif check_role(user, "aluno"):
         return "role-aluno"
     else:
         return "role-sem-role"
@@ -43,9 +43,9 @@ def get_user_profile_type(user):
     """
     Template filter para obter o tipo de perfil do usuário
     """
-    if hasattr(user, 'perfil_professor'):
+    if hasattr(user, "perfil_professor"):
         return "Professor"
-    elif hasattr(user, 'perfil_aluno'):
+    elif hasattr(user, "perfil_aluno"):
         return "Aluno"
     else:
         return "Administrativo"
@@ -56,4 +56,12 @@ def has_user_role(user, role):
     """
     Template filter para verificar se o usuário tem uma role específica
     """
-    return has_role(user, role)
+    return check_role(user, role)
+
+
+@register.filter
+def has_role(user, role):
+    """
+    Template filter para verificar se o usuário tem uma role específica
+    """
+    return check_role(user, role)

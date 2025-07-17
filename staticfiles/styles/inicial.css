@@ -120,7 +120,7 @@ main #opcoes button:active {
         width: 71px;
         height: 71px;
     }
-    
+
     header #perfil:active {
         width: 69px;
         height: 69px;
@@ -143,12 +143,12 @@ main #opcoes button:active {
         width: 50px;
         height: 50px;
     }
-    
+
     main {
         width: 90%;
         margin: 0px;
     }
-    
+
     main h1 {
         font-size: 1.625rem;
     }

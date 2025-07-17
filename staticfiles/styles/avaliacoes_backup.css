@@ -7,103 +7,65 @@ body {
   font-family: var(--font01);
 }
 
-/* Header seguindo o padrão das outras páginas - mesmo estilo do inicial.css */
-.container {
-  width: calc(100% - 100px);
-  margin: 50px;
-}
-
-/* Botão de voltar seguindo o padrão do admin_hub */
-.back-button {
-  background: var(--cor03);
-  color: white;
-  text-decoration: none;
-  padding: 10px 20px;
-  border-radius: 8px;
-  display: inline-block;
-  margin-bottom: 20px;
-  transition: all 0.3s;
-}
-
-.back-button:hover {
-  background: var(--cor04);
-  transform: translateY(-2px);
-  color: white;
-  text-decoration: none;
-}
-
+/* Header seguindo o padrão das outras páginas */
 header {
+  position: absolute;
+  top: 0;
   width: calc(100% - 100px);
   margin: 50px;
   display: flex;
-  justify-content: flex-end;
-  position: absolute;
-  top: 0;
-  z-index: 1000;
+  justify-content: space-between;
+  align-items: center;
 }
 
-/* Botão de perfil seguindo o padrão exato do inicial.css */
-header #perfil {
-  width: 70px;
-  height: 70px;
-  padding: 5px;
-  border-radius: 50%;
-  background: #c9e8dd;
+header button {
+  width: 60px;
+  height: 60px;
+  border-radius: var(--border-radius-circle);
   border: none;
+  box-shadow: var(--shadow);
+  background: var(--cor07);
   cursor: pointer;
-  box-shadow: 4px 2px 8px rgba(0, 0, 0, 0.2);
   display: flex;
   justify-content: center;
   align-items: center;
-  transition: width 0.3s, height 0.3s;
-  position: relative;
-  z-index: 1001;
-  outline: none;
+  transition: all var(--transition-fast);
 }
 
-header #perfil img {
-  width: 60%;
-  height: auto;
-  pointer-events: none;
+header button:hover {
+  transform: translateY(-2px);
 }
 
-/* Para hover do perfil somente em telas grandes */
-@media (min-width: 600px) {
-  header #perfil:hover {
-    width: 71px;
-    height: 71px;
-    transform: scale(1.02);
-  }
-
-  header #perfil:active {
-    width: 69px;
-    height: 69px;
-    transform: scale(0.98);
-  }
+header button img {
+  width: 30px;
 }
 
 /* Main seguindo o padrão */
 main {
-  margin-top: 50px;
-  padding: 0;
+  margin-top: 150px;
+  padding: 0 50px;
 }
 
-/* Header da página seguindo o padrão do admin_hub */
-.header {
-  margin-bottom: 30px;
-}
+/* Ajustes para telas menores seguindo o padrão */
+@media (max-width: 600px) {
+  header {
+    width: 90%;
+    margin: 50px auto;
+  }
 
-.header h1 {
-  color: var(--cor04);
-  font-size: 2.5rem;
-  margin: 0 0 10px 0;
-  font-weight: 700;
-}
+  header button {
+    width: 50px;
+    height: 50px;
+  }
 
-.header p {
-  color: var(--cor03);
-  font-size: 1.2rem;
-  margin: 0;
+  header button img {
+    width: 25px;
+  }
+
+  main {
+    margin-top: 120px;
+    padding: 0 5%;
+  }
 }
 
 /* Cards para avaliações seguindo o padrão de gerenciamento */
@@ -386,7 +348,7 @@ main {
   transition: all var(--transition-fast);
 }
 
-.likert-scale .form-check-input:checked+.form-check-label {
+.likert-scale .form-check-input:checked + .form-check-label {
   color: var(--cor02);
   font-weight: 600;
 }
@@ -429,7 +391,7 @@ main {
   background-color: var(--cor01);
 }
 
-.sim-nao .form-check-input:checked+.form-check-label {
+.sim-nao .form-check-input:checked + .form-check-label {
   color: var(--cor02);
   font-weight: 600;
 }
@@ -485,63 +447,52 @@ main {
 /* Responsividade */
 @media (max-width: 768px) {
   header {
-    width: 90%;
-    margin: 50px auto;
+    padding: 15px;
   }
-
-  header button {
-    width: 50px;
-    height: 50px;
-  }
-
-  header button img {
-    width: 25px;
-  }
-
+  
   main {
-    margin-top: 120px;
-    padding: 0 5%;
+    padding-top: 80px;
   }
-
+  
   .container {
     padding: 15px;
   }
-
+  
   .avaliacoes-grid {
     grid-template-columns: 1fr;
     gap: 15px;
   }
-
+  
   .rating-container {
     flex-wrap: wrap;
     justify-content: center;
   }
-
+  
   .rating-option {
     min-width: 60px;
     padding: var(--spacing-sm);
   }
-
+  
   .data-table {
     font-size: 0.9em;
   }
-
+  
   .data-table th,
   .data-table td {
     padding: 10px;
   }
-
+  
   .likert-scale {
     flex-direction: column;
     gap: var(--spacing-sm);
   }
-
+  
   .sim-nao {
     flex-direction: column;
     align-items: center;
     gap: var(--spacing-sm);
   }
-
+  
   .pergunta-navegacao {
     flex-direction: column;
     gap: var(--spacing-md);
@@ -553,49 +504,8 @@ main {
     width: 100%;
     margin-bottom: 10px;
   }
-
+  
   .pergunta-card {
     padding: var(--spacing-md);
-  }
-}
-
-/* Para hover dos botões do header somente em telas grandes */
-@media (min-width: 600px) {
-  header #perfil:hover {
-    width: 71px;
-    height: 71px;
-  }
-
-  header #perfil:active {
-    width: 69px;
-    height: 69px;
-  }
-
-  header #voltar:hover {
-    width: 71px;
-    height: 71px;
-  }
-
-  header #voltar:active {
-    width: 75px;
-    height: 75px;
-  }
-}
-
-/* Responsive design para header */
-@media (max-width: 600px) {
-  header {
-    width: calc(100% - 50px);
-    margin: 25px;
-  }
-
-  header #perfil {
-    width: 50px;
-    height: 50px;
-  }
-
-  header #voltar {
-    width: 50px;
-    height: 50px;
   }
 }

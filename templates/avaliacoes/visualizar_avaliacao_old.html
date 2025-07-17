@@ -1,0 +1,309 @@
+{% extends 'avaliacoes/base_avaliacoes.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <!-- Cabeçalho da Avaliação -->
+        <div class="card card-custom mb-4">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <h3 class="card-title">{{ titulo }}</h3>
+                        <p class="text-muted mb-1">{{ avaliacao.disciplina.nome }} - {{ avaliacao.turma.nome }}</p>
+                        <p class="text-muted mb-1">{{ avaliacao.ciclo.nome }}</p>
+                        <p class="text-muted">{{ avaliacao.questionario.nome }}</p>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <div class="mb-2">
+                            <span class="badge bg-success fs-6">
+                                <i class="bi bi-check-circle"></i> Avaliação Respondida
+                            </span>
+                        </div>
+                        {% if avaliacao.data_resposta %}
+                        <small class="text-muted">
+                            Respondida em: {{ avaliacao.data_resposta|date:"d/m/Y às H:i" }}
+                        </small>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                {% if avaliacao.ciclo.anonimo %}
+                    <div class="alert alert-info mt-3">
+                        <i class="bi bi-shield-check"></i>
+                        <strong>Avaliação Anônima:</strong> As respostas foram coletadas de forma anônima.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Respostas -->
+        {% for resposta in respostas %}
+        <div class="card card-custom mb-4">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0">
+                        {{ resposta.pergunta.enunciado }}
+                        {% if resposta.pergunta.obrigatoria %}
+                            <span class="text-danger">*</span>
+                        {% endif %}
+                    </h6>
+                    <div>
+                        {% if resposta.pergunta.categoria %}
+                            <span class="badge bg-secondary">{{ resposta.pergunta.categoria.nome }}</span>
+                        {% endif %}
+                        <span class="badge bg-info">{{ resposta.pergunta.get_tipo_display }}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                {% if resposta.pergunta.tipo == 'likert' %}
+                    <!-- Visualização Escala Likert -->
+                    <div class="likert-visualization">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-muted">Discordo Totalmente</small>
+                            <small class="text-muted">Concordo Totalmente</small>
+                        </div>
+                        <div class="d-flex justify-content-center">
+                            {% for i in "12345"|make_list %}
+                            <div class="likert-option {% if resposta.valor == i %}selected{% endif %}">
+                                {{ i }}
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <div class="text-center mt-2">
+                            <span class="badge bg-primary">Resposta: {{ resposta.valor_numerico }}</span>
+                        </div>
+                    </div>
+                
+                {% elif resposta.pergunta.tipo == 'nps' %}
+                    <!-- Visualização NPS -->
+                    <div class="nps-visualization">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-muted">0 - Nunca recomendaria</small>
+                            <small class="text-muted">10 - Certamente recomendaria</small>
+                        </div>
+                        <div class="nps-scale-visual">
+                            {% for i in "0123456789"|add:"10"|make_list %}
+                                {% if forloop.counter <= 11 %}
+                                <div class="nps-option {% if resposta.valor == forloop.counter0|stringformat:'s' %}selected{% endif %}">
+                                    {{ forloop.counter0 }}
+                                </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        <div class="text-center mt-2">
+                            <span class="badge bg-primary">Resposta: {{ resposta.valor_numerico }}</span>
+                            {% with valor=resposta.valor_numerico %}
+                                {% if valor <= 6 %}
+                                    <span class="badge bg-danger">Detrator</span>
+                                {% elif valor <= 8 %}
+                                    <span class="badge bg-warning">Neutro</span>
+                                {% else %}
+                                    <span class="badge bg-success">Promotor</span>
+                                {% endif %}
+                            {% endwith %}
+                        </div>
+                    </div>
+                
+                {% elif resposta.pergunta.tipo == 'multipla_escolha' %}
+                    <!-- Visualização Múltipla Escolha -->
+                    <div class="multipla-escolha-visualization">
+                        {% for opcao in resposta.pergunta.opcoes_multipla_escolha %}
+                            <div class="opcao-item {% if resposta.valor_texto == opcao %}selected{% endif %}">
+                                <i class="bi {% if resposta.valor_texto == opcao %}bi-check-circle-fill text-success{% else %}bi-circle text-muted{% endif %}"></i>
+                                {{ opcao }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                
+                {% elif resposta.pergunta.tipo == 'sim_nao' %}
+                    <!-- Visualização Sim/Não -->
+                    <div class="sim-nao-visualization text-center">
+                        {% if resposta.valor_boolean %}
+                            <div class="resposta-sim">
+                                <i class="bi bi-check-circle-fill text-success" style="font-size: 2rem;"></i>
+                                <p class="mt-2 mb-0"><strong>Sim</strong></p>
+                            </div>
+                        {% else %}
+                            <div class="resposta-nao">
+                                <i class="bi bi-x-circle-fill text-danger" style="font-size: 2rem;"></i>
+                                <p class="mt-2 mb-0"><strong>Não</strong></p>
+                            </div>
+                        {% endif %}
+                    </div>
+                
+                {% elif resposta.pergunta.tipo == 'texto_livre' %}
+                    <!-- Visualização Texto Livre -->
+                    <div class="texto-livre-visualization">
+                        <div class="resposta-texto">
+                            <blockquote class="blockquote">
+                                <p>{{ resposta.valor_texto|linebreaks }}</p>
+                            </blockquote>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        {% empty %}
+        <div class="card card-custom">
+            <div class="card-body text-center">
+                <i class="bi bi-exclamation-circle" style="font-size: 3rem; color: #ccc;"></i>
+                <p class="mt-3 text-muted">Nenhuma resposta encontrada para esta avaliação.</p>
+            </div>
+        </div>
+        {% endfor %}
+
+        <!-- Comentários -->
+        {% if comentarios %}
+        <div class="card card-custom mb-4">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="bi bi-chat-text"></i> Comentários Adicionais
+                </h6>
+            </div>
+            <div class="card-body">
+                {% for comentario in comentarios %}
+                <div class="comentario-item {% if not forloop.last %}border-bottom pb-3 mb-3{% endif %}">
+                    <blockquote class="blockquote">
+                        {% if comentario.elogios %}
+                            <h6>Elogios:</h6>
+                            <p>{{ comentario.elogios|linebreaks }}</p>
+                        {% endif %}
+                        {% if comentario.sugestoes %}
+                            <h6>Sugestões:</h6>
+                            <p>{{ comentario.sugestoes|linebreaks }}</p>
+                        {% endif %}
+                        {% if comentario.criticas_construtivas %}
+                            <h6>Críticas Construtivas:</h6>
+                            <p>{{ comentario.criticas_construtivas|linebreaks }}</p>
+                        {% endif %}
+                    </blockquote>
+                    {% if comentario.data_comentario %}
+                    <small class="text-muted">
+                        <i class="bi bi-calendar"></i> {{ comentario.data_comentario|date:"d/m/Y às H:i" }}
+                    </small>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Ações -->
+        <div class="card card-custom">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <a href="{% url 'listar_avaliacoes' %}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Voltar
+                    </a>
+                    
+                    <div class="btn-group">
+                        {% if user|has_role:"coordenador" or user|has_role:"admin" %}
+                        <a href="{% url 'detalhe_ciclo_avaliacao' avaliacao.ciclo.id %}" 
+                           class="btn btn-outline-primary">
+                            <i class="bi bi-calendar-check"></i> Ver Ciclo
+                        </a>
+                        <a href="{% url 'relatorio_avaliacoes' %}?professor={{ avaliacao.professor.id }}" 
+                           class="btn btn-outline-info">
+                            <i class="bi bi-graph-up"></i> Relatório do Professor
+                        </a>
+                        {% endif %}
+                        
+                        <button class="btn btn-outline-success" onclick="window.print()">
+                            <i class="bi bi-printer"></i> Imprimir
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.likert-visualization {
+    text-align: center;
+}
+
+.likert-option {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    margin: 0 10px;
+    border: 2px solid #ddd;
+    border-radius: 50%;
+    background-color: #f8f9fa;
+    font-weight: bold;
+}
+
+.likert-option.selected {
+    border-color: var(--cor-primaria);
+    background-color: var(--cor-primaria);
+    color: var(--cor-escura);
+}
+
+.nps-scale-visual {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.nps-option {
+    width: 35px;
+    height: 35px;
+    line-height: 35px;
+    text-align: center;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    background-color: #f8f9fa;
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+.nps-option.selected {
+    border-color: var(--cor-primaria);
+    background-color: var(--cor-primaria);
+    color: var(--cor-escura);
+}
+
+.opcao-item {
+    padding: 8px 12px;
+    margin: 5px 0;
+    border-radius: 5px;
+    background-color: #f8f9fa;
+}
+
+.opcao-item.selected {
+    background-color: #d4edda;
+    border-left: 4px solid #28a745;
+}
+
+.resposta-texto {
+    background-color: #f8f9fa;
+    border-left: 4px solid var(--cor-primaria);
+    padding: 15px;
+    border-radius: 5px;
+}
+
+.comentario-item blockquote {
+    background-color: #f8f9fa;
+    border-left: 4px solid #6c757d;
+    padding: 15px;
+    border-radius: 5px;
+}
+
+@media print {
+    .btn, .btn-group {
+        display: none !important;
+    }
+    
+    .card {
+        border: 1px solid #000 !important;
+        box-shadow: none !important;
+    }
+}
+</style>
+{% endblock %}

@@ -1,0 +1,343 @@
+{% extends 'avaliacoes/base_avaliacoes.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <!-- Cabeçalho da Avaliação -->
+        <div class="card card-custom mb-4">
+            <div class="card-body text-center">
+                <h3 class="card-title">{{ titulo }}</h3>
+                <p class="text-muted mb-2">{{ avaliacao.disciplina.nome }} - {{ avaliacao.turma.nome }}</p>
+                <p class="text-muted">{{ avaliacao.ciclo.nome }}</p>
+                
+                {% if avaliacao.ciclo.anonimo %}
+                    <div class="alert alert-info">
+                        <i class="bi bi-shield-check"></i>
+                        <strong>Avaliação Anônima:</strong> Suas respostas serão mantidas em sigilo.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Formulário de Avaliação -->
+        <form method="post" id="form-avaliacao">
+            {% csrf_token %}
+            
+            {% for qp in perguntas_questionario %}
+            <div class="card card-custom mb-4">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0">
+                            Pergunta {{ qp.ordem }}
+                            {% if qp.pergunta.obrigatoria %}
+                                <span class="text-danger">*</span>
+                            {% endif %}
+                        </h6>
+                        {% if qp.pergunta.categoria %}
+                            <span class="badge bg-secondary">{{ qp.pergunta.categoria.nome }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="card-body">
+                    <p class="card-text mb-3">{{ qp.pergunta.enunciado }}</p>
+                    
+                    {% if qp.pergunta.tipo == 'likert' %}
+                        <!-- Escala Likert -->
+                        <div class="likert-scale">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">Discordo Totalmente</small>
+                                <small class="text-muted">Concordo Totalmente</small>
+                            </div>
+                            <div class="d-flex justify-content-center mt-2">
+                                {% for i in "12345"|make_list %}
+                                <div class="form-check form-check-inline mx-3">
+                                    <input class="form-check-input" type="radio" 
+                                           name="pergunta_{{ qp.pergunta.id }}" 
+                                           id="likert_{{ qp.pergunta.id }}_{{ i }}" 
+                                           value="{{ i }}"
+                                           {% if qp.pergunta.obrigatoria %}required{% endif %}>
+                                    <label class="form-check-label" for="likert_{{ qp.pergunta.id }}_{{ i }}">
+                                        {{ i }}
+                                    </label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    
+                    {% elif qp.pergunta.tipo == 'nps' %}
+                        <!-- Net Promoter Score -->
+                        <div class="nps-scale">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">0 - Nunca recomendaria</small>
+                                <small class="text-muted">10 - Certamente recomendaria</small>
+                            </div>
+                            <div class="d-flex justify-content-center mt-2 flex-wrap">
+                                {% for i in "0123456789"|add:"10"|make_list %}
+                                    {% if forloop.counter <= 11 %}
+                                    <div class="form-check form-check-inline mx-1">
+                                        <input class="form-check-input" type="radio" 
+                                               name="pergunta_{{ qp.pergunta.id }}" 
+                                               id="nps_{{ qp.pergunta.id }}_{{ forloop.counter0 }}" 
+                                               value="{{ forloop.counter0 }}"
+                                               {% if qp.pergunta.obrigatoria %}required{% endif %}>
+                                        <label class="form-check-label" for="nps_{{ qp.pergunta.id }}_{{ forloop.counter0 }}">
+                                            {{ forloop.counter0 }}
+                                        </label>
+                                    </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    
+                    {% elif qp.pergunta.tipo == 'multipla_escolha' %}
+                        <!-- Múltipla Escolha -->
+                        {% for opcao in qp.pergunta.opcoes_multipla_escolha %}
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" 
+                                       name="pergunta_{{ qp.pergunta.id }}" 
+                                       id="multipla_{{ qp.pergunta.id }}_{{ forloop.counter }}" 
+                                       value="{{ opcao }}"
+                                       {% if qp.pergunta.obrigatoria %}required{% endif %}>
+                                <label class="form-check-label" for="multipla_{{ qp.pergunta.id }}_{{ forloop.counter }}">
+                                    {{ opcao }}
+                                </label>
+                            </div>
+                        {% endfor %}
+                    
+                    {% elif qp.pergunta.tipo == 'sim_nao' %}
+                        <!-- Sim/Não -->
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" 
+                                   name="pergunta_{{ qp.pergunta.id }}" 
+                                   id="sim_{{ qp.pergunta.id }}" 
+                                   value="Sim"
+                                   {% if qp.pergunta.obrigatoria %}required{% endif %}>
+                            <label class="form-check-label" for="sim_{{ qp.pergunta.id }}">
+                                Sim
+                            </label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" 
+                                   name="pergunta_{{ qp.pergunta.id }}" 
+                                   id="nao_{{ qp.pergunta.id }}" 
+                                   value="Não"
+                                   {% if qp.pergunta.obrigatoria %}required{% endif %}>
+                            <label class="form-check-label" for="nao_{{ qp.pergunta.id }}">
+                                Não
+                            </label>
+                        </div>
+                    
+                    {% elif qp.pergunta.tipo == 'texto_livre' %}
+                        <!-- Texto Livre -->
+                        <textarea class="form-control" 
+                                  name="pergunta_{{ qp.pergunta.id }}" 
+                                  id="texto_{{ qp.pergunta.id }}" 
+                                  rows="4" 
+                                  placeholder="Digite sua resposta..."
+                                  {% if qp.pergunta.obrigatoria %}required{% endif %}></textarea>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+
+            <!-- Comentário Geral -->
+            <div class="card card-custom mb-4">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="bi bi-chat-text"></i> Comentário Adicional (opcional)
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <textarea class="form-control" 
+                              name="comentario_geral" 
+                              id="comentario_geral" 
+                              rows="4" 
+                              placeholder="Se desejar, deixe um comentário adicional sobre a disciplina ou professor..."></textarea>
+                </div>
+            </div>
+
+            <!-- Botões de Ação -->
+            <div class="card card-custom">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'listar_avaliacoes' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> Voltar
+                        </a>
+                        <button type="submit" class="btn btn-primary-custom" id="btn-enviar">
+                            <i class="bi bi-send"></i> Enviar Avaliação
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal de Confirmação -->
+<div class="modal fade" id="modal-confirmacao" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmar Envio</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja enviar esta avaliação?</p>
+                <p class="text-warning">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    <strong>Atenção:</strong> Após o envio, você não poderá mais alterar suas respostas.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary-custom" id="confirmar-envio">
+                    Confirmar Envio
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.likert-scale .form-check-input:checked + .form-check-label {
+    font-weight: bold;
+    color: var(--cor-secundaria);
+}
+
+.nps-scale .form-check-input:checked + .form-check-label {
+    font-weight: bold;
+    color: var(--cor-secundaria);
+}
+
+.form-check-input:focus {
+    border-color: var(--cor-primaria);
+    box-shadow: 0 0 0 0.2rem rgba(0, 253, 148, 0.25);
+}
+
+.card-custom {
+    transition: box-shadow 0.3s ease;
+}
+
+.card-custom:hover {
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.required-field {
+    border-left: 4px solid #dc3545;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('form-avaliacao');
+    const btnEnviar = document.getElementById('btn-enviar');
+    const modal = new bootstrap.Modal(document.getElementById('modal-confirmacao'));
+    const confirmarEnvio = document.getElementById('confirmar-envio');
+    
+    // Interceptar envio do formulário
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Verificar se todas as perguntas obrigatórias foram respondidas
+        const camposObrigatorios = form.querySelectorAll('[required]');
+        let todasRespondidas = true;
+        
+        camposObrigatorios.forEach(function(campo) {
+            if (campo.type === 'radio') {
+                const name = campo.name;
+                const radios = form.querySelectorAll(`input[name="${name}"]`);
+                const algumSelecionado = Array.from(radios).some(r => r.checked);
+                if (!algumSelecionado) {
+                    todasRespondidas = false;
+                    // Destacar pergunta não respondida
+                    const card = campo.closest('.card');
+                    card.classList.add('required-field');
+                    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            } else if (campo.type === 'textarea' || campo.tagName === 'TEXTAREA') {
+                if (!campo.value.trim()) {
+                    todasRespondidas = false;
+                    campo.classList.add('is-invalid');
+                    campo.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }
+        });
+        
+        if (!todasRespondidas) {
+            alert('Por favor, responda todas as perguntas obrigatórias antes de enviar.');
+            return;
+        }
+        
+        // Mostrar modal de confirmação
+        modal.show();
+    });
+    
+    // Confirmar envio
+    confirmarEnvio.addEventListener('click', function() {
+        modal.hide();
+        btnEnviar.disabled = true;
+        btnEnviar.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Enviando...';
+        form.submit();
+    });
+    
+    // Remover destaque quando pergunta for respondida
+    form.addEventListener('change', function(e) {
+        if (e.target.type === 'radio' || e.target.tagName === 'TEXTAREA') {
+            const card = e.target.closest('.card');
+            if (card) {
+                card.classList.remove('required-field');
+            }
+            e.target.classList.remove('is-invalid');
+        }
+    });
+    
+    // Salvar progresso localmente (opcional)
+    form.addEventListener('change', function(e) {
+        if (e.target.name.startsWith('pergunta_') || e.target.name === 'comentario_geral') {
+            const dados = new FormData(form);
+            const objeto = {};
+            for (let [key, value] of dados.entries()) {
+                objeto[key] = value;
+            }
+            localStorage.setItem('avaliacao_{{ avaliacao.id }}', JSON.stringify(objeto));
+        }
+    });
+    
+    // Recuperar progresso salvo
+    const progressoSalvo = localStorage.getItem('avaliacao_{{ avaliacao.id }}');
+    if (progressoSalvo) {
+        const dados = JSON.parse(progressoSalvo);
+        for (let [key, value] of Object.entries(dados)) {
+            const campo = form.querySelector(`[name="${key}"]`);
+            if (campo) {
+                if (campo.type === 'radio') {
+                    const radio = form.querySelector(`[name="${key}"][value="${value}"]`);
+                    if (radio) radio.checked = true;
+                } else {
+                    campo.value = value;
+                }
+            }
+        }
+    }
+});
+
+// Template filter personalizado para split
+document.addEventListener('DOMContentLoaded', function() {
+    // Aplicar classes específicas para diferentes tipos de pergunta
+    const likertInputs = document.querySelectorAll('.likert-scale input[type="radio"]');
+    likertInputs.forEach(input => {
+        input.addEventListener('change', function() {
+            // Feedback visual para escala Likert
+            const container = this.closest('.likert-scale');
+            const labels = container.querySelectorAll('.form-check-label');
+            labels.forEach(label => label.style.fontWeight = 'normal');
+            this.nextElementSibling.style.fontWeight = 'bold';
+        });
+    });
+});
+</script>
+{% endblock %}

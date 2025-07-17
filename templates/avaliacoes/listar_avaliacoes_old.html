@@ -1,5 +1,4 @@
 {% extends 'avaliacoes/base_avaliacoes.html' %}
-{% load user_tags %}
 
 {% block page_title %}Lista de Avaliações{% endblock %}
 {% block page_description %}Gerencie questionários e ciclos de avaliação{% endblock %}
@@ -42,7 +41,6 @@
             <p style="color: #666; text-align: center; margin: 20px 0;">Nenhum ciclo ativo encontrado.</p>
         {% endif %}
     </div>
-
     <!-- Card de Questionários -->
     <div class="avaliacao-card">
         <h3>📋 Questionários de Avaliação</h3>
@@ -112,6 +110,22 @@
             </div>
         </div>
         {% endfor %}
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+                    <i class="bi bi-person-check"></i> Minhas Avaliações Pendentes
+                </h5>
+            </div>
+            <div class="card-body">
+                <!-- Aqui virão as avaliações pendentes do aluno -->
+                <p class="text-muted">
+                    <i class="bi bi-info-circle"></i> 
+                    As avaliações pendentes aparecerão aqui quando houver ciclos ativos.
+                </p>
+            </div>
+        </div>
     </div>
 </div>
 {% endif %}

@@ -41,6 +41,7 @@ from django.db.models import Q, Avg
 from django.utils import timezone
 from rolepermissions.roles import assign_role, remove_role
 from rolepermissions.checkers import has_role
+from .utils import check_user_permission, get_user_role_name
 from django.contrib import messages
 from django.core.paginator import Paginator
 
@@ -51,7 +52,7 @@ def gerenciar_roles(request):
     View para gerenciar roles de usuários
     Apenas coordenadores e admins podem acessar
     """
-    if not (has_role(request.user, "coordenador") or has_role(request.user, "admin")):
+    if not check_user_permission(request.user, ["coordenador", "admin"]):
         messages.error(request, "Você não tem permissão para acessar esta página.")
         return redirect("inicio")
 
@@ -87,16 +88,7 @@ def gerenciar_roles(request):
     # Lista todos os usuários com suas roles
     usuarios_com_roles = []
     for user in User.objects.all().order_by("username"):
-        role_atual = "Sem role"
-        if has_role(user, "admin"):
-            role_atual = "Administrador"
-        elif has_role(user, "coordenador"):
-            role_atual = "Coordenador"
-        elif has_role(user, "professor"):
-            role_atual = "Professor"
-        elif has_role(user, "aluno"):
-            role_atual = "Aluno"
-
+        role_atual = get_user_role_name(user)
         usuarios_com_roles.append({"usuario": user, "role": role_atual})
 
     context = {"form": form, "usuarios_com_roles": usuarios_com_roles}
@@ -110,7 +102,7 @@ def gerenciar_cursos(request):
     View para gerenciar cursos
     Apenas coordenadores e admins podem acessar
     """
-    if not (has_role(request.user, "coordenador") or has_role(request.user, "admin")):
+    if not check_user_permission(request.user, ["coordenador", "admin"]):
         messages.error(request, "Você não tem permissão para acessar esta página.")
         return redirect("inicio")
 
@@ -140,7 +132,7 @@ def gerenciar_disciplinas(request):
     View para gerenciar disciplinas
     Apenas coordenadores e admins podem acessar
     """
-    if not (has_role(request.user, "coordenador") or has_role(request.user, "admin")):
+    if not check_user_permission(request.user, ["coordenador", "admin"]):
         messages.error(request, "Você não tem permissão para acessar esta página.")
         return redirect("inicio")
 
@@ -176,7 +168,7 @@ def gerenciar_periodos(request):
     View para gerenciar períodos letivos
     Apenas coordenadores e admins podem acessar
     """
-    if not (has_role(request.user, "coordenador") or has_role(request.user, "admin")):
+    if not check_user_permission(request.user, ["coordenador", "admin"]):
         messages.error(request, "Você não tem permissão para acessar esta página.")
         return redirect("inicio")
 
@@ -206,7 +198,7 @@ def gerenciar_turmas(request):
     View para gerenciar turmas com filtros
     Apenas coordenadores e admins podem acessar
     """
-    if not (has_role(request.user, "coordenador") or has_role(request.user, "admin")):
+    if not check_user_permission(request.user, ["coordenador", "admin"]):
         messages.error(request, "Você não tem permissão para acessar esta página.")
         return redirect("inicio")
 
@@ -406,7 +398,7 @@ def buscar_alunos_turma(request):
     """
     View para buscar alunos para gerenciamento de turmas via AJAX
     """
-    if not (has_role(request.user, "coordenador") or has_role(request.user, "admin")):
+    if not check_user_permission(request.user, ["coordenador", "admin"]):
         return JsonResponse({"error": "Sem permissão"}, status=403)
 
     turma_id = request.GET.get("turma_id")
@@ -466,7 +458,7 @@ def matricular_alunos_massa(request):
     """
     View para matricular/desmatricular alunos em massa via AJAX
     """
-    if not (has_role(request.user, "coordenador") or has_role(request.user, "admin")):
+    if not check_user_permission(request.user, ["coordenador", "admin"]):
         return JsonResponse({"error": "Sem permissão"}, status=403)
 
     if request.method != "POST":
