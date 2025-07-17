@@ -1,1 +1,0 @@
-Ajuste na pagina de adm pois gerenciamente de usuarios esta quebrando
