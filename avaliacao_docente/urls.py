@@ -5,6 +5,20 @@ from .views import IndexView
 
 urlpatterns = [
     path("gerenciar-roles/", views.gerenciar_roles, name="gerenciar_roles"),
+    path("gerenciar-usuarios/", views.gerenciar_usuarios, name="gerenciar_usuarios"),
+    path(
+        "editar-usuario/<int:usuario_id>/", views.editar_usuario, name="editar_usuario"
+    ),
+    path(
+        "excluir-usuario/<int:usuario_id>/",
+        views.excluir_usuario,
+        name="excluir_usuario",
+    ),
+    path(
+        "resetar-senha-usuario/<int:usuario_id>/",
+        views.resetar_senha_usuario,
+        name="resetar_senha_usuario",
+    ),
     path("gerenciar-cursos/", views.gerenciar_cursos, name="gerenciar_cursos"),
     path("editar-curso/<int:curso_id>/", views.editar_curso, name="editar_curso"),
     path("excluir-curso/<int:curso_id>/", views.excluir_curso, name="excluir_curso"),
@@ -70,6 +84,19 @@ urlpatterns = [
         "avaliacoes/relatorios/",
         views.relatorio_avaliacoes,
         name="relatorio_avaliacoes",
+    ),
+    # URLs para CRUD de categorias
+    path("categorias/", views.gerenciar_categorias, name="gerenciar_categorias"),
+    path(
+        "categorias/<int:categoria_id>/",
+        views.categoria_detail,
+        name="categoria_detail",
+    ),
+    path("categorias/form/", views.categoria_form, name="categoria_form"),
+    path(
+        "categorias/form/<int:categoria_id>/",
+        views.categoria_form,
+        name="categoria_form_edit",
     ),
     path("", IndexView.as_view(), name="inicio"),
 ]

@@ -9,6 +9,7 @@ from django.db.models import Q
 from .forms import (
     RegistroForm,
     GerenciarRoleForm,
+    GerenciarUsuarioForm,
     CursoForm,
     DisciplinaForm,
     PeriodoLetivoForm,
@@ -16,6 +17,7 @@ from .forms import (
     QuestionarioAvaliacaoForm,
     PerguntaAvaliacaoForm,
     CicloAvaliacaoForm,
+    CategoriaPerguntaForm,
 )
 from .models import (
     Avaliacao,
@@ -131,6 +133,213 @@ def gerenciar_roles(request):
     }
 
     return render(request, "gerenciar_roles.html", context)
+
+
+@login_required
+def gerenciar_usuarios(request):
+    """
+    View para gerenciar usuários
+    Apenas coordenadores e admins podem acessar
+    """
+    if not check_user_permission(request.user, ["coordenador", "admin"]):
+        messages.error(request, "Você não tem permissão para acessar esta página.")
+        return redirect("inicio")
+
+    if request.method == "POST":
+        form = GerenciarUsuarioForm(request.POST)
+        if form.is_valid():
+            usuario = form.save(commit=False)
+            usuario.set_password("123456")  # Senha padrão
+            usuario.save()
+            messages.success(
+                request,
+                f"Usuário '{usuario.username}' criado com sucesso! Senha padrão: 123456",
+            )
+            return redirect("gerenciar_usuarios")
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"Erro no campo {field}: {error}")
+    else:
+        form = GerenciarUsuarioForm()
+
+    # Obter parâmetros de filtro da URL
+    busca = request.GET.get("busca", "").strip()
+    filtro_status = request.GET.get("status", "")
+    filtro_role = request.GET.get("role", "")
+
+    # Iniciar com todos os usuários
+    usuarios_queryset = User.objects.all()
+
+    # Aplicar filtro de busca por nome ou matrícula
+    if busca:
+        usuarios_queryset = usuarios_queryset.filter(
+            Q(first_name__icontains=busca)
+            | Q(last_name__icontains=busca)
+            | Q(username__icontains=busca)
+            | Q(email__icontains=busca)
+        )
+
+    # Aplicar filtro por status
+    if filtro_status:
+        if filtro_status == "ativo":
+            usuarios_queryset = usuarios_queryset.filter(is_active=True)
+        elif filtro_status == "inativo":
+            usuarios_queryset = usuarios_queryset.filter(is_active=False)
+
+    # Lista todos os usuários com suas roles
+    usuarios_detalhados = []
+    for user in usuarios_queryset.order_by("username"):
+        role_atual = get_user_role_name(user)
+
+        # Aplicar filtro por role
+        if filtro_role:
+            # Mapeamento dos filtros para os nomes das roles
+            filtros_map = {
+                "admin": "Administrador",
+                "coordenador": "Coordenador",
+                "professor": "Professor",
+                "aluno": "Aluno",
+                "sem_role": "Sem role",
+            }
+
+            role_esperada = filtros_map.get(filtro_role, filtro_role)
+            if role_atual != role_esperada:
+                continue
+
+        usuarios_detalhados.append(
+            {
+                "usuario": user,
+                "role": role_atual,
+                "nome_completo": f"{user.first_name} {user.last_name}",
+                "status": "Ativo" if user.is_active else "Inativo",
+            }
+        )
+
+    context = {
+        "form": form,
+        "usuarios_detalhados": usuarios_detalhados,
+        "filtro_busca": busca,
+        "filtro_status": filtro_status,
+        "filtro_role": filtro_role,
+    }
+
+    return render(request, "gerenciar_usuarios.html", context)
+
+
+@login_required
+def editar_usuario(request, usuario_id):
+    """
+    View para editar um usuário existente
+    """
+    if not check_user_permission(request.user, ["coordenador", "admin"]):
+        messages.error(request, "Você não tem permissão para editar usuários.")
+        return redirect("inicio")
+
+    usuario = get_object_or_404(User, id=usuario_id)
+
+    if request.method == "POST":
+        form = GerenciarUsuarioForm(request.POST, instance=usuario)
+        if form.is_valid():
+            form.save()
+            messages.success(
+                request, f"Usuário '{usuario.username}' atualizado com sucesso!"
+            )
+            return redirect("gerenciar_usuarios")
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"Erro no campo {field}: {error}")
+    else:
+        form = GerenciarUsuarioForm(instance=usuario)
+
+    context = {"form": form, "usuario": usuario, "editing": True}
+    return render(request, "gerenciar_usuarios.html", context)
+
+
+@login_required
+def excluir_usuario(request, usuario_id):
+    """
+    View para excluir um usuário
+    """
+    if not check_user_permission(request.user, ["coordenador", "admin"]):
+        return JsonResponse({"error": "Permissão negada"}, status=403)
+
+    if request.method == "POST":
+        try:
+            usuario = get_object_or_404(User, id=usuario_id)
+
+            # Não permite excluir o próprio usuário
+            if usuario == request.user:
+                return JsonResponse(
+                    {"error": "Não é possível excluir seu próprio usuário"}, status=400
+                )
+
+            # Não permite excluir usuários admin se não for admin
+            if has_role(usuario, "admin") and not has_role(request.user, "admin"):
+                return JsonResponse(
+                    {
+                        "error": "Apenas administradores podem excluir outros administradores"
+                    },
+                    status=403,
+                )
+
+            nome_usuario = usuario.username
+            usuario.delete()
+
+            return JsonResponse(
+                {"success": f"Usuário '{nome_usuario}' excluído com sucesso!"}
+            )
+        except Exception as e:
+            return JsonResponse(
+                {"error": f"Erro ao excluir usuário: {str(e)}"}, status=500
+            )
+
+    return JsonResponse({"error": "Método não permitido"}, status=405)
+
+
+@login_required
+def resetar_senha_usuario(request, usuario_id):
+    """
+    View para resetar senha de um usuário
+    """
+    if not check_user_permission(request.user, ["coordenador", "admin"]):
+        return JsonResponse({"error": "Permissão negada"}, status=403)
+
+    if request.method == "POST":
+        try:
+            usuario = get_object_or_404(User, id=usuario_id)
+
+            # Não permite resetar a própria senha por esta via
+            if usuario == request.user:
+                return JsonResponse(
+                    {"error": "Use a opção de alteração de senha no perfil"}, status=400
+                )
+
+            # Não permite resetar senha de admin se não for admin
+            if has_role(usuario, "admin") and not has_role(request.user, "admin"):
+                return JsonResponse(
+                    {
+                        "error": "Apenas administradores podem resetar senha de outros administradores"
+                    },
+                    status=403,
+                )
+
+            nova_senha = "123456"
+            usuario.set_password(nova_senha)
+            usuario.save()
+
+            return JsonResponse(
+                {
+                    "success": f"Senha do usuário '{usuario.username}' resetada para: {nova_senha}"
+                }
+            )
+        except Exception as e:
+            return JsonResponse(
+                {"error": f"Erro ao resetar senha: {str(e)}"}, status=500
+            )
+
+    return JsonResponse({"error": "Método não permitido"}, status=405)
 
 
 @login_required
@@ -962,21 +1171,30 @@ def editar_questionario_perguntas(request, questionario_id):
     categorias = CategoriaPergunta.objects.all()
 
     if request.method == "POST":
+        print(f"DEBUG: POST data: {request.POST}")
         if "adicionar_pergunta" in request.POST:
+            print("DEBUG: Tentando adicionar pergunta")
             form = PerguntaAvaliacaoForm(request.POST)
+            print(f"DEBUG: Form data: {form.data}")
             if form.is_valid():
+                print("DEBUG: Form é válido, salvando pergunta")
                 pergunta = form.save()
+                print(f"DEBUG: Pergunta salva: {pergunta}")
                 # Adicionar ao questionário
                 ordem = perguntas_existentes.count() + 1
-                QuestionarioPergunta.objects.create(
+                qp = QuestionarioPergunta.objects.create(
                     questionario=questionario,
                     pergunta=pergunta,
                     ordem_no_questionario=ordem,
                 )
+                print(f"DEBUG: QuestionarioPergunta criado: {qp}")
                 messages.success(request, "Pergunta adicionada com sucesso!")
                 return redirect(
                     "editar_questionario_perguntas", questionario_id=questionario.id
                 )
+            else:
+                print(f"DEBUG: Form inválido - erros: {form.errors}")
+                messages.error(request, f"Erro ao adicionar pergunta: {form.errors}")
 
         elif "remover_pergunta" in request.POST:
             pergunta_id = request.POST.get("pergunta_id")
@@ -1002,7 +1220,7 @@ def editar_questionario_perguntas(request, questionario_id):
         "perguntas_existentes": perguntas_existentes,
         "form": form,
         "categorias": categorias,
-        "titulo": f"Editar Perguntas - {questionario.nome}",
+        "titulo": f"Editar Perguntas - {questionario.titulo}",
     }
     return render(request, "avaliacoes/editar_questionario_perguntas.html", context)
 
@@ -1249,3 +1467,159 @@ def relatorio_avaliacoes(request):
         "titulo": "Relatórios de Avaliação",
     }
     return render(request, "avaliacoes/relatorio_avaliacoes.html", context)
+
+
+# ============ CRUD CATEGORIAS DE PERGUNTA ============
+
+
+@login_required
+def gerenciar_categorias(request):
+    """
+    View para gerenciar categorias de pergunta via AJAX
+    """
+    if not check_user_permission(request.user, ["coordenador", "admin"]):
+        return JsonResponse({"error": "Permissão negada"}, status=403)
+
+    if request.method == "GET":
+        # Listar todas as categorias
+        categorias = CategoriaPergunta.objects.all().order_by("ordem", "nome")
+        categorias_data = []
+
+        for categoria in categorias:
+            categorias_data.append(
+                {
+                    "id": categoria.id,
+                    "nome": categoria.nome,
+                    "descricao": categoria.descricao,
+                    "ordem": categoria.ordem,
+                    "ativa": categoria.ativa,
+                    "total_perguntas": categoria.perguntas.count(),
+                }
+            )
+
+        return JsonResponse({"categorias": categorias_data})
+
+    elif request.method == "POST":
+        # Criar nova categoria
+        form = CategoriaPerguntaForm(request.POST)
+        if form.is_valid():
+            categoria = form.save()
+            messages.success(
+                request, f"Categoria '{categoria.nome}' criada com sucesso!"
+            )
+            return JsonResponse(
+                {
+                    "success": True,
+                    "categoria": {
+                        "id": categoria.id,
+                        "nome": categoria.nome,
+                        "descricao": categoria.descricao,
+                        "ordem": categoria.ordem,
+                        "ativa": categoria.ativa,
+                        "total_perguntas": 0,
+                    },
+                }
+            )
+        else:
+            return JsonResponse(
+                {"error": "Dados inválidos", "errors": form.errors}, status=400
+            )
+
+
+@login_required
+def categoria_detail(request, categoria_id):
+    """
+    View para detalhes, edição e exclusão de categoria específica
+    """
+    if not check_user_permission(request.user, ["coordenador", "admin"]):
+        return JsonResponse({"error": "Permissão negada"}, status=403)
+
+    categoria = get_object_or_404(CategoriaPergunta, id=categoria_id)
+
+    if request.method == "GET":
+        # Retornar detalhes da categoria
+        return JsonResponse(
+            {
+                "id": categoria.id,
+                "nome": categoria.nome,
+                "descricao": categoria.descricao,
+                "ordem": categoria.ordem,
+                "ativa": categoria.ativa,
+                "total_perguntas": categoria.perguntas.count(),
+            }
+        )
+
+    elif request.method == "PUT":
+        # Editar categoria
+        import json
+
+        data = json.loads(request.body)
+        form = CategoriaPerguntaForm(data, instance=categoria)
+
+        if form.is_valid():
+            categoria = form.save()
+            messages.success(
+                request, f"Categoria '{categoria.nome}' atualizada com sucesso!"
+            )
+            return JsonResponse(
+                {
+                    "success": True,
+                    "categoria": {
+                        "id": categoria.id,
+                        "nome": categoria.nome,
+                        "descricao": categoria.descricao,
+                        "ordem": categoria.ordem,
+                        "ativa": categoria.ativa,
+                        "total_perguntas": categoria.perguntas.count(),
+                    },
+                }
+            )
+        else:
+            return JsonResponse(
+                {"error": "Dados inválidos", "errors": form.errors}, status=400
+            )
+
+    elif request.method == "DELETE":
+        # Excluir categoria
+        total_perguntas = categoria.perguntas.count()
+
+        if total_perguntas > 0:
+            return JsonResponse(
+                {
+                    "error": f"Não é possível excluir a categoria '{categoria.nome}' pois ela possui {total_perguntas} pergunta(s) associada(s)."
+                },
+                status=400,
+            )
+
+        nome_categoria = categoria.nome
+        categoria.delete()
+        messages.success(request, f"Categoria '{nome_categoria}' excluída com sucesso!")
+        return JsonResponse(
+            {
+                "success": True,
+                "message": f"Categoria '{nome_categoria}' excluída com sucesso!",
+            }
+        )
+
+
+@login_required
+def categoria_form(request, categoria_id=None):
+    """
+    View para renderizar o formulário de categoria (para modal)
+    """
+    if not check_user_permission(request.user, ["coordenador", "admin"]):
+        return JsonResponse({"error": "Permissão negada"}, status=403)
+
+    categoria = None
+    if categoria_id:
+        categoria = get_object_or_404(CategoriaPergunta, id=categoria_id)
+
+    form = CategoriaPerguntaForm(instance=categoria)
+
+    context = {
+        "form": form,
+        "categoria": categoria,
+        "is_edit": categoria is not None,
+    }
+
+    return render(request, "avaliacoes/categoria_form_modal.html", context)

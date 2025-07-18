@@ -5,18 +5,22 @@
 {% block page_description %}Gerencie questionários e ciclos de avaliação{% endblock %}
 
 {% block page_actions %}
-    {% if user|has_role:"coordenador" or user|has_role:"admin" %}
-    <div class="section-header">
-        <div>
-            <a href="{% url 'criar_questionario_avaliacao' %}" class="btn">
-                ➕ Novo Questionário
-            </a>
-            <a href="{% url 'criar_ciclo_avaliacao' %}" class="btn btn-secondary">
-                📅 Novo Ciclo
-            </a>
-        </div>
+{% if user|has_role:"coordenador" or user|has_role:"admin" %}
+<div class="section-header">
+    <div>
+        <a href="{% url 'criar_questionario_avaliacao' %}" class="btn">
+            ➕ Novo Questionário
+        </a>
+        <a href="{% url 'criar_ciclo_avaliacao' %}" class="btn btn-secondary">
+            📅 Novo Ciclo
+        </a>
+        <button type="button" class="btn btn-secondary" data-bs-toggle="modal"
+            data-bs-target="#gerenciarCategoriasModal">
+            📂 Gerenciar Categorias
+        </button>
     </div>
-    {% endif %}
+</div>
+{% endif %}
 {% endblock %}
 
 {% block content %}
@@ -25,21 +29,22 @@
     <div class="avaliacao-card">
         <h3>📅 Ciclos Ativos</h3>
         {% if ciclos %}
-            {% for ciclo in ciclos %}
-            <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f0f0f0;">
-                <div>
-                    <h6 style="margin: 0; font-weight: 600;">{{ ciclo.nome }}</h6>
-                    <small style="color: #666;">
-                        {{ ciclo.data_inicio|date:"d/m/Y" }} - {{ ciclo.data_fim|date:"d/m/Y" }}
-                    </small>
-                </div>
-                <a href="{% url 'detalhe_ciclo_avaliacao' ciclo.id %}" class="btn btn-sm">
-                    👁️ Ver
-                </a>
+        {% for ciclo in ciclos %}
+        <div
+            style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f0f0f0;">
+            <div>
+                <h6 style="margin: 0; font-weight: 600;">{{ ciclo.nome }}</h6>
+                <small style="color: #666;">
+                    {{ ciclo.data_inicio|date:"d/m/Y" }} - {{ ciclo.data_fim|date:"d/m/Y" }}
+                </small>
             </div>
-            {% endfor %}
+            <a href="{% url 'detalhe_ciclo_avaliacao' ciclo.id %}" class="btn btn-sm">
+                👁️ Ver
+            </a>
+        </div>
+        {% endfor %}
         {% else %}
-            <p style="color: #666; text-align: center; margin: 20px 0;">Nenhum ciclo ativo encontrado.</p>
+        <p style="color: #666; text-align: center; margin: 20px 0;">Nenhum ciclo ativo encontrado.</p>
         {% endif %}
     </div>
 
@@ -47,51 +52,51 @@
     <div class="avaliacao-card">
         <h3>📋 Questionários de Avaliação</h3>
         {% if avaliacoes %}
-            <div class="data-table-container">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Nome</th>
-                            <th>Descrição</th>
-                            <th>Criado em</th>
-                            <th>Status</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for questionario in avaliacoes %}
-                        <tr>
-                            <td>
-                                <strong>{{ questionario.titulo }}</strong>
-                            </td>
-                            <td>
-                                {{ questionario.descricao|truncatechars:50 }}
-                            </td>
-                            <td>
-                                {{ questionario.data_criacao|date:"d/m/Y H:i" }}
-                            </td>
-                            <td>
-                                {% if questionario.ativo %}
-                                    <span class="badge bg-success">Ativo</span>
-                                {% else %}
-                                    <span class="badge bg-secondary">Inativo</span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% if user|has_role:"coordenador" or user|has_role:"admin" %}
-                                <a href="{% url 'editar_questionario_perguntas' questionario.id %}" 
-                                   class="btn btn-sm" title="Editar Perguntas">
-                                    ✏️ Editar
-                                </a>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+        <div class="data-table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Descrição</th>
+                        <th>Criado em</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for questionario in avaliacoes %}
+                    <tr>
+                        <td>
+                            <strong>{{ questionario.titulo }}</strong>
+                        </td>
+                        <td>
+                            {{ questionario.descricao|truncatechars:50 }}
+                        </td>
+                        <td>
+                            {{ questionario.data_criacao|date:"d/m/Y H:i" }}
+                        </td>
+                        <td>
+                            {% if questionario.ativo %}
+                            <span class="badge bg-success">Ativo</span>
+                            {% else %}
+                            <span class="badge bg-secondary">Inativo</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if user|has_role:"coordenador" or user|has_role:"admin" %}
+                            <a href="{% url 'editar_questionario_perguntas' questionario.id %}" class="btn btn-sm"
+                                title="Editar Perguntas">
+                                ✏️ Editar
+                            </a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
         {% else %}
-            <p style="color: #666; text-align: center; margin: 20px 0;">Nenhum questionário encontrado.</p>
+        <p style="color: #666; text-align: center; margin: 20px 0;">Nenhum questionário encontrado.</p>
         {% endif %}
     </div>
 </div>
@@ -115,4 +120,479 @@
     </div>
 </div>
 {% endif %}
-{% endblock %}
+
+<!-- Modal de Gerenciar Categorias -->
+<div class="modal fade" id="gerenciarCategoriasModal" tabindex="-1" aria-labelledby="gerenciarCategoriasModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="gerenciarCategoriasModalLabel">📂 Gerenciar Categorias de Avaliação</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Botão para adicionar nova categoria -->
+                <div class="mb-3">
+                    <button type="button" class="btn btn-primary" onclick="abrirFormularioCategoria()">
+                        ➕ Nova Categoria
+                    </button>
+                </div>
+
+                <!-- Lista de categorias -->
+                <div id="categorias-container">
+                    <!-- Carregará dinamicamente -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para formulário de categoria -->
+<div class="modal fade" id="categoriaFormModal" tabindex="-1" aria-labelledby="categoriaFormModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-md">
+        <div id="categoria-form-container">
+            <!-- Carregará dinamicamente -->
+        </div>
+    </div>
+</div>
+
+<script>
+    // Função para carregar categorias
+    function carregarCategorias() {
+        fetch('{% url "gerenciar_categorias" %}')
+            .then(response => response.json())
+            .then(data => {
+                const container = document.getElementById('categorias-container');
+
+                if (data.categorias.length === 0) {
+                    container.innerHTML = '<p class="text-muted text-center">Nenhuma categoria encontrada.</p>';
+                    return;
+                }
+
+                let html = '<div class="table-responsive"><table class="table table-striped">';
+                html += '<thead><tr><th>Nome</th><th>Descrição</th><th>Ordem</th><th>Status</th><th>Ações</th></tr></thead><tbody>';
+
+                data.categorias.forEach(categoria => {
+                    html += `<tr>
+                    <td><strong>${categoria.nome}</strong></td>
+                    <td>${categoria.descricao || '-'}</td>
+                    <td>${categoria.ordem}</td>
+                    <td>
+                        <span class="badge bg-${categoria.ativa ? 'success' : 'secondary'}">
+                            ${categoria.ativa ? 'Ativo' : 'Inativo'}
+                        </span>
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary" onclick="editarCategoria(${categoria.id})">
+                            ✏️ Editar
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="excluirCategoria(${categoria.id}, '${categoria.nome}')">
+                            🗑️ Excluir
+                        </button>
+                    </td>
+                </tr>`;
+                });
+
+                html += '</tbody></table></div>';
+                container.innerHTML = html;
+            })
+            .catch(error => {
+                console.error('Erro ao carregar categorias:', error);
+                document.getElementById('categorias-container').innerHTML =
+                    '<p class="text-danger text-center">Erro ao carregar categorias.</p>';
+            });
+    }
+
+    // Função para abrir formulário de nova categoria
+    function abrirFormularioCategoria() {
+        fetch('{% url "categoria_form" %}')
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('categoria-form-container').innerHTML = html;
+
+                // Configurar o formulário
+                const form = document.getElementById('categoria-form');
+                form.addEventListener('submit', function (e) {
+                    e.preventDefault();
+                    salvarCategoria();
+                });
+
+                // Abrir modal
+                const modal = new bootstrap.Modal(document.getElementById('categoriaFormModal'));
+                modal.show();
+            })
+            .catch(error => {
+                console.error('Erro ao carregar formulário:', error);
+                alert('Erro ao carregar formulário de categoria');
+            });
+    }
+
+    // Função para editar categoria
+    function editarCategoria(id) {
+        fetch(`{% url "categoria_detail" 0 %}`.replace('0', id))
+            .then(response => response.json())
+            .then(data => {
+                // Carregar formulário com dados da categoria
+                fetch(`{% url "categoria_form" %}?id=${id}`)
+                    .then(response => response.text())
+                    .then(html => {
+                        document.getElementById('categoria-form-container').innerHTML = html;
+
+                        // Preencher campos com dados da categoria
+                        document.getElementById('id_nome').value = data.categoria.nome;
+                        document.getElementById('id_descricao').value = data.categoria.descricao || '';
+                        document.getElementById('id_ordem').value = data.categoria.ordem;
+                        document.getElementById('id_ativa').checked = data.categoria.ativa;
+
+                        // Configurar o formulário
+                        const form = document.getElementById('categoria-form');
+                        form.addEventListener('submit', function (e) {
+                            e.preventDefault();
+                            salvarCategoria(id);
+                        });
+
+                        // Abrir modal
+                        const modal = new bootstrap.Modal(document.getElementById('categoriaFormModal'));
+                        modal.show();
+                    })
+                    .catch(error => {
+                        console.error('Erro ao carregar formulário:', error);
+                        alert('Erro ao carregar formulário de categoria');
+                    });
+            })
+            .catch(error => {
+                console.error('Erro ao carregar categoria:', error);
+                alert('Erro ao carregar dados da categoria');
+            });
+    }
+
+    // Função para salvar categoria
+    function salvarCategoria(id = null) {
+        const form = document.getElementById('categoria-form');
+        const formData = new FormData(form);
+
+        const url = id ? `{% url "categoria_detail" 0 %}`.replace('0', id) : '{% url "gerenciar_categorias" %}';
+        const method = id ? 'PUT' : 'POST';
+
+        fetch(url, {
+            method: method,
+            body: formData,
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Fechar modal de formulário
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('categoriaFormModal'));
+                    modal.hide();
+
+                    // Recarregar lista de categorias
+                    carregarCategorias();
+
+                    // Mostrar mensagem de sucesso
+                    alert(data.message || 'Categoria salva com sucesso!');
+                } else {
+                    // Mostrar erros
+                    if (data.errors) {
+                        let errorMessages = [];
+                        for (const [field, messages] of Object.entries(data.errors)) {
+                            errorMessages.push(`${field}: ${messages.join(', ')}`);
+                        }
+                        alert('Erro ao salvar categoria:\n' + errorMessages.join('\n'));
+                    } else {
+                        alert('Erro ao salvar categoria');
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Erro ao salvar categoria:', error);
+                alert('Erro ao salvar categoria');
+            });
+    }
+
+    // Função para excluir categoria
+    function excluirCategoria(id, nome) {
+        if (!confirm(`Tem certeza que deseja excluir a categoria "${nome}"?`)) {
+            return;
+        }
+
+        fetch(`{% url "categoria_detail" 0 %}`.replace('0', id), {
+            method: 'DELETE',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Recarregar lista de categorias
+                    carregarCategorias();
+
+                    // Mostrar mensagem de sucesso
+                    alert(data.message || 'Categoria excluída com sucesso!');
+                } else {
+                    alert('Erro ao excluir categoria: ' + (data.message || 'Erro desconhecido'));
+                }
+            })
+            .catch(error => {
+                console.error('Erro ao excluir categoria:', error);
+                alert('Erro ao excluir categoria');
+            });
+    }
+
+    // Carregar categorias quando o modal for aberto
+    document.addEventListener('DOMContentLoaded', function () {
+        console.log('DOM carregado');
+
+        const modal = document.getElementById('gerenciarCategoriasModal');
+        if (modal) {
+            modal.addEventListener('shown.bs.modal', function () {
+                console.log('Modal de categorias aberto');
+                carregarCategorias();
+            });
+        }
+
+        // Verificar se Bootstrap está carregado
+        if (typeof bootstrap === 'undefined') {
+            console.error('Bootstrap não está carregado!');
+        } else {
+            console.log('Bootstrap carregado com sucesso');
+        }
+    });
+</script>
+
+<style>
+    /* Estilos para modais de categoria */
+    .modal {
+        z-index: 1050;
+    }
+
+    .modal-backdrop {
+        z-index: 1040;
+    }
+
+    .modal-lg {
+        max-width: 900px;
+    }
+
+    .modal-md {
+        max-width: 600px;
+    }
+
+    .modal-content {
+        border-radius: 0.5rem;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+
+    .table-striped>tbody>tr:nth-of-type(odd)>td,
+    .table-striped>tbody>tr:nth-of-type(odd)>th {
+        background-color: rgba(0, 0, 0, 0.05);
+    }
+
+    .badge {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+        font-weight: 500;
+        line-height: 1;
+        color: #fff;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: baseline;
+        border-radius: 0.25rem;
+    }
+
+    .badge.bg-success {
+        background-color: #198754 !important;
+    }
+
+    .badge.bg-secondary {
+        background-color: #6c757d !important;
+    }
+
+    .btn-outline-primary {
+        color: var(--cor06);
+        border-color: var(--cor06);
+        background-color: transparent;
+    }
+
+    .btn-outline-primary:hover {
+        color: #fff;
+        background-color: var(--cor06);
+        border-color: var(--cor06);
+    }
+
+    .btn-outline-danger {
+        color: #dc3545;
+        border-color: #dc3545;
+        background-color: transparent;
+    }
+
+    .btn-outline-danger:hover {
+        color: #fff;
+        background-color: #dc3545;
+        border-color: #dc3545;
+    }
+
+    .btn-danger {
+        background-color: #dc3545;
+        border-color: #dc3545;
+        color: white;
+    }
+
+    .btn-danger:hover {
+        background-color: #bb2d3b;
+        border-color: #b02a37;
+        color: white;
+    }
+
+    .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+        line-height: 1.5;
+        border-radius: 0.2rem;
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+    .table {
+        width: 100%;
+        margin-bottom: 1rem;
+        color: #212529;
+        border-collapse: collapse;
+    }
+
+    .table th,
+    .table td {
+        padding: 0.75rem;
+        vertical-align: top;
+        border-top: 1px solid #dee2e6;
+    }
+
+    .table thead th {
+        vertical-align: bottom;
+        border-bottom: 2px solid #dee2e6;
+        background-color: #f8f9fa;
+        font-weight: 600;
+    }
+
+    .modal-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        padding: 1rem 1rem;
+        border-bottom: 1px solid #dee2e6;
+        border-top-left-radius: calc(0.3rem - 1px);
+        border-top-right-radius: calc(0.3rem - 1px);
+    }
+
+    .modal-body {
+        position: relative;
+        flex: 1 1 auto;
+        padding: 1rem;
+    }
+
+    .modal-footer {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: flex-end;
+        padding: 0.75rem;
+        border-top: 1px solid #dee2e6;
+        border-bottom-right-radius: calc(0.3rem - 1px);
+        border-bottom-left-radius: calc(0.3rem - 1px);
+    }
+
+    .modal-footer>* {
+        margin: 0.25rem;
+    }
+
+    .btn-close {
+        box-sizing: content-box;
+        width: 1em;
+        height: 1em;
+        padding: 0.25em 0.25em;
+        color: #000;
+        background: transparent url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000'%3e%3cpath d='m.235 1.786 1.55-1.55L8 6.45l6.215-6.215 1.55 1.55L9.55 8l6.215 6.215-1.55 1.55L8 9.55l-6.215 6.215-1.55-1.55L6.45 8 .235 1.786Z'/%3e%3c/svg%3e") center/1em auto no-repeat;
+        border: 0;
+        border-radius: 0.25rem;
+        opacity: 0.5;
+        cursor: pointer;
+    }
+
+    .btn-close:hover {
+        opacity: 0.75;
+    }
+
+    .text-muted {
+        color: #6c757d !important;
+    }
+
+    .text-center {
+        text-align: center !important;
+    }
+
+    .text-danger {
+        color: #dc3545 !important;
+    }
+
+    .mb-3 {
+        margin-bottom: 1rem !important;
+    }
+
+    /* Animações suaves */
+    .modal.fade .modal-dialog {
+        transition: transform 0.3s ease-out;
+        transform: translate(0, -50px);
+    }
+
+    .modal.show .modal-dialog {
+        transform: none;
+    }
+
+    /* Responsividade */
+    @media (max-width: 768px) {
+        .modal-lg {
+            max-width: 95%;
+        }
+
+        .modal-md {
+            max-width: 95%;
+        }
+
+        .table-responsive {
+            font-size: 0.875rem;
+        }
+
+        .btn-sm {
+            padding: 0.125rem 0.25rem;
+            font-size: 0.75rem;
+        }
+    }
+
+    /* Melhoria nos botões do modal */
+    .modal .btn-sm {
+        margin: 0 0.125rem;
+    }
+
+    .modal .btn-outline-primary {
+        border-width: 1px;
+        font-weight: 500;
+    }
+
+    .modal .btn-outline-danger {
+        border-width: 1px;
+        font-weight: 500;
+    }
+
+    .table .btn-sm {
+        white-space: nowrap;
+    }
+</style>{% endblock %}

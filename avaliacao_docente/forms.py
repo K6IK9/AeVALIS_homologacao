@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+from django.db import models
 from .models import (
     Curso,
     PerfilProfessor,
@@ -114,6 +115,90 @@ class GerenciarRoleForm(forms.Form):
         super().__init__(*args, **kwargs)
         # Ordena usuários por username
         self.fields["usuario"].queryset = User.objects.all().order_by("username")
+
+
+class GerenciarUsuarioForm(forms.ModelForm):
+    """
+    Form para criar e editar usuários
+    """
+
+    first_name = forms.CharField(
+        max_length=150,
+        required=True,
+        label="Nome",
+        widget=forms.TextInput(
+            attrs={"class": "form-control", "placeholder": "Digite o nome"}
+        ),
+    )
+    last_name = forms.CharField(
+        max_length=150,
+        required=True,
+        label="Sobrenome",
+        widget=forms.TextInput(
+            attrs={"class": "form-control", "placeholder": "Digite o sobrenome"}
+        ),
+    )
+    email = forms.EmailField(
+        max_length=254,
+        required=True,
+        label="Email Institucional",
+        widget=forms.EmailInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "Digite o email institucional",
+            }
+        ),
+    )
+    username = forms.CharField(
+        required=True,
+        label="Matrícula",
+        widget=forms.TextInput(
+            attrs={"class": "form-control", "placeholder": "Digite a matrícula"}
+        ),
+    )
+    is_active = forms.BooleanField(
+        required=False,
+        label="Usuário Ativo",
+        widget=forms.CheckboxInput(attrs={"class": "form-check-input"}),
+        initial=True,
+    )
+
+    class Meta:
+        model = User
+        fields = ["username", "first_name", "last_name", "email", "is_active"]
+
+    def clean_email(self):
+        email = self.cleaned_data.get("email")
+        if email:
+            # Verifica se o email já existe (exceto para o próprio usuário em edição)
+            queryset = User.objects.filter(email=email)
+            if self.instance and self.instance.pk:
+                queryset = queryset.exclude(pk=self.instance.pk)
+            if queryset.exists():
+                raise forms.ValidationError(
+                    "Este email já está sendo usado por outro usuário."
+                )
+        return email
+
+    def clean_username(self):
+        username = self.cleaned_data.get("username")
+        if username:
+            # Validação para formato de matrícula
+            if not username.isdigit():
+                raise forms.ValidationError("A matrícula deve conter apenas números.")
+            if len(username) < 6:
+                raise forms.ValidationError(
+                    "A matrícula deve ter pelo menos 6 dígitos."
+                )
+            # Verifica se a matrícula já existe (exceto para o próprio usuário em edição)
+            queryset = User.objects.filter(username=username)
+            if self.instance and self.instance.pk:
+                queryset = queryset.exclude(pk=self.instance.pk)
+            if queryset.exists():
+                raise forms.ValidationError(
+                    "Esta matrícula já está sendo usada por outro usuário."
+                )
+        return username
 
 
 class CursoForm(forms.ModelForm):
@@ -483,6 +568,14 @@ class PerguntaAvaliacaoForm(forms.ModelForm):
             ),
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Definir valores padrão para campos obrigatórios
+        if not self.instance.pk:
+            self.fields["ordem"].initial = 0
+            self.fields["obrigatoria"].initial = True
+            self.fields["ativa"].initial = True
+
     def clean_opcoes_multipla_escolha(self):
         opcoes = self.cleaned_data.get("opcoes_multipla_escolha")
         tipo = self.cleaned_data.get("tipo")
@@ -665,3 +758,86 @@ class ComentarioAvaliacaoForm(forms.ModelForm):
             comentario.save()
 
         return comentario
+
+
+class CategoriaPerguntaForm(forms.ModelForm):
+    """
+    Formulário para criar e editar categorias de perguntas
+    """
+
+    class Meta:
+        model = CategoriaPergunta
+        fields = ["nome", "descricao", "ordem", "ativa"]
+        widgets = {
+            "nome": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Ex: Didática, Relacionamento, Infraestrutura",
+                    "maxlength": "50",
+                }
+            ),
+            "descricao": forms.Textarea(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Descrição opcional da categoria",
+                    "rows": "3",
+                }
+            ),
+            "ordem": forms.NumberInput(
+                attrs={
+                    "class": "form-control",
+                    "min": "0",
+                    "max": "999",
+                    "placeholder": "0",
+                }
+            ),
+            "ativa": forms.CheckboxInput(attrs={"class": "form-check-input"}),
+        }
+        labels = {
+            "nome": "Nome da Categoria",
+            "descricao": "Descrição",
+            "ordem": "Ordem de Exibição",
+            "ativa": "Categoria Ativa",
+        }
+        help_texts = {
+            "nome": "Nome único para identificar a categoria",
+            "descricao": "Descrição opcional para explicar o propósito da categoria",
+            "ordem": "Ordem de exibição nas avaliações (menor número = primeiro)",
+            "ativa": "Marque para manter a categoria ativa no sistema",
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Definir ordem padrão se não especificada
+        if not self.instance.pk:
+            # Nova categoria - definir ordem como próxima disponível
+            max_ordem = (
+                CategoriaPergunta.objects.aggregate(max_ordem=models.Max("ordem"))[
+                    "max_ordem"
+                ]
+                or 0
+            )
+            self.fields["ordem"].initial = max_ordem + 1
+
+    def clean_nome(self):
+        nome = self.cleaned_data.get("nome")
+        if nome:
+            nome = nome.strip().title()
+
+            # Verificar se já existe uma categoria com este nome
+            qs = CategoriaPergunta.objects.filter(nome__iexact=nome)
+            if self.instance.pk:
+                qs = qs.exclude(pk=self.instance.pk)
+
+            if qs.exists():
+                raise forms.ValidationError(
+                    "Já existe uma categoria com este nome. Escolha um nome diferente."
+                )
+
+        return nome
+
+    def clean_ordem(self):
+        ordem = self.cleaned_data.get("ordem")
+        if ordem is not None and ordem < 0:
+            raise forms.ValidationError("A ordem não pode ser negativa.")
+        return ordem
