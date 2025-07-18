@@ -1625,3 +1625,27 @@ def categoria_form(request, categoria_id=None):
     }
 
     return render(request, "avaliacoes/categoria_form_modal.html", context)
+
+
+class GestaoAvaliacoesView(LoginRequiredMixin, TemplateView):
+    template_name = "admin/gestao_avaliacoes.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        """Verifica se o usuário tem permissão para acessar a gestão de avaliações"""
+        if not check_user_permission(request.user, ["coordenador", "admin"]):
+            messages.error(request, "Você não tem permissão para acessar esta página.")
+            return redirect("inicio")
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Estatísticas do sistema de avaliação
+        context["stats"] = {
+            "total_ciclos": CicloAvaliacao.objects.count(),
+            "ciclos_ativos": CicloAvaliacao.objects.filter(ativo=True).count(),
+            "total_questionarios": QuestionarioAvaliacao.objects.count(),
+            "total_avaliacoes": AvaliacaoDocente.objects.count(),
+        }
+
+        return context

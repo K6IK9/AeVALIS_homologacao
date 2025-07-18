@@ -1,0 +1,424 @@
+{% load permission_tags %}
+{% load user_tags %}
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IF SADD - Gestão de Avaliações</title>
+
+    <style>
+        /* Importação das fontes */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Vidaloka&display=swap');
+
+        /* Variáveis CSS comuns */
+        :root {
+            /* Cores principais */
+            --cor01: #f0f0f0;
+            --cor01-alt: #f1f1f1;
+            --cor02: #00fd94;
+            --cor03: #376f6c;
+            --cor04: #1e3231;
+            --cor05: #090909;
+            --cor06: #00cafd;
+            --cor07: #ffffff;
+            --cor08: #ff3c3c;
+
+            /* Fontes */
+            --font01: "Poppins", sans-serif;
+            --font02: "Vidaloka", serif;
+
+            /* Sombras */
+            --shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+            --shadow-alt: 4px 2px 8px rgba(0, 0, 0, 0.2);
+
+            /* Bordas e raios */
+            --border-radius-small: 5px;
+            --border-radius-medium: 15px;
+            --border-radius-large: 25px;
+            --border-radius-xl: 35px;
+            --border-radius-circle: 50%;
+
+            /* Espaçamentos */
+            --spacing-xs: 5px;
+            --spacing-sm: 10px;
+            --spacing-md: 15px;
+            --spacing-lg: 20px;
+            --spacing-xl: 25px;
+            --spacing-2xl: 40px;
+        }
+
+        /* Reset global */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font01);
+            background-color: var(--cor01);
+            color: var(--cor05);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        header {
+            background-color: var(--cor07);
+            padding: var(--spacing-lg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        header button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        header button:hover {
+            opacity: 0.8;
+        }
+
+        header img {
+            height: 50px;
+        }
+
+        /* Main container */
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--spacing-2xl);
+        }
+
+        .page-title {
+            font-family: var(--font02);
+            font-size: 2.5rem;
+            color: var(--cor04);
+            text-align: center;
+            margin-bottom: var(--spacing-2xl);
+        }
+
+        .page-subtitle {
+            font-size: 1.1rem;
+            color: var(--cor03);
+            text-align: center;
+            margin-bottom: var(--spacing-2xl);
+        }
+
+        /* Cards grid */
+        .admin-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: var(--spacing-xl);
+            margin-bottom: var(--spacing-2xl);
+        }
+
+        .admin-card {
+            background: var(--cor07);
+            border-radius: var(--border-radius-medium);
+            padding: var(--spacing-xl);
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        .admin-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-alt);
+        }
+
+        .card-content h3 {
+            color: var(--cor04);
+            margin-bottom: var(--spacing-md);
+            font-size: 1.3rem;
+        }
+
+        .card-content .icon {
+            font-size: 1.8rem;
+            margin-right: var(--spacing-sm);
+        }
+
+        .card-content p {
+            color: var(--cor03);
+            margin-bottom: var(--spacing-lg);
+            line-height: 1.5;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: var(--spacing-sm);
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--cor02), var(--cor03));
+            color: var(--cor07);
+            text-decoration: none;
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: var(--border-radius-small);
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            color: var(--cor07);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--cor06), var(--cor03));
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--cor08), #cc0000);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--cor03);
+            color: var(--cor03);
+        }
+
+        .btn-outline:hover {
+            background: var(--cor03);
+            color: var(--cor07);
+        }
+
+        /* Back button */
+        .back-button {
+            background: var(--cor03);
+            color: var(--cor07);
+            text-decoration: none;
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: var(--border-radius-small);
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .back-button:hover {
+            opacity: 0.9;
+            color: var(--cor07);
+        }
+
+        /* Status indicators */
+        .status-badge {
+            padding: var(--spacing-xs) var(--spacing-sm);
+            border-radius: var(--border-radius-small);
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-left: var(--spacing-sm);
+        }
+
+        .status-ok {
+            background: var(--cor02);
+            color: var(--cor05);
+        }
+
+        .status-warning {
+            background: #ffc107;
+            color: var(--cor05);
+        }
+
+        .status-danger {
+            background: var(--cor08);
+            color: var(--cor07);
+        }
+
+        /* Statistics section */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-2xl);
+        }
+
+        .stat-card {
+            background: var(--cor07);
+            padding: var(--spacing-lg);
+            border-radius: var(--border-radius-medium);
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--cor03);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .stat-label {
+            color: var(--cor04);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            main {
+                padding: var(--spacing-lg);
+            }
+
+            .page-title {
+                font-size: 2rem;
+            }
+
+            .admin-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .card-actions {
+                flex-direction: column;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <button onclick="window.location.href='{% url 'admin_hub' %}'">
+            <img src="{% static 'assets/saad_logo.svg' %}" alt="Sadd Logo">
+        </button>
+        <button id="perfil">
+            <img src="{% static 'assets/perfil.svg' %}" alt="Perfil">
+        </button>
+    </header>
+
+    <main>
+        <a href="{% url 'admin_hub' %}" class="back-button">
+            ← Voltar ao Hub Administrativo
+        </a>
+
+        <h1 class="page-title">Gestão de Avaliações</h1>
+        <p class="page-subtitle">Configure e monitore o sistema de avaliação docente</p>
+
+        <!-- Estatísticas -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">{{ stats.total_ciclos }}</div>
+                <div class="stat-label">Ciclos Criados</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ stats.ciclos_ativos }}</div>
+                <div class="stat-label">Ciclos Ativos</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ stats.total_questionarios }}</div>
+                <div class="stat-label">Questionários</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ stats.total_avaliacoes }}</div>
+                <div class="stat-label">Avaliações</div>
+            </div>
+        </div>
+
+        <!-- Cards de funcionalidades -->
+        <div class="admin-grid">
+            
+            <!-- Gestão de Questionários -->
+            <div class="admin-card">
+                <div class="card-content">
+                    <h3><span class="icon">📋</span> Questionários de Avaliação</h3>
+                    <p>Crie e gerencie questionários que serão utilizados nas avaliações docentes.</p>
+                </div>
+                <div class="card-actions">
+                    <a href="{% url 'criar_questionario_avaliacao' %}" class="btn">Criar Questionário</a>
+                    <a href="{% url 'listar_avaliacoes' %}" class="btn btn-secondary">Listar Questionários</a>
+                </div>
+            </div>
+
+            <!-- Gestão de Ciclos -->
+            <div class="admin-card">
+                <div class="card-content">
+                    <h3><span class="icon">📅</span> Ciclos de Avaliação</h3>
+                    <p>Configure períodos de avaliação, associe questionários e defina turmas participantes.</p>
+                </div>
+                <div class="card-actions">
+                    <a href="{% url 'criar_ciclo_avaliacao' %}" class="btn">Criar Ciclo</a>
+                    <a href="{% url 'listar_avaliacoes' %}" class="btn btn-secondary">Gerenciar Ciclos</a>
+                </div>
+            </div>
+
+            <!-- Gestão de Categorias -->
+            <div class="admin-card">
+                <div class="card-content">
+                    <h3><span class="icon">📂</span> Categorias de Perguntas</h3>
+                    <p>Organize as perguntas em categorias para melhor estruturação dos questionários.</p>
+                </div>
+                <div class="card-actions">
+                    <a href="{% url 'listar_avaliacoes' %}" class="btn">Gerenciar Categorias</a>
+                </div>
+            </div>
+
+            <!-- Monitoramento -->
+            <div class="admin-card">
+                <div class="card-content">
+                    <h3><span class="icon">📊</span> Monitoramento e Relatórios</h3>
+                    <p>Acompanhe o progresso das avaliações e gere relatórios detalhados.</p>
+                </div>
+                <div class="card-actions">
+                    <a href="{% url 'relatorio_avaliacoes' %}" class="btn">Relatórios</a>
+                    <a href="{% url 'listar_avaliacoes' %}" class="btn btn-secondary">Status das Avaliações</a>
+                </div>
+            </div>
+
+            <!-- Configurações de Avaliação -->
+            <div class="admin-card">
+                <div class="card-content">
+                    <h3><span class="icon">⚙️</span> Configurações</h3>
+                    <p>Configure parâmetros gerais do sistema de avaliação.</p>
+                </div>
+                <div class="card-actions">
+                    <a href="#" class="btn btn-secondary">Parâmetros Gerais</a>
+                    <a href="#" class="btn btn-secondary">Notificações</a>
+                </div>
+            </div>
+
+            <!-- Limpeza e Manutenção -->
+            <div class="admin-card">
+                <div class="card-content">
+                    <h3><span class="icon">🔧</span> Manutenção</h3>
+                    <p>Ferramentas para limpeza de dados e manutenção do sistema.</p>
+                </div>
+                <div class="card-actions">
+                    <a href="#" class="btn btn-danger">Limpar Dados Antigos</a>
+                    <a href="#" class="btn btn-secondary">Logs do Sistema</a>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+
+{% include "perfil.html" %}
+
+</html>
