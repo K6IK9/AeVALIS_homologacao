@@ -460,6 +460,7 @@
       cursor: pointer;
       transition: all 0.3s;
       margin-right: 10px;
+      text-decoration: none;
     }
 
     .btn-filter:hover {
@@ -704,19 +705,19 @@
             <label for="status">Status</label>
             <select id="status" name="status" class="form-control">
               <option value="">Todos</option>
-              <option value="ativo" {% if filtro_status=='ativo' %}selected{% endif %}>Ativo</option>
-              <option value="inativo" {% if filtro_status=='inativo' %}selected{% endif %}>Inativo</option>
+              <option value="ativo" {% if filtro_status == 'ativo' %}selected{% endif %}>Ativo</option>
+              <option value="inativo" {% if filtro_status == 'inativo' %}selected{% endif %}>Inativo</option>
             </select>
           </div>
           <div class="filter-group">
             <label for="role">Role</label>
             <select id="role" name="role" class="form-control">
               <option value="">Todas</option>
-              <option value="admin" {% if filtro_role=='admin' %}selected{% endif %}>Administrador</option>
-              <option value="coordenador" {% if filtro_role=='coordenador' %}selected{% endif %}>Coordenador</option>
-              <option value="professor" {% if filtro_role=='professor' %}selected{% endif %}>Professor</option>
-              <option value="aluno" {% if filtro_role=='aluno' %}selected{% endif %}>Aluno</option>
-              <option value="sem_role" {% if filtro_role=='sem_role' %}selected{% endif %}>Sem Role</option>
+              <option value="admin" {% if filtro_role == 'admin' %}selected{% endif %}>Administrador</option>
+              <option value="coordenador" {% if filtro_role == 'coordenador' %}selected{% endif %}>Coordenador</option>
+              <option value="professor" {% if filtro_role == 'professor' %}selected{% endif %}>Professor</option>
+              <option value="aluno" {% if filtro_role == 'aluno' %}selected{% endif %}>Aluno</option>
+              <option value="sem_role" {% if filtro_role == 'sem_role' %}selected{% endif %}>Sem Role</option>
             </select>
           </div>
           <div class="filter-group">

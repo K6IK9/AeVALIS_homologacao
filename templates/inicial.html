@@ -164,7 +164,12 @@
 
 
         {% if user|has_role:'admin' %}
-        <h1>Seja bem-vindo(a) Administrador: <span id="alunoAtual"> {{ user.first_name }} {{ user.last_name }}</span>
+        <h1>Seja bem-vindo(a) Administrador:
+            {% if user.first_name and user.last_name %}
+            <span id="alunoAtual">{{ user.first_name }} {{ user.last_name }}</span>
+            {% else %}
+            <span id="alunoAtual" style="color: #ff3c3c;">Por favor, configure seu perfil</span>
+            {% endif %}
         </h1>
         <section id="opcoes">
             <h2>Opções Disponíveis</h2>
@@ -178,7 +183,13 @@
 
 
         {% elif user|has_role:'coordenador' %}
-        <h1>Seja bem-vindo(a) Coordenador: <span id="alunoAtual"> {{ user.first_name }} {{ user.last_name }}</span></h1>
+        <h1>Seja bem-vindo(a) Coordenador:
+            {% if user.first_name and user.last_name %}
+            <span id="alunoAtual">{{ user.first_name }} {{ user.last_name }}</span>
+            {% else %}
+            <span id="alunoAtual" style="color: #ff3c3c;">Por favor, configure seu perfil</span>
+            {% endif %}
+        </h1>
         <section id="opcoes">
             <h2>Opções Disponíveis</h2>
             <button onclick="window.location.href='{% url 'listar_avaliacoes' %}'" id="realizar_avaliacao">Gerenciar
@@ -187,7 +198,13 @@
                 id="relatorio_avaliacoes">Relatórios de Avaliações</button>
         </section>
         {% elif user|has_role:'professor' %}
-        <h1>Seja bem-vindo(a) Professor: <span id="alunoAtual"> {{ user.first_name }} {{ user.last_name }}</span></h1>
+        <h1>Seja bem-vindo(a) Professor:
+            {% if user.first_name and user.last_name %}
+            <span id="alunoAtual">{{ user.first_name }} {{ user.last_name }}</span>
+            {% else %}
+            <span id="alunoAtual" style="color: #ff3c3c;">Por favor, configure seu perfil</span>
+            {% endif %}
+        </h1>
         <section id="opcoes">
             <h2>Opções Disponíveis</h2>
             <button onclick="window.location.href='{% url 'listar_avaliacoes' %}'" id="realizar_avaliacao">Ver Minhas
@@ -196,7 +213,13 @@
                 id="relatorio_avaliacoes">Histórico de Avaliações</button>
         </section>
         {% elif user|has_role:'aluno' %}
-        <h1>Seja bem-vindo(a) Aluno: <span id="alunoAtual"> {{ user.first_name }} {{ user.last_name }}</span></h1>
+        <h1>Seja bem-vindo(a) Aluno:
+            {% if user.first_name and user.last_name %}
+            <span id="alunoAtual">{{ user.first_name }} {{ user.last_name }}</span>
+            {% else %}
+            <span id="alunoAtual" style="color: #ff3c3c;">Por favor, configure seu perfil</span>
+            {% endif %}
+        </h1>
         <section id="opcoes">
             <h2>Opções Disponíveis</h2>
             <button onclick="window.location.href='{% url 'listar_avaliacoes' %}'" id="realizar_avaliacao">Realizar
@@ -205,7 +228,13 @@
                 Avaliações</button>
         </section>
         {% else %}
-        <h1>Seja bem-vindo(a) <span id="alunoAtual"> {{ user.first_name }} {{ user.last_name }}</span></h1>
+        <h1>Seja bem-vindo(a)
+            {% if user.first_name and user.last_name %}
+            <span id="alunoAtual">{{ user.first_name }} {{ user.last_name }}</span>
+            {% else %}
+            <span id="alunoAtual" style="color: #ff3c3c;">Por favor, configure seu perfil</span>
+            {% endif %}
+        </h1>
         <h2 style="color:rgb(255, 0, 0);">Por favor, entre em contato com o administrador do sistema para definir seu
             perfil de usuario.</h2>
         {% endif %}
