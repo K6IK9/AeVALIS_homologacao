@@ -314,6 +314,38 @@
                 text-align: center;
             }
         }
+
+        /* Estilo para caixas de seleção menores */
+        input[type="checkbox"] {
+            width: 16px !important;
+            height: 16px !important;
+            transform: scale(0.8);
+            margin: 0 4px 0 0 !important;
+            vertical-align: middle;
+        }
+
+        /* Ajustar labels para alinhar com checkboxes menores */
+        .turma-item label,
+        .form-group label {
+            line-height: 16px;
+            vertical-align: middle;
+        }
+
+        /* Estilo específico para checkboxes em containers de turma */
+        .turma-item input[type="checkbox"] {
+            width: 14px !important;
+            height: 14px !important;
+            transform: scale(0.75);
+            margin: 0 6px 0 0 !important;
+        }
+
+        /* Estilo para checkboxes de configuração */
+        .form-group input[type="checkbox"] {
+            width: 16px !important;
+            height: 16px !important;
+            transform: scale(0.8);
+            margin: 0 8px 0 0 !important;
+        }
     </style>
     {% block extra_css %}{% endblock %}
 </head>

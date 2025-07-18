@@ -399,6 +399,15 @@ class CicloAvaliacao(models.Model):
     permite_multiplas_respostas = models.BooleanField(default=False)
     enviar_lembrete_email = models.BooleanField(default=True)
 
+    # Turmas que devem responder a avaliação
+    turmas = models.ManyToManyField(
+        Turma,
+        related_name="ciclos_avaliacao",
+        blank=True,
+        verbose_name="Turmas que devem responder",
+        help_text="Selecione as turmas que devem participar desta avaliação",
+    )
+
     data_criacao = models.DateTimeField(auto_now_add=True)
     criado_por = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="ciclos_criados"

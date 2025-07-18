@@ -428,6 +428,14 @@ class CicloAvaliacaoForm(forms.ModelForm):
     Formulário para criar/editar ciclos de avaliação
     """
 
+    turmas = forms.ModelMultipleChoiceField(
+        queryset=Turma.objects.all(),
+        widget=forms.CheckboxSelectMultiple(attrs={"class": "form-check-input"}),
+        required=False,
+        label="Turmas que devem responder",
+        help_text="Selecione as turmas que devem participar desta avaliação",
+    )
+
     class Meta:
         model = CicloAvaliacao
         fields = [
@@ -436,6 +444,7 @@ class CicloAvaliacaoForm(forms.ModelForm):
             "questionario",
             "data_inicio",
             "data_fim",
+            "turmas",
             "permite_avaliacao_anonima",
             "permite_multiplas_respostas",
             "enviar_lembrete_email",
@@ -465,6 +474,24 @@ class CicloAvaliacaoForm(forms.ModelForm):
                 attrs={"class": "form-check-input"}
             ),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Filtrar turmas apenas do período letivo selecionado
+        # Para novas instâncias, sempre mostrar todas as turmas ativas
+        if self.instance and self.instance.pk:
+            try:
+                # Tentar acessar o período letivo apenas se a instância já foi salva
+                periodo_letivo = self.instance.periodo_letivo
+                self.fields["turmas"].queryset = Turma.objects.filter(
+                    periodo_letivo=periodo_letivo, status="ativa"
+                )
+            except:
+                # Se não conseguir acessar o período letivo, mostra todas as turmas ativas
+                self.fields["turmas"].queryset = Turma.objects.filter(status="ativa")
+        else:
+            # Para novas instâncias, mostrar todas as turmas ativas
+            self.fields["turmas"].queryset = Turma.objects.filter(status="ativa")
 
     def clean(self):
         cleaned_data = super().clean()

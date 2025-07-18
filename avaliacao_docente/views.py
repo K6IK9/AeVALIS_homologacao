@@ -1242,6 +1242,8 @@ def criar_ciclo_avaliacao(request):
             ciclo = form.save(commit=False)
             ciclo.criado_por = request.user
             ciclo.save()
+            # Salvar as turmas (ManyToManyField)
+            form.save_m2m()
             messages.success(request, "Ciclo de avaliação criado com sucesso!")
             return redirect("detalhe_ciclo_avaliacao", ciclo_id=ciclo.id)
     else:
