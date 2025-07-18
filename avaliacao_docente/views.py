@@ -296,7 +296,6 @@ def editar_disciplina(request, disciplina_id):
     context = {
         "form": form,
         "disciplina": disciplina,
-        "disciplinas": Disciplina.objects.all().order_by("disciplina_nome"),
         "editing": True,
     }
     return render(request, "gerenciar_disciplinas.html", context)

@@ -6,13 +6,27 @@ from .views import IndexView
 urlpatterns = [
     path("gerenciar-roles/", views.gerenciar_roles, name="gerenciar_roles"),
     path("gerenciar-cursos/", views.gerenciar_cursos, name="gerenciar_cursos"),
+    path("editar-curso/<int:curso_id>/", views.editar_curso, name="editar_curso"),
+    path("excluir-curso/<int:curso_id>/", views.excluir_curso, name="excluir_curso"),
     path(
         "gerenciar-disciplinas/",
         views.gerenciar_disciplinas,
         name="gerenciar_disciplinas",
     ),
+    path(
+        "editar-disciplina/<int:disciplina_id>/",
+        views.editar_disciplina,
+        name="editar_disciplina",
+    ),
+    path(
+        "excluir-disciplina/<int:disciplina_id>/",
+        views.excluir_disciplina,
+        name="excluir_disciplina",
+    ),
     path("gerenciar-periodos/", views.gerenciar_periodos, name="gerenciar_periodos"),
     path("gerenciar-turmas/", views.gerenciar_turmas, name="gerenciar_turmas"),
+    path("editar-turma/<int:turma_id>/", views.editar_turma, name="editar_turma"),
+    path("excluir-turma/<int:turma_id>/", views.excluir_turma, name="excluir_turma"),
     path("buscar-alunos-turma/", views.buscar_alunos_turma, name="buscar_alunos_turma"),
     path(
         "matricular-alunos-massa/",

@@ -354,7 +354,7 @@
             background: #c82333;
         }
 
-        /* Modal de confirmação */
+        /* Modal de exclusão - padrão igual ao de cursos */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -454,7 +454,7 @@
         {% endif %}
 
         <div class="form-section">
-            <h2>Criar Nova Disciplina</h2>
+            <h2>{% if editing %}Editar Disciplina{% else %}Criar Nova Disciplina{% endif %}</h2>
             <form method="post">
                 {% csrf_token %}
                 <div class="form-row">
@@ -535,10 +535,14 @@
                     </div>
                 </div>
 
-                <button type="submit" class="btn">Criar Disciplina</button>
+                <button type="submit" class="btn">{% if editing %}Atualizar Disciplina{% else %}Criar Disciplina{% endif %}</button>
+                {% if editing %}
+                <a href="{% url 'gerenciar_disciplinas' %}" class="btn btn-secondary">Cancelar</a>
+                {% endif %}
             </form>
         </div>
 
+        {% if not editing %}
         <div class="form-section">
             <h2>Disciplinas Cadastradas</h2>
             <div class="disciplina-count">
@@ -584,166 +588,85 @@
                 </tbody>
             </table>
         </div>
-    </div>
-
-    <!-- Modal de Edição -->
-    <div id="editModal" class="modal">
-        <div class="modal-content">
-            <span class="close-modal">&times;</span>
-            <h2>Editar Disciplina</h2>
-            <form id="editForm" method="post">
-                {% csrf_token %}
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="edit_disciplina_nome">Nome da Disciplina:</label>
-                        <input type="text" id="edit_disciplina_nome" name="disciplina_nome" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="edit_disciplina_sigla">Sigla:</label>
-                        <input type="text" id="edit_disciplina_sigla" name="disciplina_sigla" required>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="edit_disciplina_tipo">Tipo:</label>
-                        <select id="edit_disciplina_tipo" name="disciplina_tipo" required>
-                            <option value="TECNICA">Técnica</option>
-                            <option value="FORMACAO_GERAL">Formação Geral</option>
-                            <option value="OPTATIVA">Optativa</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="edit_carga_horaria">Carga Horária:</label>
-                        <input type="number" id="edit_carga_horaria" name="carga_horaria" min="1" required>
-                    </div>
-                </div>
-                <div class="modal-actions">
-                    <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Salvar Alterações</button>
-                </div>
-            </form>
-        </div>
+        {% endif %}
     </div>
 
     <!-- Modal de Confirmação de Exclusão -->
-    <div id="deleteModal" class="modal">
-        <div class="modal-content">
-            <h3>Confirmar Exclusão</h3>
-            <p>Tem certeza que deseja excluir esta disciplina?</p>
-            <p><strong>Atenção:</strong> Esta ação não pode ser desfeita e pode afetar outros dados relacionados.</p>
-            <div class="modal-actions">
-                <button type="button" class="btn btn-secondary" onclick="closeDeleteModal()">Cancelar</button>
-                <button type="button" class="btn btn-danger" onclick="confirmDelete()">Excluir</button>
+    <div id="modal-overlay" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Confirmar Exclusão</h3>
+            </div>
+            <div class="modal-content">
+                <p id="modal-message">Tem certeza que deseja excluir esta disciplina? Esta ação não poderá ser desfeita.</p>
+                <div class="modal-actions">
+                    <button onclick="fecharModal()" class="btn-action" style="background: #6c757d; color: white;">Cancelar</button>
+                    <button onclick="excluirItem()" class="btn-action btn-delete">Excluir</button>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Variáveis globais para controle dos modais
-        let currentEditId = null;
-        let currentDeleteId = null;
+        // Variável global para controle do modal de exclusão
+        let itemParaExcluir = null;
 
-        // Função para abrir modal de edição
-        function editarDisciplina(id, nome, sigla, tipo, cargaHoraria) {
-            currentEditId = id;
-            document.getElementById('edit_disciplina_nome').value = nome;
-            document.getElementById('edit_disciplina_sigla').value = sigla;
-            document.getElementById('edit_disciplina_tipo').value = tipo;
-            document.getElementById('edit_carga_horaria').value = cargaHoraria;
-
-            // Atualiza a action do formulário
-            document.getElementById('editForm').action = `/editar-disciplina/${id}/`;
-
-            document.getElementById('editModal').style.display = 'block';
+        // Função para abrir modal de exclusão - padrão igual ao de cursos
+        function confirmarExclusao(id, nome) {
+            itemParaExcluir = id;
+            document.getElementById('modal-message').textContent =
+                `Tem certeza que deseja excluir a disciplina "${nome}"? Esta ação não poderá ser desfeita.`;
+            document.getElementById('modal-overlay').classList.add('active');
         }
 
-        // Função para fechar modal de edição
-        function closeEditModal() {
-            document.getElementById('editModal').style.display = 'none';
-            currentEditId = null;
+        // Função para fechar modal de exclusão - padrão igual ao de cursos
+        function fecharModal() {
+            document.getElementById('modal-overlay').classList.remove('active');
+            itemParaExcluir = null;
         }
 
-        // Função para abrir modal de exclusão
-        function excluirDisciplina(id, nome) {
-            currentDeleteId = id;
-            const confirmText = document.querySelector('#deleteModal p');
-            confirmText.innerHTML = `Tem certeza que deseja excluir a disciplina "<strong>${nome}</strong>"?`;
-            document.getElementById('deleteModal').style.display = 'block';
-        }
+        // Função para confirmar exclusão - padrão igual ao de cursos
+        function excluirItem() {
+            if (!itemParaExcluir) return;
 
-        // Função para fechar modal de exclusão
-        function closeDeleteModal() {
-            document.getElementById('deleteModal').style.display = 'none';
-            currentDeleteId = null;
-        }
-
-        // Função para confirmar exclusão
-        function confirmDelete() {
-            if (currentDeleteId) {
-                fetch(`/excluir-disciplina/${currentDeleteId}/`, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-                        'Content-Type': 'application/json',
-                    },
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            location.reload();
-                        } else {
-                            alert('Erro ao excluir disciplina: ' + (data.error || 'Erro desconhecido'));
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Erro:', error);
-                        alert('Erro ao excluir disciplina');
-                    });
-
-                closeDeleteModal();
-            }
-        }
-
-        // Fechar modais ao clicar no X ou fora do modal
-        document.querySelector('.close-modal').onclick = closeEditModal;
-
-        window.onclick = function (event) {
-            const editModal = document.getElementById('editModal');
-            const deleteModal = document.getElementById('deleteModal');
-
-            if (event.target == editModal) {
-                closeEditModal();
-            }
-            if (event.target == deleteModal) {
-                closeDeleteModal();
-            }
-        }
-
-        // Tratar envio do formulário de edição via AJAX (opcional)
-        document.getElementById('editForm').onsubmit = function (e) {
-            e.preventDefault();
-
-            const formData = new FormData(this);
-
-            fetch(this.action, {
+            fetch(`/excluir-disciplina/${itemParaExcluir}/`, {
                 method: 'POST',
-                body: formData,
                 headers: {
-                    'X-CSRFToken': formData.get('csrfmiddlewaretoken'),
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                    'Content-Type': 'application/json',
                 },
             })
-                .then(response => {
-                    if (response.ok) {
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message || 'Disciplina excluída com sucesso!');
                         location.reload();
                     } else {
-                        alert('Erro ao editar disciplina');
+                        alert(data.error || 'Erro ao excluir disciplina.');
                     }
                 })
                 .catch(error => {
                     console.error('Erro:', error);
-                    alert('Erro ao editar disciplina');
+                    alert('Erro ao excluir disciplina.');
+                })
+                .finally(() => {
+                    fecharModal();
                 });
-        };
+        }
+
+        // Fechar modal de exclusão ao clicar fora dele
+        document.getElementById('modal-overlay').addEventListener('click', function (e) {
+            if (e.target === this) {
+                fecharModal();
+            }
+        });
+
+        // Fechar modal com tecla Escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                fecharModal();
+            }
+        });
     </script>
 </body>
 

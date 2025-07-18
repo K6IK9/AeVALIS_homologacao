@@ -100,6 +100,9 @@
             border-radius: var(--border-radius-medium);
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             margin-bottom: 30px;
+            overflow-x: auto;
+            max-width: 100%;
+            box-sizing: border-box;
         }
 
         .form-section h2 {
@@ -275,8 +278,9 @@
         /* Estilos para botões de ação */
         .action-buttons {
             display: flex;
-            gap: 8px;
+            gap: 5px;
             justify-content: center;
+            flex-wrap: nowrap;
         }
 
         .btn-action {
@@ -315,96 +319,6 @@
             transform: translateY(-1px);
         }
 
-        /* Estilos para modais */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(2px);
-        }
-
-        .modal-content {
-            background-color: white;
-            margin: 5% auto;
-            padding: 30px;
-            border-radius: 12px;
-            width: 90%;
-            max-width: 600px;
-            position: relative;
-            box-shadow: var(--shadow-alt);
-            animation: modalSlideIn 0.3s ease;
-        }
-
-        @keyframes modalSlideIn {
-            from {
-                transform: translateY(-50px);
-                opacity: 0;
-            }
-
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        .close-modal {
-            position: absolute;
-            right: 15px;
-            top: 15px;
-            font-size: 24px;
-            font-weight: bold;
-            cursor: pointer;
-            color: #aaa;
-            transition: color 0.2s;
-        }
-
-        .close-modal:hover {
-            color: #000;
-        }
-
-        .modal h2,
-        .modal h3 {
-            margin-top: 0;
-            margin-bottom: 20px;
-            color: var(--cor04);
-        }
-
-        .modal-actions {
-            display: flex;
-            gap: 10px;
-            justify-content: flex-end;
-            margin-top: 25px;
-        }
-
-        .modal-actions .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: all 0.2s;
-        }
-
-        .modal-actions .btn-primary {
-            background: var(--cor02);
-            color: var(--cor04);
-        }
-
-        .modal-actions .btn-secondary {
-            background: var(--cor03);
-            color: white;
-        }
-
-        .modal-actions .btn-danger {
-            background: var(--cor08);
-            color: white;
-        }
-
         /* Responsividade */
         @media (max-width: 768px) {
             .container {
@@ -413,6 +327,9 @@
 
             .form-section {
                 padding: 20px;
+                overflow-x: auto;
+                margin: 0 -15px 20px -15px;
+                border-radius: 0;
             }
 
             .data-table {
@@ -461,11 +378,48 @@
         .turmas-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
+            margin-top: 0;
             background: white;
-            border-radius: 10px;
+            border-radius: var(--border-radius-medium);
             overflow: hidden;
+            max-width: 100%;
+            table-layout: auto;
+            min-width: 1000px;
+        }
+
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            border-radius: var(--border-radius-medium);
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: auto;
+            scrollbar-color: #999 #f1f1f1;
+        }
+
+        .table-wrapper::-webkit-scrollbar {
+            height: 16px;
+        }
+
+        .table-wrapper::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .table-wrapper::-webkit-scrollbar-thumb {
+            background: linear-gradient(45deg, #bbb, #999);
+            border-radius: 8px;
+            border: 2px solid #f1f1f1;
+        }
+
+        .table-wrapper::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(45deg, #999, #777);
+        }
+
+        .table-wrapper::-webkit-scrollbar-thumb:active {
+            background: linear-gradient(45deg, #777, #555);
         }
 
         .turmas-table th,
@@ -473,7 +427,38 @@
             padding: 15px;
             text-align: left;
             border-bottom: 1px solid #f0f0f0;
+            white-space: nowrap;
         }
+
+        .turmas-table th:nth-child(1),
+        .turmas-table td:nth-child(1) { width: 100px; } /* Código */
+        
+        .turmas-table th:nth-child(2),
+        .turmas-table td:nth-child(2) { width: 200px; } /* Disciplina */
+        
+        .turmas-table th:nth-child(3),
+        .turmas-table td:nth-child(3) { width: 180px; } /* Professor */
+        
+        .turmas-table th:nth-child(4),
+        .turmas-table td:nth-child(4) { width: 100px; } /* Período */
+        
+        .turmas-table th:nth-child(5),
+        .turmas-table td:nth-child(5) { width: 100px; } /* Turno */
+        
+        .turmas-table th:nth-child(6),
+        .turmas-table td:nth-child(6) { width: 100px; } /* Status */
+        
+        .turmas-table th:nth-child(7),
+        .turmas-table td:nth-child(7) { width: 100px; } /* Matrículas */
+        
+        .turmas-table th:nth-child(8),
+        .turmas-table td:nth-child(8) { width: 120px; } /* Data Criação */
+        
+        .turmas-table th:nth-child(9),
+        .turmas-table td:nth-child(9) { 
+            width: 200px; 
+            white-space: normal;
+        } /* Ações */
 
         .turmas-table th {
             background: var(--cor03, #376f6c);
@@ -483,6 +468,10 @@
 
         .turmas-table tbody tr:hover {
             background: #f8f9fa;
+        }
+
+        .turmas-table tbody tr:last-child td {
+            border-bottom: none;
         }
 
         .turma-count {
@@ -592,6 +581,42 @@
             animation: fadeIn 0.3s ease;
         }
 
+        .modal {
+            background: white;
+            border-radius: 15px;
+            padding: 0;
+            margin: 20px;
+            max-width: 500px;
+            width: 90%;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            animation: slideIn 0.3s ease;
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--cor08), #c82333);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            font-size: 1.2em;
+        }
+
+        .modal .modal-content {
+            padding: 20px;
+            text-align: center;
+        }
+
+        .modal .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
         .alunos-management {
             background: white;
             border-radius: 15px;
@@ -660,7 +685,7 @@
             transform: scale(1.05);
         }
 
-        .modal-content {
+        .alunos-management .modal-content {
             padding: 20px;
             max-height: calc(90vh - 140px);
             overflow-y: auto;
@@ -836,7 +861,7 @@
                 max-height: 95vh;
             }
 
-            .modal-content {
+            .alunos-management .modal-content {
                 max-height: calc(95vh - 120px);
                 padding: 15px;
             }
@@ -850,13 +875,50 @@
                 padding: 10px;
             }
 
+            .table-wrapper {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: auto;
+                padding-bottom: 5px;
+            }
+
+            .table-wrapper::-webkit-scrollbar {
+                height: 20px;
+            }
+
+            .table-wrapper::-webkit-scrollbar-track {
+                background: #f8f9fa;
+                border-radius: 10px;
+                border: 2px solid #e9ecef;
+            }
+
+            .table-wrapper::-webkit-scrollbar-thumb {
+                background: linear-gradient(45deg, #007bff, #0056b3);
+                border-radius: 10px;
+                border: 3px solid #f8f9fa;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                gap: 3px;
+            }
+
+            .btn-action {
+                font-size: 0.75em;
+                padding: 3px 6px;
+                min-width: 60px;
+            }
+
+            .btn-small {
+                font-size: 0.7em;
+                padding: 3px 6px;
+            }
+
             .section-header {
                 flex-direction: column;
                 gap: 15px;
                 align-items: stretch;
             }
-
-            .section-header
         }
     </style>
 </head>
@@ -881,7 +943,7 @@
         {% endif %}
 
         <div class="form-section">
-            <h2>Criar Nova Turma</h2>
+            <h2>{% if editing %}Editar Turma{% else %}Criar Nova Turma{% endif %}</h2>
             <form method="post">
                 {% csrf_token %}
                 <div class="form-row">
@@ -944,10 +1006,14 @@
                 </div>
                 {% endif %}
 
-                <button type="submit" class="btn">Criar Turma</button>
+                <button type="submit" class="btn">{% if editing %}Atualizar Turma{% else %}Criar Turma{% endif %}</button>
+                {% if editing %}
+                <a href="{% url 'gerenciar_turmas' %}" class="btn btn-secondary">Cancelar</a>
+                {% endif %}
             </form>
         </div>
 
+        {% if not editing %}
         <div class="form-section">
             <div class="section-header">
                 <h2>Turmas Cadastradas</h2>
@@ -962,11 +1028,11 @@
                             <label for="turno">Filtrar por Turno:</label>
                             <select name="turno" id="turno" class="form-control" onchange="aplicarFiltros()">
                                 <option value="">Todos os turnos</option>
-                                <option value="matutino" {% if filtro_turno=='matutino' %}selected{% endif %}>Matutino
+                                <option value="matutino" {% if filtro_turno == 'matutino' %}selected{% endif %}>Matutino
                                 </option>
-                                <option value="vespertino" {% if filtro_turno=='vespertino' %}selected{% endif %}>
+                                <option value="vespertino" {% if filtro_turno == 'vespertino' %}selected{% endif %}>
                                     Vespertino</option>
-                                <option value="noturno" {% if filtro_turno=='noturno' %}selected{% endif %}>Noturno
+                                <option value="noturno" {% if filtro_turno == 'noturno' %}selected{% endif %}>Noturno
                                 </option>
                             </select>
                         </div>
@@ -975,10 +1041,7 @@
                             <select name="periodo" id="periodo" class="form-control" onchange="aplicarFiltros()">
                                 <option value="">Todos os períodos</option>
                                 {% for periodo in periodos_disponiveis %}
-                                <option value="{{ periodo.id }}" {% if filtro_periodo==periodo.id|stringformat:"s"
-                                    %}selected{% endif %}>
-                                    {{ periodo.ano }}.{{ periodo.semestre }}
-                                </option>
+                                <option value="{{ periodo.id }}" {% if filtro_periodo == periodo.id|stringformat:"s" %}selected{% endif %}>{{ periodo.ano }}.{{ periodo.semestre }}</option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -986,8 +1049,8 @@
                             <label for="status">Filtrar por Status:</label>
                             <select name="status" id="status" class="form-control" onchange="aplicarFiltros()">
                                 <option value="">Todos os status</option>
-                                <option value="ativa" {% if filtro_status=='ativa' %}selected{% endif %}>Ativa</option>
-                                <option value="finalizada" {% if filtro_status=='finalizada' %}selected{% endif %}>
+                                <option value="ativa" {% if filtro_status == 'ativa' %}selected{% endif %}>Ativa</option>
+                                <option value="finalizada" {% if filtro_status == 'finalizada' %}selected{% endif %}>
                                     Finalizada</option>
                             </select>
                         </div>
@@ -1001,63 +1064,64 @@
             <div class="turma-count">
                 Total de turmas: <span id="turmas-count">{{ turmas.count }}</span>
             </div>
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Código</th>
-                        <th>Disciplina</th>
-                        <th>Professor</th>
-                        <th>Período</th>
-                        <th>Turno</th>
-                        <th>Status</th>
-                        <th>Matrículas</th>
-                        <th>Data Criação</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for turma in turmas %}
-                    <tr>
-                        <td><strong>{{ turma.codigo_turma }}</strong></td>
-                        <td>{{ turma.disciplina.disciplina_nome }}</td>
-                        <td>{{ turma.professor.user.get_full_name }}</td>
-                        <td>{{ turma.periodo_letivo.ano }}.{{ turma.periodo_letivo.semestre }}</td>
-                        <td>
-                            <span class="turno-badge">{{ turma.get_turno_display }}</span>
-                        </td>
-                        <td>
-                            <span class="status-badge status-{{ turma.status }}">
-                                {{ turma.get_status_display }}
-                            </span>
-                        </td>
-                        <td>{{ turma.matriculas.count }} alunos</td>
-                        <td>{{ turma.data_criacao|date:"d/m/Y H:i" }}</td>
-                        <td>
-                            <div class="action-buttons">
-                                <button type="button" class="btn-action btn-edit"
-                                    onclick="editarTurma({{ turma.id }}, '{{ turma.codigo_turma }}', {{ turma.disciplina.id }}, {{ turma.professor.id }}, {{ turma.periodo_letivo.id }}, '{{ turma.turno }}', '{{ turma.status }}')">
-                                    Editar
-                                </button>
-                                <button type="button" class="btn-action btn-delete"
-                                    onclick="excluirTurma({{ turma.id }}, '{{ turma.codigo_turma }}')">
-                                    Excluir
-                                </button>
-                                <button class="btn-small btn-select-all" onclick="gerenciarAlunos({{ turma.id }})">
-                                    Gerenciar Alunos
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="9" style="text-align: center; padding: 40px;">
-                            Nenhuma turma encontrada.
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+            <div class="table-wrapper">
+                <div class="scroll-hint" style="display: none; text-align: center; padding: 10px; background: #f8f9fa; border-radius: 8px 8px 0 0; color: #666; font-size: 0.9em;">
+                    ← Deslize horizontalmente para ver mais colunas →
+                </div>
+                <table class="turmas-table">
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Disciplina</th>
+                            <th>Professor</th>
+                            <th>Período</th>
+                            <th>Turno</th>
+                            <th>Status</th>
+                            <th>Matrículas</th>
+                            <th>Data Criação</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for turma in turmas %}
+                        <tr>
+                            <td><strong>{{ turma.codigo_turma }}</strong></td>
+                            <td>{{ turma.disciplina.disciplina_nome }}</td>
+                            <td>{{ turma.professor.user.get_full_name }}</td>
+                            <td>{{ turma.periodo_letivo.ano }}.{{ turma.periodo_letivo.semestre }}</td>
+                            <td>
+                                <span class="turno-badge">{{ turma.get_turno_display }}</span>
+                            </td>
+                            <td>
+                                <span class="status-badge status-{{ turma.status }}">
+                                    {{ turma.get_status_display }}
+                                </span>
+                            </td>
+                            <td>{{ turma.matriculas.count }} alunos</td>
+                            <td>{{ turma.data_criacao|date:"d/m/Y H:i" }}</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="{% url 'editar_turma' turma.id %}" class="btn-action btn-edit">✏️ Editar</a>
+                                    <button type="button" class="btn-action btn-delete"
+                                        onclick="confirmarExclusao({{ turma.id }}, '{{ turma.codigo_turma }}')">🗑️ Excluir</button>
+                                    <button class="btn-small btn-select-all" onclick="gerenciarAlunos({{ turma.id }})">
+                                        Gerenciar Alunos
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="9" style="text-align: center; padding: 40px;">
+                                Nenhuma turma encontrada.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
+        {% endif %}
 
         <!-- Modal de Gerenciamento de Alunos -->
         <div id="modal-overlay" class="modal-overlay" onclick="fecharGerenciamentoAlunos(event)">
@@ -1105,6 +1169,24 @@
         document.addEventListener('keydown', function (event) {
             if (event.key === 'Escape') {
                 fecharGerenciamentoAlunos();
+            }
+        });
+
+        // Verificar se precisa mostrar a dica de scroll
+        window.addEventListener('load', function() {
+            const tableWrapper = document.querySelector('.table-wrapper');
+            const table = document.querySelector('.turmas-table');
+            const scrollHint = document.querySelector('.scroll-hint');
+            
+            if (tableWrapper && table && scrollHint) {
+                if (table.scrollWidth > tableWrapper.clientWidth) {
+                    scrollHint.style.display = 'block';
+                    
+                    // Esconder a dica após o primeiro scroll
+                    tableWrapper.addEventListener('scroll', function() {
+                        scrollHint.style.display = 'none';
+                    }, { once: true });
+                }
             }
         });
 
@@ -1272,162 +1354,79 @@
                 });
         }
 
-        // Variáveis globais para controle dos modais de edição/exclusão
-        let currentEditId = null;
-        let currentDeleteId = null;
+        // Variável global para controle do modal de exclusão
+        let itemParaExcluir = null;
 
-        // Função para abrir modal de edição de turma
-        function editarTurma(id, codigo, disciplinaId, professorId, periodoId, turno, status) {
-            currentEditId = id;
-            document.getElementById('edit_codigo_turma').value = codigo;
-            document.getElementById('edit_disciplina').value = disciplinaId;
-            document.getElementById('edit_professor').value = professorId;
-            document.getElementById('edit_periodo_letivo').value = periodoId;
-            document.getElementById('edit_turno').value = turno;
-            document.getElementById('edit_status').value = status;
-
-            // Atualiza a action do formulário
-            document.getElementById('editTurmaForm').action = `/editar-turma/${id}/`;
-
-            document.getElementById('editTurmaModal').style.display = 'block';
+        // Função para abrir modal de exclusão - padrão igual ao de cursos
+        function confirmarExclusao(id, codigo) {
+            itemParaExcluir = id;
+            document.getElementById('modal-message').textContent =
+                `Tem certeza que deseja excluir a turma "${codigo}"? Esta ação não poderá ser desfeita.`;
+            document.getElementById('modal-exclusao-overlay').classList.add('active');
         }
 
-        // Função para fechar modal de edição de turma
-        function closeEditTurmaModal() {
-            document.getElementById('editTurmaModal').style.display = 'none';
-            currentEditId = null;
+        // Função para fechar modal de exclusão - padrão igual ao de cursos
+        function fecharModal() {
+            document.getElementById('modal-exclusao-overlay').classList.remove('active');
+            itemParaExcluir = null;
         }
 
-        // Função para abrir modal de exclusão de turma
-        function excluirTurma(id, codigo) {
-            currentDeleteId = id;
-            const confirmText = document.querySelector('#deleteTurmaModal p');
-            confirmText.innerHTML = `Tem certeza que deseja excluir a turma "<strong>${codigo}</strong>"?`;
-            document.getElementById('deleteTurmaModal').style.display = 'block';
-        }
+        // Função para confirmar exclusão - padrão igual ao de cursos
+        function excluirItem() {
+            if (!itemParaExcluir) return;
 
-        // Função para fechar modal de exclusão de turma
-        function closeDeleteTurmaModal() {
-            document.getElementById('deleteTurmaModal').style.display = 'none';
-            currentDeleteId = null;
-        }
-
-        // Função para confirmar exclusão de turma
-        function confirmDeleteTurma() {
-            if (currentDeleteId) {
-                fetch(`/excluir-turma/${currentDeleteId}/`, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-                        'Content-Type': 'application/json',
-                    },
+            fetch(`/excluir-turma/${itemParaExcluir}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                    'Content-Type': 'application/json',
+                },
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message || 'Turma excluída com sucesso!');
+                        location.reload();
+                    } else {
+                        alert(data.error || 'Erro ao excluir turma.');
+                    }
                 })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            location.reload();
-                        } else {
-                            alert('Erro ao excluir turma: ' + (data.error || 'Erro desconhecido'));
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Erro:', error);
-                        alert('Erro ao excluir turma');
-                    });
-
-                closeDeleteTurmaModal();
-            }
+                .catch(error => {
+                    console.error('Erro:', error);
+                    alert('Erro ao excluir turma.');
+                })
+                .finally(() => {
+                    fecharModal();
+                });
         }
 
-        // Fechar modais ao clicar no X ou fora do modal
-        window.onclick = function (event) {
-            const editModal = document.getElementById('editTurmaModal');
-            const deleteModal = document.getElementById('deleteTurmaModal');
+        // Fechar modal de exclusão ao clicar fora dele
+        document.getElementById('modal-exclusao-overlay').addEventListener('click', function (e) {
+            if (e.target === this) {
+                fecharModal();
+            }
+        });
 
-            if (event.target == editModal) {
-                closeEditTurmaModal();
+        // Fechar modal com tecla Escape
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                fecharModal();
             }
-            if (event.target == deleteModal) {
-                closeDeleteTurmaModal();
-            }
-        }
+        });
     </script>
 
-    <!-- Modal de Edição de Turma -->
-    <div id="editTurmaModal" class="modal">
-        <div class="modal-content">
-            <span class="close-modal" onclick="closeEditTurmaModal()">&times;</span>
-            <h2>Editar Turma</h2>
-            <form id="editTurmaForm" method="post">
-                {% csrf_token %}
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="edit_codigo_turma">Código da Turma:</label>
-                        <input type="text" id="edit_codigo_turma" name="codigo_turma" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="edit_disciplina">Disciplina:</label>
-                        <select id="edit_disciplina" name="disciplina" required>
-                            {% for disciplina in disciplinas %}
-                            <option value="{{ disciplina.id }}">{{ disciplina.disciplina_nome }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="edit_professor">Professor:</label>
-                        <select id="edit_professor" name="professor" required>
-                            {% for professor in professores %}
-                            <option value="{{ professor.id }}">{{ professor.user.get_full_name }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="edit_periodo_letivo">Período Letivo:</label>
-                        <select id="edit_periodo_letivo" name="periodo_letivo" required>
-                            {% for periodo in periodos %}
-                            <option value="{{ periodo.id }}">{{ periodo.nome }} ({{ periodo.ano }}.{{ periodo.semestre
-                                }})</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="edit_turno">Turno:</label>
-                        <select id="edit_turno" name="turno" required>
-                            <option value="MATUTINO">Matutino</option>
-                            <option value="VESPERTINO">Vespertino</option>
-                            <option value="NOTURNO">Noturno</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="edit_status">Status:</label>
-                        <select id="edit_status" name="status" required>
-                            <option value="ATIVA">Ativa</option>
-                            <option value="FINALIZADA">Finalizada</option>
-                            <option value="CANCELADA">Cancelada</option>
-                        </select>
-                    </div>
-                </div>
+    <!-- Modal de Confirmação de Exclusão -->
+    <div id="modal-exclusao-overlay" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Confirmar Exclusão</h3>
+            </div>
+            <div class="modal-content">
+                <p id="modal-message">Tem certeza que deseja excluir esta turma? Esta ação não poderá ser desfeita.</p>
                 <div class="modal-actions">
-                    <button type="button" class="btn btn-secondary" onclick="closeEditTurmaModal()">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                    <button onclick="fecharModal()" class="btn-action" style="background: #6c757d; color: white;">Cancelar</button>
+                    <button onclick="excluirItem()" class="btn-action btn-delete">Excluir</button>
                 </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Modal de Confirmação de Exclusão de Turma -->
-    <div id="deleteTurmaModal" class="modal">
-        <div class="modal-content">
-            <h3>Confirmar Exclusão</h3>
-            <p>Tem certeza que deseja excluir esta turma?</p>
-            <p><strong>Atenção:</strong> Esta ação não pode ser desfeita e pode afetar outros dados relacionados.</p>
-            <div class="modal-actions">
-                <button type="button" class="btn btn-secondary" onclick="closeDeleteTurmaModal()">Cancelar</button>
-                <button type="button" class="btn btn-danger" onclick="confirmDeleteTurma()">Excluir</button>
             </div>
         </div>
     </div>
