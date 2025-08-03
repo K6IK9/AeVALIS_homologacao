@@ -1104,11 +1104,42 @@ def matricular_alunos_massa(request):
 @login_required
 def listar_avaliacoes(request):
     """
-    View para listar todas as avaliações disponíveis
+    View para listar avaliações disponíveis
+    Para alunos: mostra apenas avaliações das turmas em que estão matriculados
+    Para outros usuários: mostra todas as avaliações ativas
     """
-    avaliacoes = QuestionarioAvaliacao.objects.filter(ativo=True).order_by(
-        "-data_criacao"
-    )
+    if hasattr(request.user, "perfil_aluno"):
+        # Para alunos: mostrar apenas avaliações das turmas em que estão matriculados
+        from django.db.models import Q
+
+        # Buscar turmas em que o aluno está matriculado com status ativa
+        turmas_aluno = request.user.perfil_aluno.matriculas.filter(
+            status="ativa"
+        ).values_list("turma_id", flat=True)
+
+        # Buscar avaliações em ciclos ativos das turmas do aluno
+        avaliacoes_disponiveis = (
+            AvaliacaoDocente.objects.filter(
+                ciclo__ativo=True,
+                turma_id__in=turmas_aluno,  # Apenas das turmas em que o aluno está matriculado
+            )
+            .exclude(
+                # Excluir avaliações já respondidas pelo aluno
+                respostas__aluno=request.user.perfil_aluno
+            )
+            .distinct()
+            .order_by("-data_criacao")
+        )
+
+        avaliacoes = avaliacoes_disponiveis
+        titulo = "Avaliações Disponíveis para Responder"
+    else:
+        # Para administradores, coordenadores e professores: mostrar todas as avaliações ativas
+        avaliacoes = AvaliacaoDocente.objects.filter(ciclo__ativo=True).order_by(
+            "-data_criacao"
+        )
+        titulo = "Avaliações Docentes"
+
     ciclos = CicloAvaliacao.objects.filter(ativo=True).order_by("-data_inicio")
 
     # Paginação
@@ -1119,7 +1150,7 @@ def listar_avaliacoes(request):
     context = {
         "avaliacoes": page_obj,
         "ciclos": ciclos,
-        "titulo": "Avaliações Docentes",
+        "titulo": titulo,
     }
     return render(request, "avaliacoes/listar_avaliacoes.html", context)
 
@@ -1299,6 +1330,13 @@ def responder_avaliacao(request, avaliacao_id):
         messages.error(request, "Apenas alunos podem responder avaliações.")
         return redirect("listar_avaliacoes")
 
+    # Verificar se o aluno está matriculado na turma da avaliação
+    if not request.user.perfil_aluno.matriculas.filter(
+        turma=avaliacao.turma, status="ativa"
+    ).exists():
+        messages.error(request, "Você não está matriculado na turma desta avaliação.")
+        return redirect("listar_avaliacoes")
+
     # Verificar se a avaliação já foi respondida
     respostas_existentes = RespostaAvaliacao.objects.filter(
         avaliacao=avaliacao, aluno=request.user.perfil_aluno
@@ -1383,11 +1421,16 @@ def visualizar_avaliacao(request, avaliacao_id):
     # Verificar permissões
     pode_visualizar = False
     if hasattr(request.user, "perfil_aluno"):
-        # Verificar se há respostas do aluno para esta avaliação
+        # Verificar se o aluno está matriculado na turma e se há respostas do aluno para esta avaliação
         respostas_aluno = RespostaAvaliacao.objects.filter(
             avaliacao=avaliacao, aluno=request.user.perfil_aluno
         ).exists()
-        if respostas_aluno:
+
+        matricula_ativa = request.user.perfil_aluno.matriculas.filter(
+            turma=avaliacao.turma, status="ativa"
+        ).exists()
+
+        if respostas_aluno and matricula_ativa:
             pode_visualizar = True
     elif (
         hasattr(request.user, "perfil_professor")
@@ -1649,3 +1692,35 @@ class GestaoAvaliacoesView(LoginRequiredMixin, TemplateView):
         }
 
         return context
+
+
+@login_required
+def minhas_avaliacoes(request):
+    """
+    View para listar as avaliações anteriores do aluno
+    Apenas alunos podem acessar suas próprias avaliações das turmas em que estão matriculados
+    """
+    if not hasattr(request.user, "perfil_aluno"):
+        messages.error(request, "Você não tem permissão para acessar esta página.")
+        return redirect("inicio")
+
+    # Buscar turmas em que o aluno está ou esteve matriculado
+    turmas_aluno = request.user.perfil_aluno.matriculas.values_list(
+        "turma_id", flat=True
+    )
+
+    # Buscar avaliações que o aluno já respondeu das suas turmas
+    avaliacoes_respondidas = (
+        AvaliacaoDocente.objects.filter(
+            respostas__aluno=request.user.perfil_aluno,
+            turma_id__in=turmas_aluno,  # Apenas das turmas em que o aluno está/esteve matriculado
+        )
+        .distinct()
+        .order_by("-data_criacao")
+    )
+
+    context = {
+        "avaliacoes": avaliacoes_respondidas,
+        "titulo": "Minhas Avaliações",
+    }
+    return render(request, "avaliacoes/minhas_avaliacoes.html", context)

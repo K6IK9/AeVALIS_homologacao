@@ -222,10 +222,10 @@
         </h1>
         <section id="opcoes">
             <h2>Opções Disponíveis</h2>
-            <button onclick="window.location.href='{% url 'listar_avaliacoes' %}'" id="realizar_avaliacao">Realizar
+            <button onclick="window.location.href='{% url 'listar_avaliacoes' %}'" id="responder_avaliacao">Responder
                 Avaliação Docente</button>
-            <button onclick="window.location.href='{% url 'listar_avaliacoes' %}'" id="relatorio_avaliacoes">Minhas
-                Avaliações</button>
+            <button onclick="window.location.href='{% url 'minhas_avaliacoes' %}'" id="ver_avaliacoes_anteriores">Ver
+                Avaliações Anteriores</button>
         </section>
         {% else %}
         <h1>Seja bem-vindo(a)

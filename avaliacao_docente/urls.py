@@ -50,6 +50,7 @@ urlpatterns = [
     path("admin-hub/", views.AdminHubView.as_view(), name="admin_hub"),
     # URLs para Avaliação Docente
     path("avaliacoes/", views.listar_avaliacoes, name="listar_avaliacoes"),
+    path("minhas-avaliacoes/", views.minhas_avaliacoes, name="minhas_avaliacoes"),
     path(
         "avaliacoes/criar-questionario/",
         views.criar_questionario_avaliacao,
