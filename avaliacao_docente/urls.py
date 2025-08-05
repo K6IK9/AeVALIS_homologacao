@@ -1,7 +1,7 @@
 from django.urls import path
 
 from . import views
-from .views import IndexView
+from .views import AdminHubView, GestaoAvaliacoesView, IndexView
 
 urlpatterns = [
     path("gerenciar-roles/", views.gerenciar_roles, name="gerenciar_roles"),
@@ -57,14 +57,24 @@ urlpatterns = [
         name="criar_questionario_avaliacao",
     ),
     path(
+        "avaliacoes/gerenciar-questionarios/",
+        views.gerenciar_questionarios,
+        name="gerenciar_questionarios",
+    ),
+    path(
+        "avaliacoes/questionario/<int:questionario_id>/editar/",
+        views.editar_questionario_simples,
+        name="editar_questionario_simples",
+    ),
+    path(
+        "avaliacoes/questionario/<int:questionario_id>/excluir/",
+        views.excluir_questionario,
+        name="excluir_questionario",
+    ),
+    path(
         "avaliacoes/questionario/<int:questionario_id>/perguntas/",
         views.editar_questionario_perguntas,
         name="editar_questionario_perguntas",
-    ),
-    path(
-        "avaliacoes/criar-ciclo/",
-        views.criar_ciclo_avaliacao,
-        name="criar_ciclo_avaliacao",
     ),
     path(
         "avaliacoes/ciclo/<int:ciclo_id>/",
@@ -98,6 +108,33 @@ urlpatterns = [
         "categorias/form/<int:categoria_id>/",
         views.categoria_form,
         name="categoria_form_edit",
+    ),
+    path(
+        "categorias/<int:categoria_id>/edit/",
+        views.editar_categoria,
+        name="editar_categoria",
+    ),
+    path(
+        "editar-categoria/<int:categoria_id>/",
+        views.editar_categoria_simples,
+        name="editar_categoria_simples",
+    ),
+    path(
+        "categorias/<int:categoria_id>/delete/",
+        views.excluir_categoria,
+        name="excluir_categoria",
+    ),
+    # URLs para CRUD de ciclos
+    path("ciclos/", views.gerenciar_ciclos, name="gerenciar_ciclos"),
+    path(
+        "editar-ciclo/<int:ciclo_id>/",
+        views.editar_ciclo_simples,
+        name="editar_ciclo_simples",
+    ),
+    path(
+        "excluir-ciclo/<int:ciclo_id>/",
+        views.excluir_ciclo,
+        name="excluir_ciclo",
     ),
     path("", IndexView.as_view(), name="inicio"),
 ]

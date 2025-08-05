@@ -1,0 +1,478 @@
+{% extends 'avaliacoes/base_avaliacoes.html' %}
+{% load permission_tags %}
+
+{% block page_title %}Gerenciar Ciclos de Avaliação{% endblock %}
+{% block page_description %}Crie e gerencie ciclos de avaliação docente{% endblock %}
+
+{% block content %}
+{% if messages %}
+<div class="messages">
+    {% for message in messages %}
+    <div class="message {{ message.tags }}">
+        {{ message }}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% if editing %}
+<!-- Formulário de Edição -->
+<div class="form-section">
+    <h2>✏️ Editar Ciclo de Avaliação</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="{{ form.nome.id_for_label }}">
+                <strong>{{ form.nome.label }}</strong>
+            </label>
+            {{ form.nome }}
+            {% if form.nome.errors %}
+            <div style="color: var(--cor08); margin-top: 5px;">
+                {% for error in form.nome.errors %}
+                <small>{{ error }}</small>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.periodo_letivo.id_for_label }}">
+                <strong>{{ form.periodo_letivo.label }}</strong>
+            </label>
+            {{ form.periodo_letivo }}
+            {% if form.periodo_letivo.errors %}
+            <div style="color: var(--cor08); margin-top: 5px;">
+                {% for error in form.periodo_letivo.errors %}
+                <small>{{ error }}</small>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.questionario.id_for_label }}">
+                <strong>{{ form.questionario.label }}</strong>
+            </label>
+            {{ form.questionario }}
+            {% if form.questionario.errors %}
+            <div style="color: var(--cor08); margin-top: 5px;">
+                {% for error in form.questionario.errors %}
+                <small>{{ error }}</small>
+                {% endfor %}
+            </div>
+            {% endif %}
+            <small style="color: #666; display: block; margin-top: 5px;">
+                Selecione o questionário que será utilizado neste ciclo de avaliação
+            </small>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="form-group">
+                <label for="{{ form.data_inicio.id_for_label }}">
+                    <strong>{{ form.data_inicio.label }}</strong>
+                </label>
+                {{ form.data_inicio }}
+                {% if form.data_inicio.errors %}
+                <div style="color: var(--cor08); margin-top: 5px;">
+                    {% for error in form.data_inicio.errors %}
+                    <small>{{ error }}</small>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.data_fim.id_for_label }}">
+                    <strong>{{ form.data_fim.label }}</strong>
+                </label>
+                {{ form.data_fim }}
+                {% if form.data_fim.errors %}
+                <div style="color: var(--cor08); margin-top: 5px;">
+                    {% for error in form.data_fim.errors %}
+                    <small>{{ error }}</small>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px;">
+            <div class="form-group">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    {{ form.permite_avaliacao_anonima }}
+                    <label for="{{ form.permite_avaliacao_anonima.id_for_label }}">
+                        {{ form.permite_avaliacao_anonima.label }}
+                    </label>
+                </div>
+                {% if form.permite_avaliacao_anonima.errors %}
+                <div style="color: var(--cor08); margin-top: 5px;">
+                    {% for error in form.permite_avaliacao_anonima.errors %}
+                    <small>{{ error }}</small>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    {{ form.permite_multiplas_respostas }}
+                    <label for="{{ form.permite_multiplas_respostas.id_for_label }}">
+                        {{ form.permite_multiplas_respostas.label }}
+                    </label>
+                </div>
+                {% if form.permite_multiplas_respostas.errors %}
+                <div style="color: var(--cor08); margin-top: 5px;">
+                    {% for error in form.permite_multiplas_respostas.errors %}
+                    <small>{{ error }}</small>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    {{ form.enviar_lembrete_email }}
+                    <label for="{{ form.enviar_lembrete_email.id_for_label }}">
+                        {{ form.enviar_lembrete_email.label }}
+                    </label>
+                </div>
+                {% if form.enviar_lembrete_email.errors %}
+                <div style="color: var(--cor08); margin-top: 5px;">
+                    {% for error in form.enviar_lembrete_email.errors %}
+                    <small>{{ error }}</small>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.turmas.id_for_label }}">
+                <strong>{{ form.turmas.label }}</strong>
+            </label>
+            <div style="max-height: 300px; overflow-y: auto; border: 1px solid #ced4da; padding: 15px; border-radius: 5px; background: #f8f9fa;">
+                {% for choice in form.turmas %}
+                <div style="margin-bottom: 8px; padding: 6px 8px; background: white; border-radius: 4px; border: 1px solid #dee2e6;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span style="display: flex; align-items: center; width: 20px; height: 20px; justify-content: center;">
+                            {{ choice.tag }}
+                        </span>
+                        <label for="{{ choice.id_for_label }}" style="margin: 0; font-weight: normal; cursor: pointer; flex-grow: 1; font-size: 14px; line-height: 1.2;">
+                            {{ choice.choice_label|truncatechars:60 }}
+                        </label>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% if form.turmas.errors %}
+            <div style="color: var(--cor08); margin-top: 5px;">
+                {% for error in form.turmas.errors %}
+                <small>{{ error }}</small>
+                {% endfor %}
+            </div>
+            {% endif %}
+            <small style="color: #666; display: block; margin-top: 5px;">
+                {{ form.turmas.help_text }}
+            </small>
+        </div>
+
+        {% if form.non_field_errors %}
+        <div style="color: var(--cor08); margin-bottom: 15px;">
+            {% for error in form.non_field_errors %}
+            <small>{{ error }}</small>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--cor01);">
+            <a href="{% url 'gerenciar_ciclos' %}" class="btn btn-secondary">
+                ← Cancelar
+            </a>
+            <button type="submit" class="btn">
+                ✓ Salvar Alterações
+            </button>
+        </div>
+    </form>
+</div>
+{% else %}
+<!-- Formulário de Criação -->
+<div class="form-section">
+    <h2>➕ Criar Novo Ciclo de Avaliação</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="{{ form.nome.id_for_label }}">
+                <strong>{{ form.nome.label }}</strong>
+            </label>
+            {{ form.nome }}
+            {% if form.nome.errors %}
+            <div style="color: var(--cor08); margin-top: 5px;">
+                {% for error in form.nome.errors %}
+                <small>{{ error }}</small>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.periodo_letivo.id_for_label }}">
+                <strong>{{ form.periodo_letivo.label }}</strong>
+            </label>
+            {{ form.periodo_letivo }}
+            {% if form.periodo_letivo.errors %}
+            <div style="color: var(--cor08); margin-top: 5px;">
+                {% for error in form.periodo_letivo.errors %}
+                <small>{{ error }}</small>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.questionario.id_for_label }}">
+                <strong>{{ form.questionario.label }}</strong>
+            </label>
+            {{ form.questionario }}
+            {% if form.questionario.errors %}
+            <div style="color: var(--cor08); margin-top: 5px;">
+                {% for error in form.questionario.errors %}
+                <small>{{ error }}</small>
+                {% endfor %}
+            </div>
+            {% endif %}
+            <small style="color: #666; display: block; margin-top: 5px;">
+                Selecione o questionário que será utilizado neste ciclo de avaliação
+            </small>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="form-group">
+                <label for="{{ form.data_inicio.id_for_label }}">
+                    <strong>{{ form.data_inicio.label }}</strong>
+                </label>
+                {{ form.data_inicio }}
+                {% if form.data_inicio.errors %}
+                <div style="color: var(--cor08); margin-top: 5px;">
+                    {% for error in form.data_inicio.errors %}
+                    <small>{{ error }}</small>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.data_fim.id_for_label }}">
+                    <strong>{{ form.data_fim.label }}</strong>
+                </label>
+                {{ form.data_fim }}
+                {% if form.data_fim.errors %}
+                <div style="color: var(--cor08); margin-top: 5px;">
+                    {% for error in form.data_fim.errors %}
+                    <small>{{ error }}</small>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px;">
+            <div class="form-group">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    {{ form.permite_avaliacao_anonima }}
+                    <label for="{{ form.permite_avaliacao_anonima.id_for_label }}">
+                        {{ form.permite_avaliacao_anonima.label }}
+                    </label>
+                </div>
+                {% if form.permite_avaliacao_anonima.errors %}
+                <div style="color: var(--cor08); margin-top: 5px;">
+                    {% for error in form.permite_avaliacao_anonima.errors %}
+                    <small>{{ error }}</small>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    {{ form.permite_multiplas_respostas }}
+                    <label for="{{ form.permite_multiplas_respostas.id_for_label }}">
+                        {{ form.permite_multiplas_respostas.label }}
+                    </label>
+                </div>
+                {% if form.permite_multiplas_respostas.errors %}
+                <div style="color: var(--cor08); margin-top: 5px;">
+                    {% for error in form.permite_multiplas_respostas.errors %}
+                    <small>{{ error }}</small>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    {{ form.enviar_lembrete_email }}
+                    <label for="{{ form.enviar_lembrete_email.id_for_label }}">
+                        {{ form.enviar_lembrete_email.label }}
+                    </label>
+                </div>
+                {% if form.enviar_lembrete_email.errors %}
+                <div style="color: var(--cor08); margin-top: 5px;">
+                    {% for error in form.enviar_lembrete_email.errors %}
+                    <small>{{ error }}</small>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.turmas.id_for_label }}">
+                <strong>{{ form.turmas.label }}</strong>
+            </label>
+            <div style="max-height: 300px; overflow-y: auto; border: 1px solid #ced4da; padding: 15px; border-radius: 5px; background: #f8f9fa;">
+                {% for choice in form.turmas %}
+                <div style="margin-bottom: 8px; padding: 6px 8px; background: white; border-radius: 4px; border: 1px solid #dee2e6;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span style="display: flex; align-items: center; width: 20px; height: 20px; justify-content: center;">
+                            {{ choice.tag }}
+                        </span>
+                        <label for="{{ choice.id_for_label }}" style="margin: 0; font-weight: normal; cursor: pointer; flex-grow: 1; font-size: 14px; line-height: 1.2;">
+                            {{ choice.choice_label|truncatechars:60 }}
+                        </label>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% if form.turmas.errors %}
+            <div style="color: var(--cor08); margin-top: 5px;">
+                {% for error in form.turmas.errors %}
+                <small>{{ error }}</small>
+                {% endfor %}
+            </div>
+            {% endif %}
+            <small style="color: #666; display: block; margin-top: 5px;">
+                {{ form.turmas.help_text }}
+            </small>
+        </div>
+
+        {% if form.non_field_errors %}
+        <div style="color: var(--cor08); margin-bottom: 15px;">
+            {% for error in form.non_field_errors %}
+            <small>{{ error }}</small>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--cor01);">
+            <a href="{% url 'listar_avaliacoes' %}" class="btn btn-secondary">
+                ← Cancelar
+            </a>
+            <button type="submit" class="btn">
+                ✓ Criar Ciclo
+            </button>
+        </div>
+    </form>
+</div>
+{% endif %}
+
+<div class="form-section">
+    <h2>📋 Ciclos de Avaliação Cadastrados</h2>
+    <div style="margin-bottom: 20px; color: var(--cor03);">
+        <strong>Total de ciclos:</strong> {{ ciclos.count }}
+    </div>
+    
+    {% if ciclos %}
+    <div class="data-table-container" style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
+        <table class="data-table" style="min-width: 1000px;">
+            <thead>
+                <tr>
+                    <th style="min-width: 150px;">Nome</th>
+                    <th style="min-width: 120px;">Período Letivo</th>
+                    <th style="min-width: 150px;">Questionário</th>
+                    <th style="min-width: 120px;">Início</th>
+                    <th style="min-width: 120px;">Fim</th>
+                    <th style="min-width: 100px;">Status</th>
+                    <th style="min-width: 80px;">Ativo</th>
+                    <th style="text-align: center; min-width: 200px;">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ciclo in ciclos %}
+                <tr>
+                    <td style="min-width: 150px;"><strong>{{ ciclo.nome }}</strong></td>
+                    <td style="min-width: 120px;">{{ ciclo.periodo_letivo.nome }}</td>
+                    <td style="min-width: 150px;">{{ ciclo.questionario.titulo }}</td>
+                    <td style="min-width: 120px;">{{ ciclo.data_inicio|date:"d/m/Y H:i" }}</td>
+                    <td style="min-width: 120px;">{{ ciclo.data_fim|date:"d/m/Y H:i" }}</td>
+                    <td style="min-width: 100px;">
+                        {% if ciclo.status == 'agendado' %}
+                            <span class="badge bg-warning">📅 Agendado</span>
+                        {% elif ciclo.status == 'em_andamento' %}
+                            <span class="badge bg-info">⏳ Em Andamento</span>
+                        {% elif ciclo.status == 'finalizado' %}
+                            <span class="badge bg-success">✅ Finalizado</span>
+                        {% endif %}
+                    </td>
+                    <td style="min-width: 80px;">
+                        {% if ciclo.ativo %}
+                            <span class="badge bg-success">✅ Ativo</span>
+                        {% else %}
+                            <span class="badge bg-secondary">❌ Inativo</span>
+                        {% endif %}
+                    </td>
+                    <td style="text-align: center; min-width: 200px;">
+                        <div style="display: flex; gap: 5px; justify-content: center; align-items: center; flex-wrap: nowrap;">
+                            <a href="{% url 'detalhe_ciclo_avaliacao' ciclo.id %}" class="btn btn-sm" title="Visualizar" style="white-space: nowrap;">
+                                👁️ Ver
+                            </a>
+                            <a href="{% url 'editar_ciclo_simples' ciclo.id %}" class="btn btn-sm btn-secondary" title="Editar" style="white-space: nowrap;">
+                                ✏️ Editar
+                            </a>
+                            <a href="{% url 'excluir_ciclo' ciclo.id %}" class="btn btn-sm btn-danger" title="Excluir" style="white-space: nowrap;"
+                               onclick="return confirm('Tem certeza que deseja excluir o ciclo \'{{ ciclo.nome }}\'? Esta ação não pode ser desfeita.')">
+                                🗑️ Excluir
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div style="text-align: center; padding: 40px; color: #666;">
+        <p style="font-size: 1.1em; margin-bottom: 20px;">Nenhum ciclo de avaliação encontrado.</p>
+        <p>Crie o primeiro ciclo para começar a gerenciar avaliações.</p>
+    </div>
+    {% endif %}
+</div>
+
+<div class="form-section" style="background: #f8f9fa; border-left: 4px solid var(--cor02);">
+    <h2 style="color: var(--cor03); margin-bottom: 15px;">📅 Informações sobre Ciclos</h2>
+    <div style="color: #666; line-height: 1.6;">
+        <h4 style="color: var(--cor03); margin-bottom: 15px;">O que é um Ciclo de Avaliação?</h4>
+        <p style="margin-bottom: 15px;">
+            Um ciclo de avaliação define um período específico durante o qual os alunos podem responder
+            aos questionários. Cada ciclo está associado a um questionário e pode ter configurações
+            específicas de anonimato e datas.
+        </p>
+        
+        <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #dee2e6;">
+            <h5 style="color: var(--cor03); margin-bottom: 10px;">Configurações Importantes:</h5>
+            <ul style="line-height: 1.6;">
+                <li><strong>Período:</strong> Define quando as avaliações estarão disponíveis</li>
+                <li><strong>Questionário:</strong> Deve estar ativo e ter perguntas cadastradas</li>
+                <li><strong>Turmas:</strong> Selecione as turmas que devem participar desta avaliação</li>
+                <li><strong>Anônimo:</strong> Quando ativado, oculta a identidade dos respondentes</li>
+            </ul>
+        </div>
+        
+        <div style="margin-top: 15px; padding: 10px; background: #fff3cd; border-radius: 5px;">
+            <strong style="color: #856404;">⚠️ Atenção:</strong>
+            <span style="color: #856404;">
+                Certifique-se de que o questionário selecionado possui perguntas antes de ativar o ciclo.
+            </span>
+        </div>
+    </div>
+</div>
+{% endblock %}

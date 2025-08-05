@@ -13,139 +13,324 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Vidaloka&display=swap');
 
-        @import url('https://fonts.googleapis.com/css2?family=Vidaloka&display=swap');
-
         :root {
-            --cor01: #f1f1f1;
+            /* Cores principais */
+            --cor01: #f0f0f0;
+            --cor01-alt: #f1f1f1;
             --cor02: #00fd94;
             --cor03: #376f6c;
             --cor04: #1e3231;
             --cor05: #090909;
-
             --cor06: #00cafd;
             --cor07: #ffffff;
             --cor08: #ff3c3c;
 
+            /* Fontes */
             --font01: "Poppins", sans-serif;
             --font02: "Vidaloka", serif;
 
-            --shadow: 4px 2px 8px rgba(0, 0, 0, 0.2);
+            /* Sombras e efeitos */
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --shadow-hover: 0 8px 25px rgba(0, 0, 0, 0.15);
+            --shadow-card: 0 10px 30px rgba(55, 111, 108, 0.15);
+
+            /* Bordas e raios */
+            --border-radius-small: 8px;
+            --border-radius-medium: 15px;
+            --border-radius-large: 25px;
+            --border-radius-circle: 50%;
+
+            /* Transições */
+            --transition-fast: 0.2s ease-in-out;
+            --transition-medium: 0.3s ease-in-out;
+            --transition-slow: 0.5s ease-in-out;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-
             font-family: var(--font01);
         }
 
         body {
-            height: 100vh;
+            min-height: 100vh;
+            background: var(--cor01);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* Header aprimorado */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            padding: 15px 5%;
+            background: var(--cor01);
+            z-index: 100;
+            
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header button {
+            width: 50px;
+            height: 50px;
+            border-radius: var(--border-radius-circle);
+            border: none;
+            background: var(--cor07);
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            transition: var(--transition-fast);
+            
             display: flex;
             justify-content: center;
             align-items: center;
-
-            position: relative;
-
-            background: var(--cor01);
-
-            header,
-            main {
-                /*border: 1px solid;*/
-                width: 90vw;
-                margin: auto;
-            }
-
-            header {
-                position: absolute;
-                height: 10vh;
-            }
-
-            header {
-                top: 5vh;
-            }
-
-            /*main {
-        height: 60vh;
-    }*/
         }
 
-        /* ------------- HOME -------------------*/
-
-        header {
-            display: flex;
-            flex-direction: row;
-            justify-content: space-between;
-
-            button {
-                width: 60px;
-                height: 60px;
-                border-radius: 50%;
-                border: none;
-                box-shadow: var(--shadow);
-                background: var(--cor07);
-
-                cursor: pointer;
-
-                display: flex;
-                justify-content: center;
-                align-items: center;
-
-                img {
-                    width: 30px;
-                }
-            }
+        header button:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+            background: var(--cor03);
         }
 
+        header button img {
+            width: 24px;
+            height: 24px;
+            transition: var(--transition-fast);
+        }
+
+        header button:hover img {
+            filter: brightness(0) invert(1);
+        }
+
+        /* Container principal */
         main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 100px 20px 50px;
+            gap: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Título de boas-vindas */
+        h1 {
+            text-align: center;
+            font-family: var(--font02);
+            font-weight: 400;
+            font-size: clamp(1.8rem, 4vw, 3rem);
+            color: var(--cor04);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 10px;
+            line-height: 1.2;
+        }
+
+        h1 span#alunoAtual {
+            display: block;
+            font-family: var(--font01);
+            font-weight: 600;
+            color: var(--cor02);
+            margin-top: 10px;
+            font-size: clamp(1.2rem, 3vw, 2rem);
+        }
+
+        /* Seção de opções redesenhada */
+        #opcoes {
+            width: 100%;
+            max-width: 600px;
+            padding: 40px;
+            background: var(--cor07);
+            border-radius: var(--border-radius-large);
+            box-shadow: var(--shadow-card);
+            border: 1px solid rgba(55, 111, 108, 0.1);
+            
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 25px;
+            
+            transition: var(--transition-fast);
+        }
 
-            h1,
-            h1>span {
-                text-align: center;
-                font-family: var(--font02);
-                font-weight: 500;
-                text-shadow: var(--shadow);
+        #opcoes:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 25px rgba(55, 111, 108, 0.12);
+        }
+
+        #opcoes h2 {
+            color: var(--cor03);
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            text-align: center;
+            position: relative;
+        }
+
+        #opcoes h2::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: var(--cor02);
+            border-radius: 2px;
+        }
+
+        /* Botões redesenhados */
+        #opcoes button {
+            width: 100%;
+            padding: 18px 25px;
+            background: var(--cor02);
+            color: var(--cor05);
+            border: none;
+            border-radius: var(--border-radius-medium);
+            font-size: 1rem;
+            font-weight: 600;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            
+            box-shadow: 0 4px 15px rgba(0, 253, 148, 0.25);
+        }
+
+        #opcoes button:hover {
+            transform: translateY(-1px);
+            background: var(--cor06);
+            box-shadow: 0 4px 15px rgba(0, 253, 148, 0.25);
+        }
+
+        #opcoes button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 10px rgba(0, 253, 148, 0.2);
+        }
+
+        /* Botões secundários para diferentes roles */
+        #opcoes button:nth-child(3),
+        #opcoes button:nth-child(4) {
+            background: var(--cor03);
+            color: var(--cor07);
+            box-shadow: 0 4px 15px rgba(55, 111, 108, 0.25);
+        }
+
+        #opcoes button:nth-child(3):hover,
+        #opcoes button:nth-child(4):hover {
+            background: var(--cor04);
+            box-shadow: 0 4px 15px rgba(55, 111, 108, 0.25);
+        }
+
+        /* Mensagem de erro */
+        h2[style*="color:rgb(255, 0, 0)"] {
+            background: var(--cor07);
+            color: var(--cor08) !important;
+            padding: 20px;
+            border-radius: var(--border-radius-medium);
+            border-left: 4px solid var(--cor08);
+            box-shadow: var(--shadow);
+            text-align: center;
+            font-size: 1.1rem;
+            max-width: 600px;
+        }
+
+        /* Animações de entrada */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        #opcoes {
+            animation: fadeInUp 0.6s ease-out 0.1s both;
+        }
+
+        /* Responsividade aprimorada */
+        @media (max-width: 768px) {
+            header {
+                padding: 15px 20px;
+            }
+
+            main {
+                padding: 100px 15px 30px;
+                gap: 30px;
             }
 
             #opcoes {
-                width: 60vw;
-                padding: 40px;
+                padding: 30px 25px;
+                max-width: 100%;
+            }
 
-                display: flex;
-                flex-direction: column;
-                align-items: center;
+            #opcoes button {
+                padding: 16px 20px;
+                font-size: 0.95rem;
+            }
+
+            h1 {
+                margin-bottom: 5px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header button {
+                width: 45px;
+                height: 45px;
+            }
+
+            header button img {
+                width: 20px;
+                height: 20px;
+            }
+
+            #opcoes {
+                padding: 25px 20px;
                 gap: 20px;
+            }
 
-                background: var(--cor03);
+            #opcoes h2 {
+                font-size: 1.3rem;
+            }
 
-                border-radius: 20px;
+            #opcoes button {
+                padding: 14px 18px;
+                font-size: 0.9rem;
+            }
+        }
 
-                h2 {
-                    color: var(--cor01);
-                }
+        /* Estados de loading e interação */
+        .loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
 
-                button {
-                    width: 100%;
-                    padding: 20px;
+        /* Melhoria na acessibilidade */
+        button:focus-visible {
+            outline: 2px solid var(--cor02);
+            outline-offset: 2px;
+        }
 
-                    text-align: left;
-                    font-weight: 600;
-                    color: var(--cor03);
-
-                    border-radius: 15px;
-                    border: none;
-
-                    cursor: pointer;
-                }
-
-                button:active {
-                    outline: 2px solid var(--cor02);
-                }
+        /* Suporte para modo escuro (futuro) */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --cor01: #1a1a1a;
+                --cor07: #2d2d2d;
             }
         }
     </style>
@@ -241,7 +426,196 @@
 
     </main>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Smooth scroll e efeitos de interação
+            const buttons = document.querySelectorAll('#opcoes button');
+            const header = document.querySelector('header');
+            
+            // Efeito de loading nos botões
+            buttons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    // Adiciona efeito de loading
+                    this.style.transform = 'scale(0.98)';
+                    this.style.opacity = '0.8';
+                    
+                    // Adiciona um pequeno delay para feedback visual
+                    setTimeout(() => {
+                        // O onclick do HTML vai executar após este timeout
+                    }, 150);
+                });
+            });
 
+            // Efeito parallax suave no header
+            window.addEventListener('scroll', function() {
+                const scrolled = window.pageYOffset;
+                const parallax = scrolled * 0.5;
+                
+                if (header) {
+                    header.style.transform = `translateY(${parallax}px)`;
+                }
+            });
+
+            // Animação de typing para o nome do usuário
+            const nomeUsuario = document.querySelector('#alunoAtual');
+            if (nomeUsuario && !nomeUsuario.textContent.includes('configure')) {
+                const texto = nomeUsuario.textContent;
+                nomeUsuario.textContent = '';
+                let i = 0;
+                
+                function typeWriter() {
+                    if (i < texto.length) {
+                        nomeUsuario.textContent += texto.charAt(i);
+                        i++;
+                        setTimeout(typeWriter, 100);
+                    }
+                }
+                
+                // Inicia o efeito após um pequeno delay
+                setTimeout(typeWriter, 1000);
+            }
+
+            // Efeito de hover personalizado para o logo
+            const logoButton = document.querySelector('#ifSadd');
+            if (logoButton) {
+                logoButton.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-3px) rotate(5deg)';
+                });
+                
+                logoButton.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) rotate(0deg)';
+                });
+            }
+
+            // Efeito de hover para o botão de perfil
+            const perfilButton = document.querySelector('#perfil');
+            if (perfilButton) {
+                perfilButton.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-3px) scale(1.1)';
+                });
+                
+                perfilButton.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            }
+
+            // Adiciona classe para animações escalonadas nos botões
+            buttons.forEach((button, index) => {
+                button.style.setProperty('--delay', `${index * 0.1}s`);
+            });
+
+            // Efeito de partículas flutuantes (opcional)
+            function createFloatingParticle() {
+                const particle = document.createElement('div');
+                particle.style.cssText = `
+                    position: fixed;
+                    width: 4px;
+                    height: 4px;
+                    background: var(--cor02);
+                    border-radius: 50%;
+                    pointer-events: none;
+                    z-index: -1;
+                    opacity: 0.3;
+                `;
+                
+                particle.style.left = Math.random() * window.innerWidth + 'px';
+                particle.style.top = window.innerHeight + 'px';
+                
+                document.body.appendChild(particle);
+                
+                // Anima a partícula
+                const animation = particle.animate([
+                    { transform: 'translateY(0px)', opacity: 0.3 },
+                    { transform: `translateY(-${window.innerHeight + 100}px)`, opacity: 0 }
+                ], {
+                    duration: Math.random() * 3000 + 2000,
+                    easing: 'ease-out'
+                });
+                
+                animation.onfinish = () => particle.remove();
+            }
+
+            // Cria partículas ocasionalmente
+            setInterval(createFloatingParticle, 3000);
+
+            // Melhoria na acessibilidade - navegação por teclado
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Tab') {
+                    document.body.classList.add('keyboard-navigation');
+                }
+            });
+
+            document.addEventListener('mousedown', function() {
+                document.body.classList.remove('keyboard-navigation');
+            });
+        });
+
+        // Função para o botão do perfil (mantém compatibilidade)
+        document.getElementById('perfil').addEventListener('click', function() {
+            // Aqui você pode adicionar a lógica para abrir o perfil
+            // Por agora, mantemos a funcionalidade existente se houver
+        });
+
+        // Função para o botão do logo
+        document.getElementById('ifSadd').addEventListener('click', function() {
+            // Adiciona um efeito visual ao clicar no logo
+            this.style.animation = 'pulse 0.6s ease-in-out';
+            setTimeout(() => {
+                this.style.animation = '';
+            }, 600);
+        });
+    </script>
+
+    <style>
+        /* Animações adicionais */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        /* Melhorias para navegação por teclado */
+        .keyboard-navigation button:focus {
+            outline: 3px solid var(--cor02);
+            outline-offset: 2px;
+        }
+
+        /* Efeito de carregamento */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition-medium);
+        }
+
+        .loading-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid var(--cor01);
+            border-top: 3px solid var(--cor02);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
 
 </body>
 

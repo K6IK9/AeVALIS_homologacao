@@ -7,624 +7,541 @@
 {% block page_actions %}
 {% if user|has_role:"coordenador" or user|has_role:"admin" %}
 <div class="section-header">
-    <div>
-        <a href="{% url 'criar_questionario_avaliacao' %}" class="btn">
-            ➕ Novo Questionário
+    <div class="d-flex gap-2">
+        <a href="{% url 'gerenciar_questionarios' %}" class="btn btn-primary-custom">
+            <i class="bi bi-clipboard-check"></i> Gerenciar Questionários
         </a>
-        <a href="{% url 'criar_ciclo_avaliacao' %}" class="btn btn-secondary">
-            📅 Novo Ciclo
+        <a href="{% url 'gerenciar_categorias' %}" class="btn btn-secondary-custom">
+            <i class="bi bi-tags"></i> Gerenciar Categorias
         </a>
-        <button type="button" class="btn btn-secondary" data-bs-toggle="modal"
-            data-bs-target="#gerenciarCategoriasModal">
-            📂 Gerenciar Categorias
-        </button>
+        <a href="{% url 'gerenciar_ciclos' %}" class="btn btn-secondary-custom">
+            <i class="bi bi-arrow-repeat"></i> Gerenciar Ciclos
+        </a>
     </div>
 </div>
 {% endif %}
 {% endblock %}
 
 {% block content %}
-<div class="avaliacoes-grid">
-    <!-- Card de Ciclos Ativos -->
-    <div class="avaliacao-card">
-        <h3>📅 Ciclos Ativos</h3>
-        {% if ciclos %}
-        {% for ciclo in ciclos %}
-        <div
-            style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f0f0f0;">
-            <div>
-                <h6 style="margin: 0; font-weight: 600;">{{ ciclo.nome }}</h6>
-                <small style="color: #666;">
-                    {{ ciclo.data_inicio|date:"d/m/Y" }} - {{ ciclo.data_fim|date:"d/m/Y" }}
-                </small>
+<div class="row g-4">
+    <!-- Card de Ciclos Ativos - Apenas para admins/coordenadores/professores -->
+    {% if not user|has_role:"aluno" %}
+    <div class="col-12">
+        <div class="card card-custom">
+            <div class="card-header">
+                <h6 class="card-title mb-0">
+                    <i class="bi bi-calendar-check"></i> Ciclos Ativos
+                </h6>
             </div>
-            <a href="{% url 'detalhe_ciclo_avaliacao' ciclo.id %}" class="btn btn-sm">
-                👁️ Ver
-            </a>
+            <div class="card-body">
+                {% if ciclos %}
+                    <div class="row g-3">
+                        {% for ciclo in ciclos %}
+                        <div class="col-md-6 col-lg-4">
+                            <div class="ciclo-item">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div class="flex-grow-1">
+                                        <h6 class="ciclo-nome mb-1">{{ ciclo.nome }}</h6>
+                                        <small class="text-muted">
+                                            <i class="bi bi-calendar-range"></i>
+                                            {{ ciclo.data_inicio|date:"d/m/Y" }} - {{ ciclo.data_fim|date:"d/m/Y" }}
+                                        </small>
+                                    </div>
+                                    <a href="{% url 'detalhe_ciclo_avaliacao' ciclo.id %}" 
+                                       class="btn btn-outline-primary-custom btn-sm"
+                                       title="Visualizar Ciclo"
+                                       data-bs-toggle="tooltip">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="bi bi-calendar-x" style="font-size: 3rem; color: #ccc;"></i>
+                        <p class="mt-3 text-muted"><strong>Nenhum ciclo ativo encontrado</strong></p>
+                        <p class="text-muted">Crie um novo ciclo para começar as avaliações.</p>
+                    </div>
+                {% endif %}
+            </div>
         </div>
-        {% endfor %}
-        {% else %}
-        <p style="color: #666; text-align: center; margin: 20px 0;">Nenhum ciclo ativo encontrado.</p>
-        {% endif %}
     </div>
+    {% endif %}
 
     <!-- Card de Questionários ou Avaliações -->
-    <div class="avaliacao-card">
-        <h3>📋 {{ titulo }}</h3>
-        {% if avaliacoes %}
-        <div class="data-table-container">
-            {% if user|has_role:"aluno" %}
-            <!-- Exibição para alunos - mostra avaliações docentes -->
-            <div class="avaliacoes-grid">
-                {% for avaliacao in avaliacoes %}
-                <div class="avaliacao-card" style="margin-bottom: 15px; padding: 15px; border: 1px solid #ddd; border-radius: 8px;">
-                    <h4>{{ avaliacao.disciplina.disciplina_nome }}</h4>
-                    <p><strong>Professor:</strong> {{ avaliacao.professor.user.get_full_name }}</p>
-                    <p><strong>Turma:</strong> {{ avaliacao.turma.codigo_turma }}</p>
-                    <p><strong>Ciclo:</strong> {{ avaliacao.ciclo.nome }}</p>
-                    <small style="color: #666;">
-                        Período: {{ avaliacao.ciclo.data_inicio|date:"d/m/Y" }} - {{ avaliacao.ciclo.data_fim|date:"d/m/Y" }}
-                    </small>
-                    <div style="margin-top: 15px;">
-                        <a href="{% url 'responder_avaliacao' avaliacao.id %}" class="btn">
-                            📝 Responder Avaliação
-                        </a>
+    <div class="col-12">
+        <div class="card card-custom">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h6 class="card-title mb-0">
+                    <i class="bi bi-list-check"></i> {{ titulo }}
+                </h6>
+                {% if avaliacoes %}
+                    <small class="text-muted">{{ avaliacoes|length }} avaliação(ões)</small>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                {% if avaliacoes %}
+                    {% if user|has_role:"aluno" %}
+                    <!-- Exibição para alunos - mostra avaliações docentes -->
+                    <div class="row g-3">
+                        {% for avaliacao in avaliacoes %}
+                        <div class="col-md-6 col-lg-4">
+                            <div class="avaliacao-item">
+                                <div class="avaliacao-header">
+                                    <h5 class="avaliacao-titulo">{{ avaliacao.disciplina.disciplina_nome }}</h5>
+                                </div>
+                                <div class="avaliacao-body">
+                                    <div class="info-item">
+                                        <span class="info-label">
+                                            <i class="bi bi-person"></i> Professor:
+                                        </span>
+                                        <span class="info-value">{{ avaliacao.professor.user.get_full_name }}</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="info-label">
+                                            <i class="bi bi-collection"></i> Turma:
+                                        </span>
+                                        <span class="info-value">{{ avaliacao.turma.codigo_turma }}</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="info-label">
+                                            <i class="bi bi-clock"></i> Ciclo:
+                                        </span>
+                                        <span class="info-value">{{ avaliacao.ciclo.nome }}</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="info-label">
+                                            <i class="bi bi-calendar-range"></i> Período:
+                                        </span>
+                                        <span class="info-value">
+                                            {{ avaliacao.ciclo.data_inicio|date:"d/m/Y" }} - {{ avaliacao.ciclo.data_fim|date:"d/m/Y" }}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="avaliacao-footer">
+                                    <a href="{% url 'responder_avaliacao' avaliacao.id %}" class="btn btn-primary-custom w-100">
+                                        <i class="bi bi-pencil-square"></i> Responder Avaliação
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
                     </div>
-                </div>
-                {% endfor %}
-            </div>
-            {% else %}
-            <!-- Exibição para administradores/coordenadores - mostra avaliações docentes como tabela -->
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Professor</th>
-                        <th>Disciplina</th>
-                        <th>Turma</th>
-                        <th>Ciclo</th>
-                        <th>Status</th>
-                        <th>Respostas</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for avaliacao in avaliacoes %}
-                    <tr>
-                        <td>
-                            <strong>{{ avaliacao.professor.user.get_full_name }}</strong>
-                        </td>
-                        <td>
-                            {{ avaliacao.disciplina.disciplina_nome }}
-                        </td>
-                        <td>
-                            {{ avaliacao.turma.codigo_turma }}
-                        </td>
-                        <td>
-                            {{ avaliacao.ciclo.nome }}
-                        </td>
-                        <td>
-                            <span class="badge bg-{% if avaliacao.status == 'pendente' %}warning{% elif avaliacao.status == 'em_andamento' %}info{% elif avaliacao.status == 'finalizada' %}success{% else %}secondary{% endif %}">
-                                {{ avaliacao.get_status_display }}
-                            </span>
-                        </td>
-                        <td>
-                            {{ avaliacao.total_respostas }}
-                        </td>
-                        <td>
-                            <a href="{% url 'visualizar_avaliacao' avaliacao.id %}" class="btn btn-sm" title="Visualizar">
-                                👁️ Ver
-                            </a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            {% endif %}
-        </div>
-        {% else %}
-        <p style="color: #666; text-align: center; margin: 20px 0;">
-            {% if user|has_role:"aluno" %}
-            Nenhuma avaliação disponível para responder no momento.
-            {% else %}
-            Nenhuma avaliação encontrada.
-            {% endif %}
-        </p>
-        {% endif %}
-    </div>
-</div>
-
-<!-- Seção de Avaliações para Responder (se houver) -->
-{% if avaliacoes_para_responder %}
-<div class="form-section">
-    <h2>📝 Avaliações Pendentes</h2>
-    <div class="avaliacoes-grid">
-        {% for avaliacao in avaliacoes_para_responder %}
-        <div class="avaliacao-card">
-            <h4>{{ avaliacao.titulo }}</h4>
-            <p>{{ avaliacao.descricao }}</p>
-            <div style="margin-top: 15px;">
-                <a href="{% url 'responder_avaliacao' avaliacao.id %}" class="btn">
-                    📝 Responder Avaliação
-                </a>
-            </div>
-        </div>
-        {% endfor %}
-    </div>
-</div>
-{% endif %}
-
-<!-- Modal de Gerenciar Categorias -->
-<div class="modal fade" id="gerenciarCategoriasModal" tabindex="-1" aria-labelledby="gerenciarCategoriasModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="gerenciarCategoriasModalLabel">📂 Gerenciar Categorias de Avaliação</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
-            </div>
-            <div class="modal-body">
-                <!-- Botão para adicionar nova categoria -->
-                <div class="mb-3">
-                    <button type="button" class="btn btn-primary" onclick="abrirFormularioCategoria()">
-                        ➕ Nova Categoria
-                    </button>
-                </div>
-
-                <!-- Lista de categorias -->
-                <div id="categorias-container">
-                    <!-- Carregará dinamicamente -->
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                    {% else %}
+                    <!-- Exibição para administradores/coordenadores - mostra avaliações docentes como tabela -->
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Professor</th>
+                                    <th>Disciplina</th>
+                                    <th>Turma</th>
+                                    <th>Ciclo</th>
+                                    <th>Status</th>
+                                    <th class="text-center">Respostas</th>
+                                    <th class="text-center">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for avaliacao in avaliacoes %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ avaliacao.professor.user.get_full_name }}</strong>
+                                    </td>
+                                    <td>
+                                        {{ avaliacao.disciplina.disciplina_nome }}
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-light text-dark">{{ avaliacao.turma.codigo_turma }}</span>
+                                    </td>
+                                    <td>
+                                        {{ avaliacao.ciclo.nome }}
+                                    </td>
+                                    <td>
+                                        {% if avaliacao.status == 'pendente' %}
+                                            <span class="badge bg-warning">
+                                                <i class="bi bi-clock"></i> Pendente
+                                            </span>
+                                        {% elif avaliacao.status == 'em_andamento' %}
+                                            <span class="badge bg-info">
+                                                <i class="bi bi-hourglass-split"></i> Em Andamento
+                                            </span>
+                                        {% elif avaliacao.status == 'finalizada' %}
+                                            <span class="badge bg-success">
+                                                <i class="bi bi-check-circle"></i> Finalizada
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">
+                                                <i class="bi bi-question-circle"></i> {{ avaliacao.get_status_display }}
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-primary-custom">{{ avaliacao.total_respostas }}</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <a href="{% url 'visualizar_avaliacao' avaliacao.id %}" 
+                                           class="btn btn-outline-primary-custom btn-sm" 
+                                           title="Visualizar Avaliação"
+                                           data-bs-toggle="tooltip">
+                                            <i class="bi bi-eye"></i> Ver
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% endif %}
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="bi bi-clipboard-x" style="font-size: 3rem; color: #ccc;"></i>
+                        {% if user|has_role:"aluno" %}
+                            <p class="mt-3 text-muted"><strong>Nenhuma avaliação disponível</strong></p>
+                            <p class="text-muted">Não há avaliações para responder no momento.</p>
+                        {% else %}
+                            <p class="mt-3 text-muted"><strong>Nenhuma avaliação encontrada</strong></p>
+                            <p class="text-muted">Crie ciclos de avaliação para gerar avaliações docentes.</p>
+                        {% endif %}
+                    </div>
+                {% endif %}
             </div>
         </div>
     </div>
 </div>
+{% endblock %}
 
-<!-- Modal para formulário de categoria -->
-<div class="modal fade" id="categoriaFormModal" tabindex="-1" aria-labelledby="categoriaFormModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog modal-md">
-        <div id="categoria-form-container">
-            <!-- Carregará dinamicamente -->
-        </div>
-    </div>
-</div>
-
-<script>
-    // Função para carregar categorias
-    function carregarCategorias() {
-        fetch('{% url "gerenciar_categorias" %}')
-            .then(response => response.json())
-            .then(data => {
-                const container = document.getElementById('categorias-container');
-
-                if (data.categorias.length === 0) {
-                    container.innerHTML = '<p class="text-muted text-center">Nenhuma categoria encontrada.</p>';
-                    return;
-                }
-
-                let html = '<div class="table-responsive"><table class="table table-striped">';
-                html += '<thead><tr><th>Nome</th><th>Descrição</th><th>Ordem</th><th>Status</th><th>Ações</th></tr></thead><tbody>';
-
-                data.categorias.forEach(categoria => {
-                    html += `<tr>
-                    <td><strong>${categoria.nome}</strong></td>
-                    <td>${categoria.descricao || '-'}</td>
-                    <td>${categoria.ordem}</td>
-                    <td>
-                        <span class="badge bg-${categoria.ativa ? 'success' : 'secondary'}">
-                            ${categoria.ativa ? 'Ativo' : 'Inativo'}
-                        </span>
-                    </td>
-                    <td>
-                        <button class="btn btn-sm btn-outline-primary" onclick="editarCategoria(${categoria.id})">
-                            ✏️ Editar
-                        </button>
-                        <button class="btn btn-sm btn-outline-danger" onclick="excluirCategoria(${categoria.id}, '${categoria.nome}')">
-                            🗑️ Excluir
-                        </button>
-                    </td>
-                </tr>`;
-                });
-
-                html += '</tbody></table></div>';
-                container.innerHTML = html;
-            })
-            .catch(error => {
-                console.error('Erro ao carregar categorias:', error);
-                document.getElementById('categorias-container').innerHTML =
-                    '<p class="text-danger text-center">Erro ao carregar categorias.</p>';
-            });
-    }
-
-    // Função para abrir formulário de nova categoria
-    function abrirFormularioCategoria() {
-        fetch('{% url "categoria_form" %}')
-            .then(response => response.text())
-            .then(html => {
-                document.getElementById('categoria-form-container').innerHTML = html;
-
-                // Configurar o formulário
-                const form = document.getElementById('categoria-form');
-                form.addEventListener('submit', function (e) {
-                    e.preventDefault();
-                    salvarCategoria();
-                });
-
-                // Abrir modal
-                const modal = new bootstrap.Modal(document.getElementById('categoriaFormModal'));
-                modal.show();
-            })
-            .catch(error => {
-                console.error('Erro ao carregar formulário:', error);
-                alert('Erro ao carregar formulário de categoria');
-            });
-    }
-
-    // Função para editar categoria
-    function editarCategoria(id) {
-        fetch(`{% url "categoria_detail" 0 %}`.replace('0', id))
-            .then(response => response.json())
-            .then(data => {
-                // Carregar formulário com dados da categoria
-                fetch(`{% url "categoria_form" %}?id=${id}`)
-                    .then(response => response.text())
-                    .then(html => {
-                        document.getElementById('categoria-form-container').innerHTML = html;
-
-                        // Preencher campos com dados da categoria
-                        document.getElementById('id_nome').value = data.categoria.nome;
-                        document.getElementById('id_descricao').value = data.categoria.descricao || '';
-                        document.getElementById('id_ordem').value = data.categoria.ordem;
-                        document.getElementById('id_ativa').checked = data.categoria.ativa;
-
-                        // Configurar o formulário
-                        const form = document.getElementById('categoria-form');
-                        form.addEventListener('submit', function (e) {
-                            e.preventDefault();
-                            salvarCategoria(id);
-                        });
-
-                        // Abrir modal
-                        const modal = new bootstrap.Modal(document.getElementById('categoriaFormModal'));
-                        modal.show();
-                    })
-                    .catch(error => {
-                        console.error('Erro ao carregar formulário:', error);
-                        alert('Erro ao carregar formulário de categoria');
-                    });
-            })
-            .catch(error => {
-                console.error('Erro ao carregar categoria:', error);
-                alert('Erro ao carregar dados da categoria');
-            });
-    }
-
-    // Função para salvar categoria
-    function salvarCategoria(id = null) {
-        const form = document.getElementById('categoria-form');
-        const formData = new FormData(form);
-
-        const url = id ? `{% url "categoria_detail" 0 %}`.replace('0', id) : '{% url "gerenciar_categorias" %}';
-        const method = id ? 'PUT' : 'POST';
-
-        fetch(url, {
-            method: method,
-            body: formData,
-            headers: {
-                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-            }
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Fechar modal de formulário
-                    const modal = bootstrap.Modal.getInstance(document.getElementById('categoriaFormModal'));
-                    modal.hide();
-
-                    // Recarregar lista de categorias
-                    carregarCategorias();
-
-                    // Mostrar mensagem de sucesso
-                    alert(data.message || 'Categoria salva com sucesso!');
-                } else {
-                    // Mostrar erros
-                    if (data.errors) {
-                        let errorMessages = [];
-                        for (const [field, messages] of Object.entries(data.errors)) {
-                            errorMessages.push(`${field}: ${messages.join(', ')}`);
-                        }
-                        alert('Erro ao salvar categoria:\n' + errorMessages.join('\n'));
-                    } else {
-                        alert('Erro ao salvar categoria');
-                    }
-                }
-            })
-            .catch(error => {
-                console.error('Erro ao salvar categoria:', error);
-                alert('Erro ao salvar categoria');
-            });
-    }
-
-    // Função para excluir categoria
-    function excluirCategoria(id, nome) {
-        if (!confirm(`Tem certeza que deseja excluir a categoria "${nome}"?`)) {
-            return;
-        }
-
-        fetch(`{% url "categoria_detail" 0 %}`.replace('0', id), {
-            method: 'DELETE',
-            headers: {
-                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-            }
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Recarregar lista de categorias
-                    carregarCategorias();
-
-                    // Mostrar mensagem de sucesso
-                    alert(data.message || 'Categoria excluída com sucesso!');
-                } else {
-                    alert('Erro ao excluir categoria: ' + (data.message || 'Erro desconhecido'));
-                }
-            })
-            .catch(error => {
-                console.error('Erro ao excluir categoria:', error);
-                alert('Erro ao excluir categoria');
-            });
-    }
-
-    // Carregar categorias quando o modal for aberto
-    document.addEventListener('DOMContentLoaded', function () {
-        console.log('DOM carregado');
-
-        const modal = document.getElementById('gerenciarCategoriasModal');
-        if (modal) {
-            modal.addEventListener('shown.bs.modal', function () {
-                console.log('Modal de categorias aberto');
-                carregarCategorias();
-            });
-        }
-
-        // Verificar se Bootstrap está carregado
-        if (typeof bootstrap === 'undefined') {
-            console.error('Bootstrap não está carregado!');
-        } else {
-            console.log('Bootstrap carregado com sucesso');
-        }
-    });
-</script>
-
+{% block extra_js %}
 <style>
-    /* Estilos para modais de categoria */
-    .modal {
-        z-index: 1050;
+    /* Variáveis CSS do sistema */
+    :root {
+        --cor01: #f0f0f0;
+        --cor02: #00fd94;
+        --cor03: #376f6c;
+        --cor04: #1e3231;
+        --cor05: #090909;
+        --cor06: #00cafd;
+        --cor07: #ffffff;
+        --cor08: #ff3c3c;
     }
 
-    .modal-backdrop {
-        z-index: 1040;
-    }
-
-    .modal-lg {
-        max-width: 900px;
-    }
-
-    .modal-md {
-        max-width: 600px;
-    }
-
-    .modal-content {
+    .card-custom {
+        border: 1px solid #dee2e6;
         border-radius: 0.5rem;
-        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
     }
 
-    .table-striped>tbody>tr:nth-of-type(odd)>td,
-    .table-striped>tbody>tr:nth-of-type(odd)>th {
-        background-color: rgba(0, 0, 0, 0.05);
-    }
-
-    .badge {
-        padding: 0.25rem 0.5rem;
-        font-size: 0.75rem;
-        font-weight: 500;
-        line-height: 1;
-        color: #fff;
-        text-align: center;
-        white-space: nowrap;
-        vertical-align: baseline;
-        border-radius: 0.25rem;
-    }
-
-    .badge.bg-success {
-        background-color: #198754 !important;
-    }
-
-    .badge.bg-secondary {
-        background-color: #6c757d !important;
-    }
-
-    .btn-outline-primary {
-        color: var(--cor06);
-        border-color: var(--cor06);
-        background-color: transparent;
-    }
-
-    .btn-outline-primary:hover {
-        color: #fff;
-        background-color: var(--cor06);
-        border-color: var(--cor06);
-    }
-
-    .btn-outline-danger {
-        color: #dc3545;
-        border-color: #dc3545;
-        background-color: transparent;
-    }
-
-    .btn-outline-danger:hover {
-        color: #fff;
-        background-color: #dc3545;
-        border-color: #dc3545;
-    }
-
-    .btn-danger {
-        background-color: #dc3545;
-        border-color: #dc3545;
-        color: white;
-    }
-
-    .btn-danger:hover {
-        background-color: #bb2d3b;
-        border-color: #b02a37;
-        color: white;
-    }
-
-    .btn-sm {
-        padding: 0.25rem 0.5rem;
-        font-size: 0.875rem;
-        line-height: 1.5;
-        border-radius: 0.2rem;
-    }
-
-    .table-responsive {
-        overflow-x: auto;
-    }
-
-    .table {
-        width: 100%;
-        margin-bottom: 1rem;
-        color: #212529;
-        border-collapse: collapse;
-    }
-
-    .table th,
-    .table td {
-        padding: 0.75rem;
-        vertical-align: top;
-        border-top: 1px solid #dee2e6;
-    }
-
-    .table thead th {
-        vertical-align: bottom;
-        border-bottom: 2px solid #dee2e6;
+    .card-custom .card-header {
         background-color: #f8f9fa;
+        border-bottom: 1px solid #dee2e6;
+        padding: 0.75rem 1rem;
+    }
+
+    .card-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--cor03);
+    }
+
+    /* Estilização dos ciclos ativos */
+    .ciclo-item {
+        padding: 1rem;
+        border: 1px solid #e9ecef;
+        border-radius: 0.375rem;
+        background-color: #f8f9fa;
+        transition: all 0.2s ease;
+    }
+
+    .ciclo-item:hover {
+        background-color: #e9ecef;
+        border-color: var(--cor03);
+        transform: translateY(-1px);
+    }
+
+    .ciclo-nome {
+        font-weight: 600;
+        color: var(--cor03);
+        margin-bottom: 0.25rem;
+    }
+
+    /* Estilização dos cards de avaliação para alunos */
+    .avaliacao-item {
+        border: 1px solid #dee2e6;
+        border-radius: 0.5rem;
+        background-color: var(--cor07);
+        transition: all 0.2s ease;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .avaliacao-item:hover {
+        border-color: var(--cor02);
+        box-shadow: 0 0.5rem 1rem rgba(0, 253, 148, 0.15);
+        transform: translateY(-2px);
+    }
+
+    .avaliacao-header {
+        padding: 1rem 1rem 0.5rem;
+        border-bottom: 1px solid #f8f9fa;
+    }
+
+    .avaliacao-titulo {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--cor03);
+        margin-bottom: 0;
+    }
+
+    .avaliacao-body {
+        padding: 0.5rem 1rem;
+        flex-grow: 1;
+    }
+
+    .avaliacao-footer {
+        padding: 0.5rem 1rem 1rem;
+        margin-top: auto;
+    }
+
+    .info-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.5rem;
+        padding: 0.25rem 0;
+    }
+
+    .info-label {
+        font-size: 0.875rem;
+        color: #6c757d;
+        font-weight: 500;
+        flex-shrink: 0;
+        margin-right: 0.5rem;
+    }
+
+    .info-value {
+        font-size: 0.875rem;
+        color: var(--cor03);
+        text-align: right;
+        font-weight: 500;
+    }
+
+    /* Estilização da tabela */
+    .table th {
+        font-weight: 600;
+        color: var(--cor03);
+        border-bottom: 2px solid #dee2e6;
+        font-size: 0.875rem;
+    }
+
+    .table td {
+        vertical-align: middle;
+        font-size: 0.875rem;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: rgba(0, 253, 148, 0.05);
+    }
+
+    /* Badges customizados */
+    .badge {
+        font-size: 0.75rem;
+        padding: 0.35rem 0.65rem;
+        font-weight: 500;
+    }
+
+    .badge i {
+        margin-right: 0.25rem;
+    }
+
+    .bg-primary-custom {
+        background-color: var(--cor02) !important;
+        color: var(--cor05) !important;
+    }
+
+    /* Botões personalizados */
+    .btn {
+        font-weight: 500;
+        border-radius: 0.375rem;
+        transition: all 0.2s ease-in-out;
+    }
+
+    .btn-primary-custom {
+        background-color: var(--cor02);
+        border-color: var(--cor02);
+        color: var(--cor05);
         font-weight: 600;
     }
 
-    .modal-header {
-        display: flex;
-        align-items: flex-start;
-        justify-content: space-between;
-        padding: 1rem 1rem;
-        border-bottom: 1px solid #dee2e6;
-        border-top-left-radius: calc(0.3rem - 1px);
-        border-top-right-radius: calc(0.3rem - 1px);
+    .btn-primary-custom:hover {
+        background-color: var(--cor06);
+        border-color: var(--cor06);
+        color: var(--cor05);
+        transform: translateY(-1px);
     }
 
-    .modal-body {
-        position: relative;
-        flex: 1 1 auto;
-        padding: 1rem;
+    .btn-secondary-custom {
+        background-color: var(--cor03);
+        border-color: var(--cor03);
+        color: var(--cor07);
+        font-weight: 600;
     }
 
-    .modal-footer {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        justify-content: flex-end;
-        padding: 0.75rem;
-        border-top: 1px solid #dee2e6;
-        border-bottom-right-radius: calc(0.3rem - 1px);
-        border-bottom-left-radius: calc(0.3rem - 1px);
+    .btn-secondary-custom:hover {
+        background-color: var(--cor04);
+        border-color: var(--cor04);
+        color: var(--cor07);
+        transform: translateY(-1px);
     }
 
-    .modal-footer>* {
-        margin: 0.25rem;
+    .btn-outline-primary-custom {
+        color: var(--cor03);
+        border-color: var(--cor03);
+        background-color: transparent;
     }
 
-    .btn-close {
-        box-sizing: content-box;
-        width: 1em;
-        height: 1em;
-        padding: 0.25em 0.25em;
-        color: #000;
-        background: transparent url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000'%3e%3cpath d='m.235 1.786 1.55-1.55L8 6.45l6.215-6.215 1.55 1.55L9.55 8l6.215 6.215-1.55 1.55L8 9.55l-6.215 6.215-1.55-1.55L6.45 8 .235 1.786Z'/%3e%3c/svg%3e") center/1em auto no-repeat;
-        border: 0;
-        border-radius: 0.25rem;
+    .btn-outline-primary-custom:hover {
+        background-color: var(--cor03);
+        border-color: var(--cor03);
+        color: var(--cor07);
+        transform: translateY(-1px);
+    }
+
+    .btn-danger-custom {
+        background-color: var(--cor08);
+        border-color: var(--cor08);
+        color: var(--cor07);
+    }
+
+    .btn-danger-custom:hover {
+        background-color: #c82333;
+        border-color: #c82333;
+        color: var(--cor07);
+        transform: translateY(-1px);
+    }
+
+    /* Estados vazios */
+    .text-center i {
         opacity: 0.5;
-        cursor: pointer;
-    }
-
-    .btn-close:hover {
-        opacity: 0.75;
-    }
-
-    .text-muted {
-        color: #6c757d !important;
-    }
-
-    .text-center {
-        text-align: center !important;
-    }
-
-    .text-danger {
-        color: #dc3545 !important;
-    }
-
-    .mb-3 {
-        margin-bottom: 1rem !important;
-    }
-
-    /* Animações suaves */
-    .modal.fade .modal-dialog {
-        transition: transform 0.3s ease-out;
-        transform: translate(0, -50px);
-    }
-
-    .modal.show .modal-dialog {
-        transform: none;
     }
 
     /* Responsividade */
     @media (max-width: 768px) {
-        .modal-lg {
-            max-width: 95%;
+        .ciclo-item {
+            padding: 0.75rem;
         }
 
-        .modal-md {
-            max-width: 95%;
+        .avaliacao-item {
+            margin-bottom: 1rem;
         }
 
-        .table-responsive {
-            font-size: 0.875rem;
+        .info-item {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.25rem;
         }
 
-        .btn-sm {
-            padding: 0.125rem 0.25rem;
-            font-size: 0.75rem;
+        .info-value {
+            text-align: left;
+        }
+
+        .d-flex.gap-2 {
+            flex-direction: column;
+            gap: 0.5rem !important;
+        }
+
+        .btn {
+            width: 100%;
         }
     }
 
-    /* Melhoria nos botões do modal */
-    .modal .btn-sm {
-        margin: 0 0.125rem;
+    /* Animações suaves */
+    .card-custom,
+    .ciclo-item,
+    .avaliacao-item,
+    .btn {
+        transition: all 0.2s ease-in-out;
     }
 
-    .modal .btn-outline-primary {
-        border-width: 1px;
-        font-weight: 500;
+    /* Melhorias nos tooltips */
+    [data-bs-toggle="tooltip"] {
+        cursor: pointer;
     }
 
-    .modal .btn-outline-danger {
-        border-width: 1px;
-        font-weight: 500;
+    @keyframes fade-in {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 
-    .table .btn-sm {
-        white-space: nowrap;
+    .fade-in {
+        animation: fade-in 0.5s ease-out forwards;
     }
-</style>{% endblock %}
+
+    /* Badges de status personalizados */
+    .badge.bg-warning {
+        background-color: #ffc107 !important;
+        color: #212529 !important;
+    }
+
+    .badge.bg-info {
+        background-color: var(--cor06) !important;
+        color: var(--cor05) !important;
+    }
+
+    .badge.bg-success {
+        background-color: var(--cor02) !important;
+        color: var(--cor05) !important;
+    }
+
+    .badge.bg-secondary {
+        background-color: #6c757d !important;
+        color: var(--cor07) !important;
+    }
+
+    .badge.bg-light {
+        background-color: #f8f9fa !important;
+        color: var(--cor03) !important;
+        border: 1px solid #dee2e6;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Inicializar tooltips
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+
+        // Adicionar animação suave aos cards
+        const avaliacaoItems = document.querySelectorAll('.avaliacao-item');
+        avaliacaoItems.forEach((item, index) => {
+            item.style.animationDelay = `${index * 0.1}s`;
+            item.classList.add('fade-in');
+        });
+
+        // Adicionar animação aos ciclos também
+        const cicloItems = document.querySelectorAll('.ciclo-item');
+        cicloItems.forEach((item, index) => {
+            item.style.animationDelay = `${index * 0.05}s`;
+            item.classList.add('fade-in');
+        });
+
+        // Garantir que os botões tenham as classes corretas
+        const buttons = document.querySelectorAll('.btn:not([class*="btn-"])');
+        buttons.forEach(button => {
+            if (!button.className.includes('btn-')) {
+                button.classList.add('btn-primary-custom');
+            }
+        });
+    });
+</script>
+{% endblock %}

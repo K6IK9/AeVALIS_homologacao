@@ -65,8 +65,8 @@
         --cor07: #ffffff;
         --cor08: #ff3c3c;
         --shadow: 4px 2px 8px rgba(0, 0, 0, 0.2);
-        --gradient-primary: linear-gradient(135deg, var(--cor03) 0%, var(--cor04) 100%);
-        --gradient-secondary: linear-gradient(135deg, var(--cor02) 0%, var(--cor06) 100%);
+        --gradient-primary: var(--cor03);
+        --gradient-secondary: var(--cor08);
     }
 
     #modalPerfilOverlay {
@@ -75,13 +75,13 @@
         left: 0;
         width: 100vw;
         height: 100vh;
-        background: rgba(0, 0, 0, 0.6);
-        backdrop-filter: blur(5px);
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(3px);
         z-index: 2000;
         display: flex;
         align-items: center;
         justify-content: center;
-        animation: overlayFadeIn 0.3s ease-out;
+        animation: overlayFadeIn 0.2s ease-out;
     }
 
     @keyframes overlayFadeIn {
@@ -91,8 +91,8 @@
 
     #modalPerfil {
         background: var(--cor07);
-        border-radius: 24px;
-        box-shadow: 0 20px 60px rgba(55, 111, 108, 0.25);
+        border-radius: 16px;
+        box-shadow: 0 8px 32px rgba(55, 111, 108, 0.15);
         padding: 0;
         width: 45%;
         max-width: 800px;
@@ -102,13 +102,13 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        animation: modalShow 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        animation: modalShow 0.3s ease-out;
         
     }
 
     @keyframes modalShow {
         from {
-            transform: translateY(-60px) scale(0.9);
+            transform: translateY(-30px) scale(0.95);
             opacity: 0;
         }
         to {
@@ -121,26 +121,26 @@
         position: absolute;
         top: 20px;
         right: 20px;
-        background: rgba(255, 255, 255, 0.9);
-        border: none;
+        background: var(--cor07);
+        border: 2px solid var(--cor08);
         border-radius: 50%;
         width: 40px;
         height: 40px;
-        font-size: 1.8rem;
+        font-size: 1.5rem;
         color: var(--cor08);
         cursor: pointer;
         z-index: 10;
-        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        transition: all 0.2s ease;
         display: flex;
         align-items: center;
         justify-content: center;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
 
     #fecharPerfil:hover {
         background: var(--cor08);
         color: white;
-        transform: scale(1.1) rotate(90deg);
+        transform: scale(1.05);
     }
 
     #dados_modal {
@@ -149,8 +149,8 @@
         flex-direction: column;
         gap: 20px;
         align-items: center;
-        background: var(--gradient-primary);
-        border-radius: 24px;
+        background: var(--cor03);
+        border-radius: 16px;
         padding: 120px 40px 40px 40px;
         position: relative;
         min-height: 480px;
@@ -168,8 +168,8 @@
         top: 0;
         left: 50%;
         transform: translate(-50%, -50%);
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-        border: 4px solid var(--cor02);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+        border: 3px solid var(--cor02);
     }
 
     #aside_perfil_modal img {
@@ -189,15 +189,15 @@
         text-transform: uppercase;
         letter-spacing: 0.5px;
         color: white;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         border: 2px solid white;
     }
 
-    .role-admin { background: linear-gradient(45deg, #dc3545, #e74c3c); }
-    .role-coordenador { background: linear-gradient(45deg, #6f42c1, #8e44ad); }
-    .role-professor { background: linear-gradient(45deg, #fd7e14, #f39c12); }
-    .role-aluno { background: linear-gradient(45deg, #198754, #27ae60); }
-    .role-sem-role { background: linear-gradient(45deg, #6c757d, #95a5a6); }
+    .role-admin { background: var(--cor08); }
+    .role-coordenador { background: #6f42c1; }
+    .role-professor { background: #fd7e14; }
+    .role-aluno { background: #198754; }
+    .role-sem-role { background: #6c757d; }
 
     .profile-header {
         text-align: center;
@@ -209,16 +209,16 @@
         font-size: 1.8rem;
         font-weight: 600;
         margin: 0 0 8px 0;
-        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
     }
 
     .profile-type {
-        background: rgba(255, 255, 255, 0.2);
+        background: rgba(255, 255, 255, 0.25);
         padding: 6px 16px;
         border-radius: 20px;
         font-size: 0.9rem;
         font-weight: 500;
-        backdrop-filter: blur(10px);
+        backdrop-filter: blur(5px);
         border: 1px solid rgba(255, 255, 255, 0.3);
     }
 
@@ -252,12 +252,12 @@
         border-radius: 12px;
         border: none;
         background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(10px);
+        backdrop-filter: blur(5px);
         color: var(--cor03);
         font-size: 0.95rem;
         margin: 0;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
         border: 1px solid rgba(255, 255, 255, 0.6);
         display: flex;
         flex-direction: column;
@@ -265,8 +265,8 @@
     }
 
     .infos_modal:hover p {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
         background: rgba(255, 255, 255, 1);
     }
 
@@ -290,44 +290,26 @@
         padding: 14px 24px;
         border-radius: 12px;
         border: none;
-        background: var(--gradient-secondary);
-        color: var(--cor05);
+        background: var(--cor08);
+        color: white;
         font-weight: 700;
         font-size: 1rem;
         cursor: pointer;
         margin-top: 20px;
-        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-        box-shadow: 0 6px 20px rgba(255, 60, 60, 0.3);
+        transition: all 0.2s ease;
+        box-shadow: 0 4px 12px rgba(255, 60, 60, 0.25);
         display: flex;
         align-items: center;
         justify-content: center;
         gap: 8px;
         letter-spacing: 0.5px;
         text-transform: uppercase;
-        position: relative;
-        overflow: hidden;
-    }
-
-    #logout_modal::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-        transition: left 0.5s;
-    }
-
-    #logout_modal:hover::before {
-        left: 100%;
     }
 
     #logout_modal:hover {
-        background: linear-gradient(135deg, #ff3c3c, #e74c3c);
-        color: white;
-        transform: translateY(-3px);
-        box-shadow: 0 10px 25px rgba(255, 60, 60, 0.4);
+        background: #d63031;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 16px rgba(255, 60, 60, 0.3);
     }
 
     #logout_modal span {

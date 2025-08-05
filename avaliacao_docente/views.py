@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.edit import CreateView
 from django.views.generic import TemplateView
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.contrib.auth import login
 from django.db.models import Q
 from .forms import (
@@ -1133,16 +1133,18 @@ def listar_avaliacoes(request):
 
         avaliacoes = avaliacoes_disponiveis
         titulo = "Avaliações Disponíveis para Responder"
+        # Para alunos não precisamos dos ciclos
+        ciclos = []
     else:
         # Para administradores, coordenadores e professores: mostrar todas as avaliações ativas
         avaliacoes = AvaliacaoDocente.objects.filter(ciclo__ativo=True).order_by(
             "-data_criacao"
         )
         titulo = "Avaliações Docentes"
+        # Para não-alunos, mostrar os ciclos ativos
+        ciclos = CicloAvaliacao.objects.filter(ativo=True).order_by("-data_inicio")
 
-    ciclos = CicloAvaliacao.objects.filter(ativo=True).order_by("-data_inicio")
-
-    # Paginação
+    # Remover a linha duplicada de ciclos que estava fora do if/else    # Paginação
     paginator = Paginator(avaliacoes, 10)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
@@ -1153,6 +1155,114 @@ def listar_avaliacoes(request):
         "titulo": titulo,
     }
     return render(request, "avaliacoes/listar_avaliacoes.html", context)
+
+
+@login_required
+def gerenciar_questionarios(request):
+    """
+    View para gerenciar questionários de avaliação
+    Permite criar, editar e listar questionários
+    """
+    if not (check_user_permission(request.user, ["coordenador", "admin"])):
+        messages.error(request, "Você não tem permissão para gerenciar questionários.")
+        return redirect("listar_avaliacoes")
+
+    editing_id = request.GET.get("edit")
+    questionario_editando = None
+
+    if editing_id:
+        try:
+            questionario_editando = QuestionarioAvaliacao.objects.get(id=editing_id)
+        except QuestionarioAvaliacao.DoesNotExist:
+            messages.error(request, "Questionário não encontrado.")
+            return redirect("gerenciar_questionarios")
+
+    if request.method == "POST":
+        if editing_id:
+            # Editando questionário existente
+            form = QuestionarioAvaliacaoForm(
+                request.POST, instance=questionario_editando
+            )
+            if form.is_valid():
+                questionario = form.save()
+                messages.success(
+                    request,
+                    f"Questionário '{questionario.titulo}' atualizado com sucesso!",
+                )
+                return redirect("gerenciar_questionarios")
+        else:
+            # Criando novo questionário
+            form = QuestionarioAvaliacaoForm(request.POST)
+            if form.is_valid():
+                questionario = form.save(commit=False)
+                questionario.criado_por = request.user
+                questionario.save()
+                messages.success(
+                    request, f"Questionário '{questionario.titulo}' criado com sucesso!"
+                )
+                return redirect("gerenciar_questionarios")
+    else:
+        if questionario_editando:
+            form = QuestionarioAvaliacaoForm(instance=questionario_editando)
+        else:
+            form = QuestionarioAvaliacaoForm()
+
+    # Listar todos os questionários
+    questionarios = QuestionarioAvaliacao.objects.all().order_by("-data_criacao")
+
+    context = {
+        "form": form,
+        "questionarios": questionarios,
+        "editing": bool(editing_id),
+        "questionario_editando": questionario_editando,
+        "titulo": "Editar Questionário" if editing_id else "Novo Questionário",
+    }
+
+    return render(request, "gerenciar_questionarios.html", context)
+
+
+@login_required
+def editar_questionario_simples(request, questionario_id):
+    """
+    Redireciona para o gerenciamento com o questionário selecionado para edição
+    """
+    if not (check_user_permission(request.user, ["coordenador", "admin"])):
+        messages.error(request, "Você não tem permissão para editar questionários.")
+        return redirect("listar_avaliacoes")
+
+    return redirect(f"{reverse('gerenciar_questionarios')}?edit={questionario_id}")
+
+
+@login_required
+def excluir_questionario(request, questionario_id):
+    """
+    View para excluir um questionário
+    """
+    if not (check_user_permission(request.user, ["coordenador", "admin"])):
+        messages.error(request, "Você não tem permissão para excluir questionários.")
+        return redirect("listar_avaliacoes")
+
+    try:
+        questionario = QuestionarioAvaliacao.objects.get(id=questionario_id)
+        nome_questionario = questionario.titulo
+
+        # Verificar se o questionário está sendo usado em algum ciclo
+        if CicloAvaliacao.objects.filter(questionario=questionario).exists():
+            messages.error(
+                request,
+                f"Não é possível excluir o questionário '{nome_questionario}' pois está sendo usado em ciclos de avaliação.",
+            )
+            return redirect("gerenciar_questionarios")
+
+        questionario.delete()
+        messages.success(
+            request, f"Questionário '{nome_questionario}' excluído com sucesso!"
+        )
+
+    except QuestionarioAvaliacao.DoesNotExist:
+        messages.error(request, "Questionário não encontrado.")
+
+    return redirect("gerenciar_questionarios")
 
 
 @login_required
@@ -1254,37 +1364,6 @@ def editar_questionario_perguntas(request, questionario_id):
         "titulo": f"Editar Perguntas - {questionario.titulo}",
     }
     return render(request, "avaliacoes/editar_questionario_perguntas.html", context)
-
-
-@login_required
-def criar_ciclo_avaliacao(request):
-    """
-    View para criar um novo ciclo de avaliação
-    """
-    if not (check_user_permission(request.user, ["coordenador", "admin"])):
-        messages.error(
-            request, "Você não tem permissão para criar ciclos de avaliação."
-        )
-        return redirect("listar_avaliacoes")
-
-    if request.method == "POST":
-        form = CicloAvaliacaoForm(request.POST)
-        if form.is_valid():
-            ciclo = form.save(commit=False)
-            ciclo.criado_por = request.user
-            ciclo.save()
-            # Salvar as turmas (ManyToManyField)
-            form.save_m2m()
-            messages.success(request, "Ciclo de avaliação criado com sucesso!")
-            return redirect("detalhe_ciclo_avaliacao", ciclo_id=ciclo.id)
-    else:
-        form = CicloAvaliacaoForm()
-
-    return render(
-        request,
-        "avaliacoes/criar_ciclo.html",
-        {"form": form, "titulo": "Criar Ciclo de Avaliação"},
-    )
 
 
 @login_required
@@ -1520,55 +1599,88 @@ def relatorio_avaliacoes(request):
 @login_required
 def gerenciar_categorias(request):
     """
-    View para gerenciar categorias de pergunta via AJAX
+    View para gerenciar categorias de pergunta
     """
     if not check_user_permission(request.user, ["coordenador", "admin"]):
-        return JsonResponse({"error": "Permissão negada"}, status=403)
+        messages.error(request, "Você não tem permissão para acessar esta página.")
+        return redirect("inicio")
 
     if request.method == "GET":
-        # Listar todas as categorias
-        categorias = CategoriaPergunta.objects.all().order_by("ordem", "nome")
-        categorias_data = []
+        # Verificar se é uma requisição AJAX (para compatibilidade com código existente)
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            # Listar todas as categorias para AJAX
+            categorias = CategoriaPergunta.objects.all().order_by("ordem", "nome")
+            categorias_data = []
 
-        for categoria in categorias:
-            categorias_data.append(
-                {
-                    "id": categoria.id,
-                    "nome": categoria.nome,
-                    "descricao": categoria.descricao,
-                    "ordem": categoria.ordem,
-                    "ativa": categoria.ativa,
-                    "total_perguntas": categoria.perguntas.count(),
-                }
-            )
-
-        return JsonResponse({"categorias": categorias_data})
-
-    elif request.method == "POST":
-        # Criar nova categoria
-        form = CategoriaPerguntaForm(request.POST)
-        if form.is_valid():
-            categoria = form.save()
-            messages.success(
-                request, f"Categoria '{categoria.nome}' criada com sucesso!"
-            )
-            return JsonResponse(
-                {
-                    "success": True,
-                    "categoria": {
+            for categoria in categorias:
+                categorias_data.append(
+                    {
                         "id": categoria.id,
                         "nome": categoria.nome,
                         "descricao": categoria.descricao,
                         "ordem": categoria.ordem,
                         "ativa": categoria.ativa,
-                        "total_perguntas": 0,
-                    },
-                }
-            )
+                        "total_perguntas": categoria.perguntas.count(),
+                    }
+                )
+
+            return JsonResponse({"categorias": categorias_data})
         else:
-            return JsonResponse(
-                {"error": "Dados inválidos", "errors": form.errors}, status=400
-            )
+            # Renderizar template normal
+            categorias = CategoriaPergunta.objects.all().order_by("ordem", "nome")
+            form = CategoriaPerguntaForm()
+
+            context = {
+                "categorias": categorias,
+                "form": form,
+            }
+
+            return render(request, "gerenciar_categorias.html", context)
+
+    elif request.method == "POST":
+        # Verificar se é uma requisição AJAX
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            # Criar nova categoria via AJAX
+            form = CategoriaPerguntaForm(request.POST)
+            if form.is_valid():
+                categoria = form.save()
+                messages.success(
+                    request, f"Categoria '{categoria.nome}' criada com sucesso!"
+                )
+                return JsonResponse(
+                    {
+                        "success": True,
+                        "categoria": {
+                            "id": categoria.id,
+                            "nome": categoria.nome,
+                            "descricao": categoria.descricao,
+                            "ordem": categoria.ordem,
+                            "ativa": categoria.ativa,
+                            "total_perguntas": 0,
+                        },
+                    }
+                )
+            else:
+                return JsonResponse(
+                    {"error": "Dados inválidos", "errors": form.errors}, status=400
+                )
+        else:
+            # Criar nova categoria via formulário normal
+            form = CategoriaPerguntaForm(request.POST)
+            if form.is_valid():
+                categoria = form.save()
+                messages.success(
+                    request, f"Categoria '{categoria.nome}' criada com sucesso!"
+                )
+                return redirect("gerenciar_categorias")
+            else:
+                # Se houve erro, renderizar novamente o template com os erros
+                categorias = CategoriaPergunta.objects.all().order_by("ordem", "nome")
+                context = {
+                    "categorias": categorias,
+                    "form": form,
+                }
+                return render(request, "gerenciar_categorias.html", context)
 
 
 @login_required
@@ -1670,6 +1782,128 @@ def categoria_form(request, categoria_id=None):
     return render(request, "avaliacoes/categoria_form_modal.html", context)
 
 
+@login_required
+def editar_categoria(request, categoria_id):
+    """
+    View para editar uma categoria específica
+    """
+    if not check_user_permission(request.user, ["coordenador", "admin"]):
+        messages.error(request, "Você não tem permissão para acessar esta página.")
+        return redirect("inicio")
+
+    categoria = get_object_or_404(CategoriaPergunta, id=categoria_id)
+
+    if request.method == "POST":
+        form = CategoriaPerguntaForm(request.POST, instance=categoria)
+        if form.is_valid():
+            categoria = form.save()
+            messages.success(
+                request, f"Categoria '{categoria.nome}' atualizada com sucesso!"
+            )
+            return redirect("gerenciar_categorias")
+        else:
+            messages.error(request, "Erro ao atualizar categoria. Verifique os dados.")
+
+    return redirect("gerenciar_categorias")
+
+
+@login_required
+def editar_categoria_simples(request, categoria_id):
+    """
+    View para editar uma categoria específica - versão simples sem JavaScript
+    """
+    if not check_user_permission(request.user, ["coordenador", "admin"]):
+        messages.error(request, "Você não tem permissão para acessar esta página.")
+        return redirect("inicio")
+
+    categoria = get_object_or_404(CategoriaPergunta, id=categoria_id)
+
+    if request.method == "POST":
+        form = CategoriaPerguntaForm(request.POST, instance=categoria)
+        if form.is_valid():
+            categoria = form.save()
+            messages.success(
+                request, f"Categoria '{categoria.nome}' atualizada com sucesso!"
+            )
+            return redirect("gerenciar_categorias")
+        else:
+            # Se houve erro, renderizar novamente o template com os erros
+            categorias = CategoriaPergunta.objects.all().order_by("ordem", "nome")
+            context = {
+                "categorias": categorias,
+                "form": form,
+                "editing": True,
+                "categoria": categoria,
+            }
+            return render(request, "gerenciar_categorias.html", context)
+    else:
+        form = CategoriaPerguntaForm(instance=categoria)
+
+    # Buscar todas as categorias para exibir na listagem
+    categorias = CategoriaPergunta.objects.all().order_by("ordem", "nome")
+
+    context = {
+        "form": form,
+        "categorias": categorias,
+        "editing": True,
+        "categoria": categoria,
+    }
+
+    return render(request, "gerenciar_categorias.html", context)
+
+
+@login_required
+def excluir_categoria(request, categoria_id):
+    """
+    View para excluir uma categoria específica
+    """
+    if not check_user_permission(request.user, ["coordenador", "admin"]):
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            return JsonResponse({"error": "Permissão negada"}, status=403)
+        else:
+            messages.error(request, "Você não tem permissão para acessar esta página.")
+            return redirect("inicio")
+
+    categoria = get_object_or_404(CategoriaPergunta, id=categoria_id)
+
+    if request.method == "POST":
+        # Verificar se a categoria tem perguntas associadas
+        total_perguntas = categoria.perguntas.count()
+
+        if total_perguntas > 0:
+            error_msg = f"Não é possível excluir a categoria '{categoria.nome}' pois ela possui {total_perguntas} pergunta(s) associada(s)."
+
+            if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+                return JsonResponse(
+                    {"success": False, "error": error_msg},
+                    status=400,
+                )
+            else:
+                messages.error(request, error_msg)
+                return redirect("gerenciar_categorias")
+
+        nome_categoria = categoria.nome
+        categoria.delete()
+
+        success_msg = f"Categoria '{nome_categoria}' excluída com sucesso!"
+
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            return JsonResponse(
+                {
+                    "success": True,
+                    "message": success_msg,
+                }
+            )
+        else:
+            messages.success(request, success_msg)
+            return redirect("gerenciar_categorias")
+
+    if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+        return JsonResponse({"error": "Método não permitido"}, status=405)
+    else:
+        return redirect("gerenciar_categorias")
+
+
 class GestaoAvaliacoesView(LoginRequiredMixin, TemplateView):
     template_name = "admin/gestao_avaliacoes.html"
 
@@ -1724,3 +1958,106 @@ def minhas_avaliacoes(request):
         "titulo": "Minhas Avaliações",
     }
     return render(request, "avaliacoes/minhas_avaliacoes.html", context)
+
+
+# ============ CRUD CICLOS DE AVALIAÇÃO ============
+
+
+@login_required
+def gerenciar_ciclos(request):
+    """
+    View para gerenciar ciclos de avaliação
+    """
+    if not check_user_permission(request.user, ["coordenador", "admin"]):
+        messages.error(request, "Você não tem permissão para acessar esta página.")
+        return redirect("inicio")
+
+    if request.method == "POST":
+        form = CicloAvaliacaoForm(request.POST)
+        if form.is_valid():
+            ciclo = form.save(commit=False)
+            ciclo.criado_por = request.user
+            ciclo.save()
+            # Salvar as turmas (ManyToManyField)
+            form.save_m2m()
+            messages.success(request, f"Ciclo '{ciclo.nome}' criado com sucesso!")
+            return redirect("gerenciar_ciclos")
+        else:
+            # Se houve erro, renderizar novamente o template com os erros
+            ciclos = CicloAvaliacao.objects.all().order_by("-data_inicio")
+            context = {
+                "ciclos": ciclos,
+                "form": form,
+            }
+            return render(request, "gerenciar_ciclos.html", context)
+    else:
+        form = CicloAvaliacaoForm()
+
+    # Lista todos os ciclos
+    ciclos = CicloAvaliacao.objects.all().order_by("-data_inicio")
+
+    context = {"form": form, "ciclos": ciclos}
+
+    return render(request, "gerenciar_ciclos.html", context)
+
+
+@login_required
+def editar_ciclo_simples(request, ciclo_id):
+    """
+    View para editar um ciclo de avaliação - versão simples sem JavaScript
+    """
+    if not check_user_permission(request.user, ["coordenador", "admin"]):
+        messages.error(
+            request, "Você não tem permissão para editar ciclos de avaliação."
+        )
+        return redirect("inicio")
+
+    ciclo = get_object_or_404(CicloAvaliacao, id=ciclo_id)
+
+    if request.method == "POST":
+        form = CicloAvaliacaoForm(request.POST, instance=ciclo)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f"Ciclo '{ciclo.nome}' atualizado com sucesso!")
+            return redirect("gerenciar_ciclos")
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"Erro no campo {field}: {error}")
+    else:
+        form = CicloAvaliacaoForm(instance=ciclo)
+
+    context = {"form": form, "ciclo": ciclo, "editing": True}
+    return render(request, "gerenciar_ciclos.html", context)
+
+
+@login_required
+def excluir_ciclo(request, ciclo_id):
+    """
+    View para excluir um ciclo de avaliação
+    """
+    if not check_user_permission(request.user, ["coordenador", "admin"]):
+        messages.error(
+            request, "Você não tem permissão para excluir ciclos de avaliação."
+        )
+        return redirect("inicio")
+
+    ciclo = get_object_or_404(CicloAvaliacao, id=ciclo_id)
+
+    if request.method == "POST":
+        # Verificar se o ciclo tem avaliações associadas
+        total_avaliacoes = ciclo.avaliacoes.count()
+
+        if total_avaliacoes > 0:
+            error_msg = f"Não é possível excluir o ciclo '{ciclo.nome}' pois ele possui {total_avaliacoes} avaliação(ões) associada(s)."
+            messages.error(request, error_msg)
+            return redirect("gerenciar_ciclos")
+
+        nome_ciclo = ciclo.nome
+        ciclo.delete()
+
+        success_msg = f"Ciclo '{nome_ciclo}' excluído com sucesso!"
+        messages.success(request, success_msg)
+        return redirect("gerenciar_ciclos")
+
+    return redirect("gerenciar_ciclos")
