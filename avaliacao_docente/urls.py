@@ -1,9 +1,10 @@
 from django.urls import path
 
 from . import views
-from .views import AdminHubView, GestaoAvaliacoesView, IndexView
+from .views import AdminHubView, IndexView
 
 urlpatterns = [
+    
     path("gerenciar-roles/", views.gerenciar_roles, name="gerenciar_roles"),
     path("gerenciar-usuarios/", views.gerenciar_usuarios, name="gerenciar_usuarios"),
     path(
@@ -51,11 +52,11 @@ urlpatterns = [
     # URLs para Avaliação Docente
     path("avaliacoes/", views.listar_avaliacoes, name="listar_avaliacoes"),
     path("minhas-avaliacoes/", views.minhas_avaliacoes, name="minhas_avaliacoes"),
-    path(
-        "avaliacoes/criar-questionario/",
-        views.criar_questionario_avaliacao,
-        name="criar_questionario_avaliacao",
-    ),
+    # path(
+    #     "avaliacoes/criar-questionario/",
+    #     views.criar_questionario_avaliacao,
+    #     name="criar_questionario_avaliacao",
+    # ),
     path(
         "avaliacoes/gerenciar-questionarios/",
         views.gerenciar_questionarios,
@@ -103,12 +104,12 @@ urlpatterns = [
         views.categoria_detail,
         name="categoria_detail",
     ),
-    path("categorias/form/", views.categoria_form, name="categoria_form"),
-    path(
-        "categorias/form/<int:categoria_id>/",
-        views.categoria_form,
-        name="categoria_form_edit",
-    ),
+    # path("categorias/form/", views.categoria_form, name="categoria_form"),
+    # path(
+    #     "categorias/form/<int:categoria_id>/",
+    #     views.categoria_form,
+    #     name="categoria_form_edit",
+    # ),
     path(
         "categorias/<int:categoria_id>/edit/",
         views.editar_categoria,

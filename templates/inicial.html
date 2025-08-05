@@ -204,6 +204,13 @@
             box-shadow: 0 4px 15px rgba(0, 253, 148, 0.25);
         }
 
+        /* Links que contêm botões */
+        .opcao-link {
+            width: 100%;
+            text-decoration: none;
+            display: block;
+        }
+
         #opcoes button:hover {
             transform: translateY(-1px);
             background: var(--cor06);
@@ -358,12 +365,15 @@
         </h1>
         <section id="opcoes">
             <h2>Opções Disponíveis</h2>
-            <button onclick="window.location.href='{% url 'listar_avaliacoes' %}'" id="realizar_avaliacao">Gerenciar
-                Avaliações Docentes</button>
-            <button onclick="window.location.href='{% url 'relatorio_avaliacoes' %}'"
-                id="relatorio_avaliacoes">Relatórios de Avaliações</button>
-            <button onclick="window.location.href='{% url 'admin_hub' %}'" id="admin_hub">Acessar Hub
-                Administrativo</button>
+            <a href="{% url 'listar_avaliacoes' %}" class="opcao-link">
+                <button id="realizar_avaliacao">Gerenciar Avaliações Docentes</button>
+            </a>
+            <a href="{% url 'relatorio_avaliacoes' %}" class="opcao-link">
+                <button id="relatorio_avaliacoes">Relatórios de Avaliações</button>
+            </a>
+            <a href="{% url 'admin_hub' %}" class="opcao-link">
+                <button id="admin_hub">Acessar Hub Administrativo</button>
+            </a>
         </section>
 
 
@@ -377,10 +387,12 @@
         </h1>
         <section id="opcoes">
             <h2>Opções Disponíveis</h2>
-            <button onclick="window.location.href='{% url 'listar_avaliacoes' %}'" id="realizar_avaliacao">Gerenciar
-                Avaliações Docentes</button>
-            <button onclick="window.location.href='{% url 'relatorio_avaliacoes' %}'"
-                id="relatorio_avaliacoes">Relatórios de Avaliações</button>
+            <a href="{% url 'listar_avaliacoes' %}" class="opcao-link">
+                <button id="realizar_avaliacao">Gerenciar Avaliações Docentes</button>
+            </a>
+            <a href="{% url 'relatorio_avaliacoes' %}" class="opcao-link">
+                <button id="relatorio_avaliacoes">Relatórios de Avaliações</button>
+            </a>
         </section>
         {% elif user|has_role:'professor' %}
         <h1>Seja bem-vindo(a) Professor:
@@ -392,10 +404,12 @@
         </h1>
         <section id="opcoes">
             <h2>Opções Disponíveis</h2>
-            <button onclick="window.location.href='{% url 'listar_avaliacoes' %}'" id="realizar_avaliacao">Ver Minhas
-                Avaliações</button>
-            <button onclick="window.location.href='{% url 'relatorio_avaliacoes' %}'"
-                id="relatorio_avaliacoes">Histórico de Avaliações</button>
+            <a href="{% url 'listar_avaliacoes' %}" class="opcao-link">
+                <button id="realizar_avaliacao">Ver Minhas Avaliações</button>
+            </a>
+            <a href="{% url 'relatorio_avaliacoes' %}" class="opcao-link">
+                <button id="relatorio_avaliacoes">Histórico de Avaliações</button>
+            </a>
         </section>
         {% elif user|has_role:'aluno' %}
         <h1>Seja bem-vindo(a) Aluno:
@@ -407,10 +421,12 @@
         </h1>
         <section id="opcoes">
             <h2>Opções Disponíveis</h2>
-            <button onclick="window.location.href='{% url 'listar_avaliacoes' %}'" id="responder_avaliacao">Responder
-                Avaliação Docente</button>
-            <button onclick="window.location.href='{% url 'minhas_avaliacoes' %}'" id="ver_avaliacoes_anteriores">Ver
-                Avaliações Anteriores</button>
+            <a href="{% url 'listar_avaliacoes' %}" class="opcao-link">
+                <button id="responder_avaliacao">Responder Avaliação Docente</button>
+            </a>
+            <a href="{% url 'minhas_avaliacoes' %}" class="opcao-link">
+                <button id="ver_avaliacoes_anteriores">Ver Avaliações Anteriores</button>
+            </a>
         </section>
         {% else %}
         <h1>Seja bem-vindo(a)

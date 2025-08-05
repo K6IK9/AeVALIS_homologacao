@@ -171,9 +171,11 @@
 
 <body>
     <header>
-        <button id="voltar" onclick="window.history.back();">
-            <img src="{% static 'assets/back_seta.svg' %}" alt="Voltar">
-        </button>
+        <a href="{% url 'inicio' %}">
+            <button id="voltar">
+                <img src="{% static 'assets/back_seta.svg' %}" alt="Voltar">
+            </button>
+        </a>
         <button id="perfil">
             <img src="{% static 'assets/perfil.svg' %}" alt="Perfil">
         </button>

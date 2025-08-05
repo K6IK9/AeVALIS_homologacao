@@ -1265,34 +1265,34 @@ def excluir_questionario(request, questionario_id):
     return redirect("gerenciar_questionarios")
 
 
-@login_required
-def criar_questionario_avaliacao(request):
-    """
-    View para criar um novo questionário de avaliação
-    Apenas coordenadores e admins podem criar
-    """
-    if not (check_user_permission(request.user, ["coordenador", "admin"])):
-        messages.error(request, "Você não tem permissão para criar questionários.")
-        return redirect("listar_avaliacoes")
+# @login_required
+# def criar_questionario_avaliacao(request):
+#     """
+#     View para criar um novo questionário de avaliação
+#     Apenas coordenadores e admins podem criar
+#     """
+#     if not (check_user_permission(request.user, ["coordenador", "admin"])):
+#         messages.error(request, "Você não tem permissão para criar questionários.")
+#         return redirect("listar_avaliacoes")
 
-    if request.method == "POST":
-        form = QuestionarioAvaliacaoForm(request.POST)
-        if form.is_valid():
-            questionario = form.save(commit=False)
-            questionario.criado_por = request.user
-            questionario.save()
-            messages.success(request, "Questionário criado com sucesso!")
-            return redirect(
-                "editar_questionario_perguntas", questionario_id=questionario.id
-            )
-    else:
-        form = QuestionarioAvaliacaoForm()
+#     if request.method == "POST":
+#         form = QuestionarioAvaliacaoForm(request.POST)
+#         if form.is_valid():
+#             questionario = form.save(commit=False)
+#             questionario.criado_por = request.user
+#             questionario.save()
+#             messages.success(request, "Questionário criado com sucesso!")
+#             return redirect(
+#                 "editar_questionario_perguntas", questionario_id=questionario.id
+#             )
+#     else:
+#         form = QuestionarioAvaliacaoForm()
 
-    return render(
-        request,
-        "avaliacoes/criar_questionario.html",
-        {"form": form, "titulo": "Criar Questionário de Avaliação"},
-    )
+#     return render(
+#         request,
+#         "avaliacoes/criar_questionario.html",
+#         {"form": form, "titulo": "Criar Questionário de Avaliação"},
+#     )
 
 
 @login_required
@@ -1759,27 +1759,27 @@ def categoria_detail(request, categoria_id):
         )
 
 
-@login_required
-def categoria_form(request, categoria_id=None):
-    """
-    View para renderizar o formulário de categoria (para modal)
-    """
-    if not check_user_permission(request.user, ["coordenador", "admin"]):
-        return JsonResponse({"error": "Permissão negada"}, status=403)
+# @login_required
+# def categoria_form(request, categoria_id=None):
+#     """
+#     View para renderizar o formulário de categoria (para modal)
+#     """
+#     if not check_user_permission(request.user, ["coordenador", "admin"]):
+#         return JsonResponse({"error": "Permissão negada"}, status=403)
 
-    categoria = None
-    if categoria_id:
-        categoria = get_object_or_404(CategoriaPergunta, id=categoria_id)
+#     categoria = None
+#     if categoria_id:
+#         categoria = get_object_or_404(CategoriaPergunta, id=categoria_id)
 
-    form = CategoriaPerguntaForm(instance=categoria)
+#     form = CategoriaPerguntaForm(instance=categoria)
 
-    context = {
-        "form": form,
-        "categoria": categoria,
-        "is_edit": categoria is not None,
-    }
+#     context = {
+#         "form": form,
+#         "categoria": categoria,
+#         "is_edit": categoria is not None,
+#     }
 
-    return render(request, "avaliacoes/categoria_form_modal.html", context)
+#     return render(request, "avaliacoes/categoria_form_modal.html", context)
 
 
 @login_required
@@ -1902,30 +1902,6 @@ def excluir_categoria(request, categoria_id):
         return JsonResponse({"error": "Método não permitido"}, status=405)
     else:
         return redirect("gerenciar_categorias")
-
-
-class GestaoAvaliacoesView(LoginRequiredMixin, TemplateView):
-    template_name = "admin/gestao_avaliacoes.html"
-
-    def dispatch(self, request, *args, **kwargs):
-        """Verifica se o usuário tem permissão para acessar a gestão de avaliações"""
-        if not check_user_permission(request.user, ["coordenador", "admin"]):
-            messages.error(request, "Você não tem permissão para acessar esta página.")
-            return redirect("inicio")
-        return super().dispatch(request, *args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        # Estatísticas do sistema de avaliação
-        context["stats"] = {
-            "total_ciclos": CicloAvaliacao.objects.count(),
-            "ciclos_ativos": CicloAvaliacao.objects.filter(ativo=True).count(),
-            "total_questionarios": QuestionarioAvaliacao.objects.count(),
-            "total_avaliacoes": AvaliacaoDocente.objects.count(),
-        }
-
-        return context
 
 
 @login_required
