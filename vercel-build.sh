@@ -1,7 +1,7 @@
 #!/bin/bash
 # Script para rodar collectstatic e garantir que a pasta staticfiles seja copiada para static para o Vercel servir corretamente
 
-python manage.py collectstatic --noinput
+python3 manage.py collectstatic --noinput
 
 # Remove a pasta static antiga, se existir
 rm -rf static
