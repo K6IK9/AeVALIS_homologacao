@@ -140,8 +140,8 @@ STATIC_URL = "static/"
 
 # Diretórios onde o Django procura arquivos estáticos durante desenvolvimento
 # STATICFILES_DIRS = [
-    BASE_DIR / "static",
-]
+ #  BASE_DIR / "static",
+#]
 
 STATIC_DIRS = [os.path.join(BASE_DIR, 'static')]
 
