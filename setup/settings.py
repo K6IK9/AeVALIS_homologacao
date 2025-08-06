@@ -46,6 +46,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",  # Para servir arquivos estáticos
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -79,15 +80,15 @@ WSGI_APPLICATION = "setup.wsgi.application"
 
 # Banco de dados PostgreSQL e esta hospedado na Vercel
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config('DB_NAME'),
-        'USER': config('DB_USER'),
-        'PASSWORD': config('DB_PASSWORD'),
-        'HOST': config('DB_HOST', default='localhost'),
-        'PORT': config('DB_PORT', default='5432'),
-        'OPTIONS': {
-            'sslmode': 'require',
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": config("DB_NAME"),
+        "USER": config("DB_USER"),
+        "PASSWORD": config("DB_PASSWORD"),
+        "HOST": config("DB_HOST", default="localhost"),
+        "PORT": config("DB_PORT", default="5432"),
+        "OPTIONS": {
+            "sslmode": "require",
         },
     }
 }
@@ -167,3 +168,47 @@ LOGIN_LOGOUT_REDIRECT_URL = ""  # Redireciona para a página de login após o lo
 
 
 ROLEPERMISSIONS_MODULE = "setup.roles"  # Define o módulo de permissões de função
+
+# ============ CONFIGURAÇÕES ESPECÍFICAS PARA VERCEL ============
+
+# Configurações de segurança para produção
+if not DEBUG:
+    # Headers de segurança
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    X_FRAME_OPTIONS = "DENY"
+
+    # HTTPS em produção
+    SECURE_SSL_REDIRECT = False  # Vercel já gerencia HTTPS
+
+    # Configuração para servir arquivos estáticos
+    STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
+    # WhiteNoise configurations
+    WHITENOISE_USE_FINDERS = True
+    WHITENOISE_AUTOREFRESH = True
+
+# Configuração para lidar com headers do Vercel
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+# Configurações de timeout para Vercel (máximo 10 segundos para hobby plan)
+if "VERCEL" in os.environ:
+    # Configurações específicas do Vercel
+    DATABASES["default"]["CONN_MAX_AGE"] = 0  # Não usar conexões persistentes
+
+    # Log para debugging no Vercel
+    LOGGING = {
+        "version": 1,
+        "disable_existing_loggers": False,
+        "handlers": {
+            "console": {
+                "class": "logging.StreamHandler",
+            },
+        },
+        "loggers": {
+            "django": {
+                "handlers": ["console"],
+                "level": "INFO",
+            },
+        },
+    }
