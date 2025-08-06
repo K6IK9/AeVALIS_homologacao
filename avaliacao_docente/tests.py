@@ -11,6 +11,14 @@ from .models import (
     PeriodoLetivo,
     Turma,
     MatriculaTurma,
+    QuestionarioAvaliacao,
+    CategoriaPergunta,
+    PerguntaAvaliacao,
+    QuestionarioPergunta,
+    CicloAvaliacao,
+    AvaliacaoDocente,
+    RespostaAvaliacao,
+    ComentarioAvaliacao,
 )
 from .views import gerenciar_perfil_usuario
 import datetime
@@ -568,3 +576,456 @@ class IntegrationTestCase(TestCase):
         self.assertEqual(Disciplina.objects.count(), 1)
         self.assertEqual(Turma.objects.count(), 1)
         self.assertEqual(PeriodoLetivo.objects.count(), 1)
+
+
+class AvaliacaoDocenteTestCase(TestCase):
+    """Testes para os modelos do sistema de avaliação docente"""
+
+    def setUp(self):
+        # Criar usuários
+        self.user_admin = User.objects.create_user(
+            username="admin123456",
+            email="admin@exemplo.com",
+            first_name="Admin",
+            last_name="Sistema",
+            password="senha123",
+        )
+        assign_role(self.user_admin, "admin")
+
+        self.user_professor = User.objects.create_user(
+            username="prof123456",
+            email="prof@exemplo.com",
+            first_name="Professor",
+            last_name="Teste",
+            password="senha123",
+        )
+        assign_role(self.user_professor, "professor")
+
+        self.user_aluno = User.objects.create_user(
+            username="aluno123456",
+            email="aluno@exemplo.com",
+            first_name="Aluno",
+            last_name="Teste",
+            password="senha123",
+        )
+        assign_role(self.user_aluno, "aluno")
+
+        # Criar perfis
+        self.perfil_professor = PerfilProfessor.objects.create(
+            user=self.user_professor, registro_academico="PROF001"
+        )
+
+        self.perfil_aluno = PerfilAluno.objects.create(
+            user=self.user_aluno, situacao="Ativo"
+        )
+
+        # Criar estrutura acadêmica
+        self.periodo, created = PeriodoLetivo.objects.get_or_create(
+            ano=2024, semestre=1, defaults={"nome": "Período 2024.1"}
+        )
+
+        self.curso = Curso.objects.create(
+            curso_nome="Informática",
+            curso_sigla="INFO",
+            coordenador_curso=self.perfil_professor,
+        )
+
+        self.disciplina = Disciplina.objects.create(
+            disciplina_nome="Programação",
+            disciplina_sigla="PROG",
+            disciplina_tipo="Obrigatória",
+            curso=self.curso,
+            professor=self.perfil_professor,
+            periodo_letivo=self.periodo,
+        )
+
+        self.turma = Turma.objects.create(
+            disciplina=self.disciplina,
+            professor=self.perfil_professor,
+            periodo_letivo=self.periodo,
+            turno="matutino",
+        )
+
+        # Matricular aluno
+        self.matricula = MatriculaTurma.objects.create(
+            aluno=self.perfil_aluno, turma=self.turma
+        )
+
+    def test_questionario_avaliacao_creation(self):
+        """Testa criação de questionário de avaliação"""
+        questionario = QuestionarioAvaliacao.objects.create(
+            titulo="Avaliação Docente 2024.1",
+            descricao="Questionário para avaliar o desempenho dos docentes",
+            criado_por=self.user_admin,
+        )
+
+        self.assertEqual(questionario.titulo, "Avaliação Docente 2024.1")
+        self.assertTrue(questionario.ativo)
+        self.assertEqual(questionario.criado_por, self.user_admin)
+        self.assertEqual(str(questionario), "Avaliação Docente 2024.1")
+
+    def test_categoria_pergunta_creation(self):
+        """Testa criação de categoria de pergunta"""
+        categoria = CategoriaPergunta.objects.create(
+            nome="Didática",
+            descricao="Perguntas relacionadas à metodologia de ensino",
+            ordem=1,
+        )
+
+        self.assertEqual(categoria.nome, "Didática")
+        self.assertEqual(categoria.ordem, 1)
+        self.assertTrue(categoria.ativa)
+        self.assertEqual(str(categoria), "Didática")
+
+    def test_pergunta_avaliacao_creation(self):
+        """Testa criação de pergunta de avaliação"""
+        categoria = CategoriaPergunta.objects.create(
+            nome="Didática", descricao="Metodologia de ensino"
+        )
+
+        pergunta = PerguntaAvaliacao.objects.create(
+            enunciado="O professor explica o conteúdo de forma clara?",
+            tipo="likert",
+            categoria=categoria,
+            ordem=1,
+        )
+
+        self.assertEqual(pergunta.tipo, "likert")
+        self.assertTrue(pergunta.obrigatoria)
+        self.assertTrue(pergunta.ativa)
+        self.assertEqual(pergunta.categoria, categoria)
+        self.assertIn("O professor explica", str(pergunta))
+
+    def test_questionario_pergunta_relationship(self):
+        """Testa relacionamento entre questionário e pergunta"""
+        questionario = QuestionarioAvaliacao.objects.create(
+            titulo="Teste Questionário", criado_por=self.user_admin
+        )
+
+        categoria = CategoriaPergunta.objects.create(nome="Didática")
+
+        pergunta = PerguntaAvaliacao.objects.create(
+            enunciado="Pergunta teste", tipo="likert", categoria=categoria
+        )
+
+        rel = QuestionarioPergunta.objects.create(
+            questionario=questionario, pergunta=pergunta, ordem_no_questionario=1
+        )
+
+        self.assertEqual(rel.questionario, questionario)
+        self.assertEqual(rel.pergunta, pergunta)
+        self.assertEqual(rel.ordem_no_questionario, 1)
+
+    def test_ciclo_avaliacao_creation(self):
+        """Testa criação de ciclo de avaliação"""
+        from django.utils import timezone
+        from datetime import timedelta
+
+        questionario = QuestionarioAvaliacao.objects.create(
+            titulo="Questionário Teste", criado_por=self.user_admin
+        )
+
+        data_inicio = timezone.now()
+        data_fim = data_inicio + timedelta(days=30)
+
+        ciclo = CicloAvaliacao.objects.create(
+            nome="Ciclo Teste 2024.1",
+            periodo_letivo=self.periodo,
+            data_inicio=data_inicio,
+            data_fim=data_fim,
+            questionario=questionario,
+            criado_por=self.user_admin,
+        )
+
+        self.assertEqual(ciclo.nome, "Ciclo Teste 2024.1")
+        self.assertEqual(ciclo.questionario, questionario)
+        self.assertTrue(ciclo.ativo)
+        self.assertTrue(ciclo.permite_avaliacao_anonima)
+        self.assertEqual(str(ciclo), f"Ciclo Teste 2024.1 ({self.periodo})")
+
+    def test_ciclo_avaliacao_status_property(self):
+        """Testa propriedade status do ciclo de avaliação"""
+        from django.utils import timezone
+        from datetime import timedelta
+
+        questionario = QuestionarioAvaliacao.objects.create(
+            titulo="Questionário Teste", criado_por=self.user_admin
+        )
+
+        now = timezone.now()
+
+        # Ciclo futuro
+        ciclo_futuro = CicloAvaliacao.objects.create(
+            nome="Ciclo Futuro",
+            periodo_letivo=self.periodo,
+            data_inicio=now + timedelta(days=1),
+            data_fim=now + timedelta(days=30),
+            questionario=questionario,
+            criado_por=self.user_admin,
+        )
+
+        # Ciclo passado
+        ciclo_passado = CicloAvaliacao.objects.create(
+            nome="Ciclo Passado",
+            periodo_letivo=self.periodo,
+            data_inicio=now - timedelta(days=30),
+            data_fim=now - timedelta(days=1),
+            questionario=questionario,
+            criado_por=self.user_admin,
+        )
+
+        # Ciclo atual
+        ciclo_atual = CicloAvaliacao.objects.create(
+            nome="Ciclo Atual",
+            periodo_letivo=self.periodo,
+            data_inicio=now - timedelta(days=1),
+            data_fim=now + timedelta(days=1),
+            questionario=questionario,
+            criado_por=self.user_admin,
+        )
+
+        self.assertEqual(ciclo_futuro.status, "agendado")
+        self.assertEqual(ciclo_passado.status, "finalizado")
+        self.assertEqual(ciclo_atual.status, "em_andamento")
+
+    def test_avaliacao_docente_creation(self):
+        """Testa criação de avaliação docente"""
+        questionario = QuestionarioAvaliacao.objects.create(
+            titulo="Questionário Teste", criado_por=self.user_admin
+        )
+
+        from django.utils import timezone
+        from datetime import timedelta
+
+        data_inicio = timezone.now()
+        data_fim = data_inicio + timedelta(days=30)
+
+        ciclo = CicloAvaliacao.objects.create(
+            nome="Ciclo Teste",
+            periodo_letivo=self.periodo,
+            data_inicio=data_inicio,
+            data_fim=data_fim,
+            questionario=questionario,
+            criado_por=self.user_admin,
+        )
+
+        avaliacao = AvaliacaoDocente.objects.create(
+            ciclo=ciclo,
+            turma=self.turma,
+            professor=self.perfil_professor,
+            disciplina=self.disciplina,
+        )
+
+        self.assertEqual(avaliacao.ciclo, ciclo)
+        self.assertEqual(avaliacao.turma, self.turma)
+        self.assertEqual(avaliacao.professor, self.perfil_professor)
+        self.assertEqual(avaliacao.status, "pendente")
+
+    def test_resposta_avaliacao_creation(self):
+        """Testa criação de resposta de avaliação"""
+        # Criar estrutura completa
+        questionario = QuestionarioAvaliacao.objects.create(
+            titulo="Questionário Teste", criado_por=self.user_admin
+        )
+
+        categoria = CategoriaPergunta.objects.create(nome="Didática")
+
+        pergunta = PerguntaAvaliacao.objects.create(
+            enunciado="Pergunta teste", tipo="likert", categoria=categoria
+        )
+
+        from django.utils import timezone
+        from datetime import timedelta
+
+        data_inicio = timezone.now()
+        data_fim = data_inicio + timedelta(days=30)
+
+        ciclo = CicloAvaliacao.objects.create(
+            nome="Ciclo Teste",
+            periodo_letivo=self.periodo,
+            data_inicio=data_inicio,
+            data_fim=data_fim,
+            questionario=questionario,
+            criado_por=self.user_admin,
+        )
+
+        avaliacao = AvaliacaoDocente.objects.create(
+            ciclo=ciclo,
+            turma=self.turma,
+            professor=self.perfil_professor,
+            disciplina=self.disciplina,
+        )
+
+        resposta = RespostaAvaliacao.objects.create(
+            avaliacao=avaliacao,
+            aluno=self.perfil_aluno,
+            pergunta=pergunta,
+            valor_numerico=5,
+        )
+
+        self.assertEqual(resposta.avaliacao, avaliacao)
+        self.assertEqual(resposta.aluno, self.perfil_aluno)
+        self.assertEqual(resposta.pergunta, pergunta)
+        self.assertEqual(resposta.valor_numerico, 5)
+        self.assertFalse(resposta.anonima)
+
+    def test_resposta_valor_display(self):
+        """Testa método valor_display das respostas"""
+        questionario = QuestionarioAvaliacao.objects.create(
+            titulo="Questionário Teste", criado_por=self.user_admin
+        )
+
+        categoria = CategoriaPergunta.objects.create(nome="Didática")
+
+        # Pergunta Likert
+        pergunta_likert = PerguntaAvaliacao.objects.create(
+            enunciado="Pergunta Likert", tipo="likert", categoria=categoria
+        )
+
+        # Pergunta NPS
+        pergunta_nps = PerguntaAvaliacao.objects.create(
+            enunciado="Pergunta NPS", tipo="nps", categoria=categoria
+        )
+
+        # Pergunta Sim/Não
+        pergunta_sim_nao = PerguntaAvaliacao.objects.create(
+            enunciado="Pergunta Sim/Não", tipo="sim_nao", categoria=categoria
+        )
+
+        from django.utils import timezone
+        from datetime import timedelta
+
+        data_inicio = timezone.now()
+        data_fim = data_inicio + timedelta(days=30)
+
+        ciclo = CicloAvaliacao.objects.create(
+            nome="Ciclo Teste",
+            periodo_letivo=self.periodo,
+            data_inicio=data_inicio,
+            data_fim=data_fim,
+            questionario=questionario,
+            criado_por=self.user_admin,
+        )
+
+        avaliacao = AvaliacaoDocente.objects.create(
+            ciclo=ciclo,
+            turma=self.turma,
+            professor=self.perfil_professor,
+            disciplina=self.disciplina,
+        )
+
+        # Testar resposta Likert
+        resposta_likert = RespostaAvaliacao.objects.create(
+            avaliacao=avaliacao,
+            aluno=self.perfil_aluno,
+            pergunta=pergunta_likert,
+            valor_numerico=5,
+        )
+        self.assertIn("Concordo totalmente", resposta_likert.valor_display())
+
+        # Testar resposta NPS
+        resposta_nps = RespostaAvaliacao.objects.create(
+            avaliacao=avaliacao,
+            aluno=self.perfil_aluno,
+            pergunta=pergunta_nps,
+            valor_numerico=9,
+        )
+        self.assertEqual(resposta_nps.valor_display(), "9/10")
+
+        # Testar resposta Sim/Não
+        resposta_sim_nao = RespostaAvaliacao.objects.create(
+            avaliacao=avaliacao,
+            aluno=self.perfil_aluno,
+            pergunta=pergunta_sim_nao,
+            valor_boolean=True,
+        )
+        self.assertEqual(resposta_sim_nao.valor_display(), "Sim")
+
+    def test_comentario_avaliacao_creation(self):
+        """Testa criação de comentário de avaliação"""
+        questionario = QuestionarioAvaliacao.objects.create(
+            titulo="Questionário Teste", criado_por=self.user_admin
+        )
+
+        from django.utils import timezone
+        from datetime import timedelta
+
+        data_inicio = timezone.now()
+        data_fim = data_inicio + timedelta(days=30)
+
+        ciclo = CicloAvaliacao.objects.create(
+            nome="Ciclo Teste",
+            periodo_letivo=self.periodo,
+            data_inicio=data_inicio,
+            data_fim=data_fim,
+            questionario=questionario,
+            criado_por=self.user_admin,
+        )
+
+        avaliacao = AvaliacaoDocente.objects.create(
+            ciclo=ciclo,
+            turma=self.turma,
+            professor=self.perfil_professor,
+            disciplina=self.disciplina,
+        )
+
+        comentario = ComentarioAvaliacao.objects.create(
+            avaliacao=avaliacao,
+            aluno=self.perfil_aluno,
+            elogios="Excelente professor!",
+            sugestoes="Poderia usar mais exemplos práticos",
+        )
+
+        self.assertEqual(comentario.avaliacao, avaliacao)
+        self.assertEqual(comentario.aluno, self.perfil_aluno)
+        self.assertEqual(comentario.elogios, "Excelente professor!")
+        self.assertFalse(comentario.anonimo)
+
+    def test_avaliacao_docente_calculos(self):
+        """Testa métodos de cálculo da avaliação docente"""
+        # Criar estrutura completa
+        questionario = QuestionarioAvaliacao.objects.create(
+            titulo="Questionário Teste", criado_por=self.user_admin
+        )
+
+        categoria = CategoriaPergunta.objects.create(nome="Didática")
+
+        pergunta = PerguntaAvaliacao.objects.create(
+            enunciado="Pergunta teste", tipo="likert", categoria=categoria
+        )
+
+        from django.utils import timezone
+        from datetime import timedelta
+
+        data_inicio = timezone.now()
+        data_fim = data_inicio + timedelta(days=30)
+
+        ciclo = CicloAvaliacao.objects.create(
+            nome="Ciclo Teste",
+            periodo_letivo=self.periodo,
+            data_inicio=data_inicio,
+            data_fim=data_fim,
+            questionario=questionario,
+            criado_por=self.user_admin,
+        )
+
+        avaliacao = AvaliacaoDocente.objects.create(
+            ciclo=ciclo,
+            turma=self.turma,
+            professor=self.perfil_professor,
+            disciplina=self.disciplina,
+        )
+
+        # Adicionar resposta
+        RespostaAvaliacao.objects.create(
+            avaliacao=avaliacao,
+            aluno=self.perfil_aluno,
+            pergunta=pergunta,
+            valor_numerico=4,
+        )
+
+        # Testar métodos
+        self.assertEqual(avaliacao.total_respostas(), 1)
+        self.assertEqual(len(avaliacao.alunos_aptos()), 1)
+        self.assertEqual(avaliacao.percentual_participacao(), 100.0)
+        self.assertEqual(avaliacao.media_geral(), 4.0)
