@@ -150,7 +150,27 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
-# Default primary key field type
+# WhiteNoise configuration para produção
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
+# Configurações do WhiteNoise
+WHITENOISE_USE_FINDERS = True
+WHITENOISE_AUTOREFRESH = True
+WHITENOISE_SKIP_COMPRESS_EXTENSIONS = [
+    "jpg",
+    "jpeg",
+    "png",
+    "gif",
+    "webp",
+    "zip",
+    "gz",
+    "tgz",
+    "bz2",
+    "tbz",
+    "xz",
+    "br",
+]
+WHITENOISE_MAX_AGE = 31536000  # 1 ano# Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
@@ -180,13 +200,6 @@ if not DEBUG:
 
     # HTTPS em produção
     SECURE_SSL_REDIRECT = False  # Vercel já gerencia HTTPS
-
-    # Configuração para servir arquivos estáticos
-    STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
-
-    # WhiteNoise configurations
-    WHITENOISE_USE_FINDERS = True
-    WHITENOISE_AUTOREFRESH = True
 
 # Configuração para lidar com headers do Vercel
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")

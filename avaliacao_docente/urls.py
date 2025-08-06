@@ -4,7 +4,6 @@ from . import views
 from .views import AdminHubView, IndexView
 
 urlpatterns = [
-    
     path("gerenciar-roles/", views.gerenciar_roles, name="gerenciar_roles"),
     path("gerenciar-usuarios/", views.gerenciar_usuarios, name="gerenciar_usuarios"),
     path(
@@ -137,5 +136,6 @@ urlpatterns = [
         views.excluir_ciclo,
         name="excluir_ciclo",
     ),
+    path("debug-static/", views.debug_static, name="debug_static"),
     path("", IndexView.as_view(), name="inicio"),
 ]

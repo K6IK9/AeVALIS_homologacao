@@ -1,4 +1,4 @@
-# 🚀 Deploy no Vercel - Guia Completo
+# 🚀 Deploy no Vercel - Guia Atualizado
 
 ## 📋 Pré-requisitos
 
@@ -37,63 +37,75 @@ DB_PORT=5432
 1. Conecte seu repositório ao Vercel
 2. O Vercel detectará automaticamente que é um projeto Python
 3. As configurações do `vercel.json` serão aplicadas
-4. O script `build.sh` executará as migrações
+4. O script `vercel-build.py` executará automaticamente:
+   - Migrações do banco
+   - Coleta de arquivos estáticos
 
-### 4. Pós-Deploy
+### 4. Verificação de Arquivos Estáticos
 
-Após o primeiro deploy:
-
-1. **Criar superusuário**:
-   ```bash
-   vercel env pull
-   python manage.py createsuperuser
-   ```
-
-2. **Verificar funcionamento**:
-   - Acesse `/admin/` 
-   - Teste login e funcionalidades
+Após o deploy, acesse:
+- `/debug-static/` - Página de debug para testar imagens
+- `/static/assets/saad_logo.svg` - Teste direto de arquivos
 
 ## 🔧 Configurações Importantes
 
 ### Arquivos de Configuração
 
-- `vercel.json` - Configuração principal do Vercel
-- `build.sh` - Script de build (migrações e static files)
-- `requirements.txt` - Dependências Python
+- `vercel.json` - Configuração principal do Vercel (apenas 1 build)
+- `package.json` - Script de build automático
+- `vercel-build.py` - Script Python de build
+- `requirements.txt` - Dependências Python (incluindo WhiteNoise)
 - `.vercelignore` - Arquivos ignorados no deploy
+
+### WhiteNoise para Arquivos Estáticos
+
+O projeto usa WhiteNoise para servir arquivos estáticos em produção:
+- Compressão automática
+- Cache de longa duração
+- Serving eficiente de SVG, PNG, CSS, JS
 
 ### Limitações do Vercel (Hobby Plan)
 
-- **Timeout**: 10 segundos por request
+- **Timeout**: 10 segundos por request (configurado para 30s)
 - **Memória**: 1024 MB
 - **Tamanho**: 250 MB por deploy
 - **Bandwidth**: 100 GB/mês
 
 ## 🐛 Troubleshooting
 
+### Imagens Não Carregam
+```
+1. Verifique se DEBUG=False no Vercel
+2. Acesse /debug-static/ para testar
+3. Confirme que WhiteNoise está no MIDDLEWARE
+4. Verifique se collectstatic rodou no build
+```
+
 ### Erro de Timeout
 ```
-Add to settings.py:
-DATABASES['default']['CONN_MAX_AGE'] = 0
+Configurado maxDuration: 30 no vercel.json
+CONN_MAX_AGE = 0 para conexões não persistentes
 ```
 
-### Arquivos Estáticos não Carregam
+### Arquivos Estáticos não Encontrados
 ```
 Verify STATIC_URL = "/static/"
-Check WhiteNoise middleware order
+Check STATIC_ROOT = BASE_DIR / "staticfiles"
+Ensure WhiteNoise middleware order
 ```
 
-### Erro de Migrações
+### Erro de Build
 ```
-Check database connection
+Check vercel-build.py logs
 Verify environment variables
+Test locally: python vercel-build.py
 ```
 
 ## 📚 Recursos Úteis
 
 - [Vercel Python Runtime](https://vercel.com/docs/runtimes/python)
 - [Django on Vercel](https://vercel.com/guides/deploying-django-with-vercel)
-- [Environment Variables](https://vercel.com/docs/projects/environment-variables)
+- [WhiteNoise Documentation](http://whitenoise.evans.io/)
 
 ## 🆘 Comandos Úteis
 
@@ -107,7 +119,17 @@ vercel logs
 # Baixar variáveis de ambiente
 vercel env pull
 
-# Executar migrações local com env do Vercel
-vercel env pull
-python manage.py migrate
+# Testar build localmente
+python vercel-build.py
+
+# Testar arquivos estáticos
+python manage.py collectstatic --dry-run
 ```
+
+## 🎯 Principais Mudanças
+
+1. **Apenas 1 build** no vercel.json (removido conflito)
+2. **WhiteNoise** gerencia arquivos estáticos
+3. **Script Python** para build (vercel-build.py)
+4. **Debug page** para testar imagens (/debug-static/)
+5. **Configurações otimizadas** para produção

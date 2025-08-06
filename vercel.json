@@ -16,11 +16,20 @@
             "dest": "/static/$1"
         },
         {
+            "src": "/media/(.*)",
+            "dest": "/media/$1"
+        },
+        {
             "src": "/(.*)",
             "dest": "setup/wsgi.py"
         }
     ],
     "env": {
         "DJANGO_SETTINGS_MODULE": "setup.settings"
+    },
+    "functions": {
+        "setup/wsgi.py": {
+            "maxDuration": 30
+        }
     }
 }

@@ -1990,3 +1990,16 @@ def excluir_ciclo(request, ciclo_id):
         return redirect("gerenciar_ciclos")
 
     return redirect("gerenciar_ciclos")
+
+
+def debug_static(request):
+    """
+    View para debug de arquivos estáticos
+    """
+    from django.conf import settings
+
+    context = {
+        "debug": settings.DEBUG,
+        "STATIC_URL": settings.STATIC_URL,
+    }
+    return render(request, "debug_static.html", context)
