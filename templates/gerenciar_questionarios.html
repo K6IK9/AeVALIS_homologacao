@@ -1,20 +1,203 @@
-{% extends 'avaliacoes/base_avaliacoes.html' %}
 {% load user_tags %}
+{% load static %}
 
-{% block page_title %}Gerenciar Questionários{% endblock %}
-{% block page_description %}Gerencie questionários de avaliação docente{% endblock %}
+<!DOCTYPE html>
+<html lang="pt-br">
 
-{% block page_actions %}
-<div class="section-header">
-    <div>
-        <a href="{% url 'listar_avaliacoes' %}" class="btn btn-outline-secondary">
-            <i class="bi bi-arrow-left"></i> Voltar
-        </a>
-    </div>
-</div>
-{% endblock %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar Questionários - IF SADD</title>
 
-{% block content %}
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        /* Importação das fontes */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Vidaloka&display=swap');
+
+        /* Variáveis CSS comuns */
+        :root {
+            /* Cores principais */
+            --cor01: #f0f0f0;
+            --cor01-alt: #f1f1f1;
+            --cor02: #00fd94;
+            --cor03: #376f6c;
+            --cor04: #1e3231;
+            --cor05: #090909;
+            --cor06: #00cafd;
+            --cor07: #ffffff;
+            --cor08: #ff3c3c;
+
+            /* Fontes */
+            --font01: "Poppins", sans-serif;
+            --font02: "Vidaloka", serif;
+
+            /* Sombras */
+            --shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+            --shadow-alt: 4px 2px 8px rgba(0, 0, 0, 0.2);
+
+            /* Bordas e raios */
+            --border-radius-small: 5px;
+            --border-radius-medium: 15px;
+            --border-radius-large: 25px;
+            --border-radius-xl: 35px;
+            --border-radius-circle: 50%;
+
+            /* Espaçamentos */
+            --spacing-xs: 5px;
+            --spacing-sm: 10px;
+            --spacing-md: 15px;
+            --spacing-lg: 20px;
+            --spacing-xl: 25px;
+            --spacing-2xl: 40px;
+            --spacing-3xl: 50px;
+
+            /* Transições */
+            --transition-fast: 0.2s;
+            --transition-medium: 0.3s;
+        }
+
+        /* Reset global */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: var(--font01);
+        }
+
+        body {
+            background: var(--cor01);
+        }
+
+        /* Layout base para páginas de gerenciamento */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: var(--cor03);
+            color: white;
+            padding: 20px;
+            border-radius: var(--border-radius-medium);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0 0 10px 0;
+            font-size: 2.2em;
+        }
+
+        .header p {
+            margin: 0;
+            opacity: 0.9;
+        }
+
+        /* Botão de voltar */
+        .back-button {
+            background: var(--cor03);
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            display: inline-block;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+
+        .back-button:hover {
+            background: var(--cor04);
+            transform: translateY(-2px);
+            color: white;
+            text-decoration: none;
+        }
+
+        /* Mensagens */
+        .messages {
+            margin-bottom: 20px;
+        }
+
+        .message {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+
+        .message.warning {
+            background: #fff3cd;
+            color: #856404;
+            border-left: 4px solid #ffc107;
+        }
+
+        .message.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border-left: 4px solid #17a2b8;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.6em;
+            }
+
+            .back-button {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>  
+    <main>
+        <div class="container">
+            <a href="{% url 'listar_avaliacoes' %}" class="back-button">← Voltar</a>
+
+            <!-- Header da página -->
+            <div class="header">
+                <h1>Gerenciar Questionários</h1>
+                <p>Gerencie questionários de avaliação docente</p>
+            </div>
+
+            <!-- Mensagens -->
+            {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                <div class="message {{ message.tags }}">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+
+            <!-- Conteúdo principal -->
 <div class="row">
     <!-- Formulário de Criação/Edição -->
     <div class="col-md-4">
@@ -227,9 +410,16 @@
         </div>
     </div>
 </div>
-{% endblock %}
+        </div>
+    </main>
 
-{% block extra_js %}
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
+
+{% include "perfil.html" %}
 <style>
     .card-custom {
         border: 1px solid #dee2e6;
@@ -392,4 +582,11 @@
         }
     });
 </script>
-{% endblock %}
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
+
+{% include "perfil.html" %}
