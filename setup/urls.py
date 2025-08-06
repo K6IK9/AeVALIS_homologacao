@@ -10,5 +10,5 @@ urlpatterns = [
     path("", include("avaliacao_docente.urls")),
     path("registro/", views.RegistrarUsuarioView.as_view(), name="registro"),
     path("accounts/", include("django.contrib.auth.urls")),  # Para autenticação
-] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+]
 
