@@ -558,7 +558,7 @@
             <!-- Header da página -->
             <div class="header">
                 <h1>Visualizar Avaliação</h1>
-                <p>{{ avaliacao.disciplina.nome }} - {{ avaliacao.turma.nome }}</p>
+                <p>{{ avaliacao.disciplina.disciplina_nome }} - {{ avaliacao.turma.codigo_turma }}</p>
             </div>
 
             <!-- Mensagens -->
@@ -579,10 +579,10 @@
                     <div class="avaliacao-header">
                         <div class="avaliacao-info">
                             <h3>{{ titulo }}</h3>
-                            <p><strong>Disciplina:</strong> {{ avaliacao.disciplina.nome }}</p>
-                            <p><strong>Turma:</strong> {{ avaliacao.turma.nome }}</p>
+                            <p><strong>Disciplina:</strong> {{ avaliacao.disciplina.disciplina_nome }}</p>
+                            <p><strong>Turma:</strong> {{ avaliacao.turma.codigo_turma }}</p>
                             <p><strong>Ciclo:</strong> {{ avaliacao.ciclo.nome }}</p>
-                            <p><strong>Questionário:</strong> {{ avaliacao.questionario.titulo }}</p>
+                            <p><strong>Questionário:</strong> {{ avaliacao.ciclo.questionario.titulo }}</p>
                         </div>
                         <div class="avaliacao-status">
                             <span class="status-badge">
@@ -596,7 +596,7 @@
                         </div>
                     </div>
 
-                    {% if avaliacao.ciclo.anonimo %}
+                    {% if avaliacao.ciclo.permite_avaliacao_anonima %}
                     <div class="info-alert">
                         🔒 <strong>Avaliação Anônima:</strong> As respostas foram coletadas de forma anônima.
                     </div>
@@ -627,7 +627,7 @@
                             <span class="likert-labels">Discordo Totalmente</span>
                             <div class="likert-options">
                                 {% for i in "12345"|make_list %}
-                                <div class="likert-option {% if resposta.resposta_numerica == i|add:0 %}selected{% endif %}">
+                                <div class="likert-option {% if resposta.valor_numerico == i|add:0 %}selected{% endif %}">
                                     {{ i }}
                                 </div>
                                 {% endfor %}
@@ -635,7 +635,7 @@
                             <span class="likert-labels">Concordo Totalmente</span>
                         </div>
                         <div class="resposta-valor">
-                            <strong>Resposta Selecionada: {{ resposta.resposta_numerica }}</strong>
+                            <strong>Resposta Selecionada: {{ resposta.valor_numerico }}</strong>
                         </div>
 
                         {% elif resposta.pergunta.tipo == 'nps' %}
@@ -647,24 +647,24 @@
                             <div class="nps-options">
                                 {% for i in "0123456789"|add:"10"|make_list %}
                                 {% if forloop.counter <= 11 %}
-                                <div class="nps-option {% if resposta.resposta_numerica == forloop.counter0 %}selected{% endif %}">
+                                <div class="nps-option {% if resposta.valor_numerico == forloop.counter0 %}selected{% endif %}">
                                     {{ forloop.counter0 }}
                                 </div>
                                 {% endif %}
                                 {% endfor %}
                             </div>
                             <div class="resposta-valor">
-                                <strong>Nota Atribuída: {{ resposta.resposta_numerica }}</strong>
+                                <strong>Nota Atribuída: {{ resposta.valor_numerico }}</strong>
                             </div>
                         </div>
 
                         {% elif resposta.pergunta.tipo == 'multipla_escolha' or resposta.pergunta.tipo == 'sim_nao' %}
                         <div class="resposta-destaque">
-                            {{ resposta.resposta_texto }}
+                            {{ resposta.valor_texto }}
                         </div>
 
                         {% elif resposta.pergunta.tipo == 'texto_livre' %}
-                        <div class="resposta-texto">{{ resposta.resposta_texto }}</div>
+                        <div class="resposta-texto">{{ resposta.valor_texto }}</div>
                         {% endif %}
                     </div>
                 </div>

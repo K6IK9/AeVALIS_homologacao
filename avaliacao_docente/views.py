@@ -824,11 +824,17 @@ class AdminHubView(LoginRequiredMixin, TemplateView):
         context["total_usuarios"] = User.objects.count()
         context["total_cursos"] = Curso.objects.count()
         context["total_disciplinas"] = Disciplina.objects.count()
-        context["total_avaliacoes"] = Avaliacao.objects.count()
         context["total_turmas"] = Turma.objects.count()
         context["total_professores"] = PerfilProfessor.objects.count()
         context["total_alunos"] = PerfilAluno.objects.count()
         context["total_periodos"] = PeriodoLetivo.objects.count()
+
+        # Avaliaições realizadas - contar respostas únicas
+        from django.db.models import Count
+
+        context["total_avaliacoes"] = (
+            RespostaAvaliacao.objects.values("avaliacao").distinct().count()
+        )
 
         return context
 

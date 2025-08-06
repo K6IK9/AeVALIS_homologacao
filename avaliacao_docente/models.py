@@ -59,8 +59,6 @@ class PerfilAluno(models.Model):
     objects = models.Manager()  # Manager padrão
     non_admin = PerfilAlunoManager()  # Manager que exclui admins
 
-    objects = PerfilAlunoManager()
-
     def __str__(self):
         return f"{self.user.get_full_name()} - {self.user.username}"
 
@@ -89,8 +87,6 @@ class PerfilProfessor(models.Model):
 
     objects = models.Manager()  # Manager padrão
     non_admin = PerfilProfessorManager()  # Manager que exclui admins
-
-    objects = PerfilProfessorManager()
 
     def __str__(self):
         return f"{self.user.get_full_name()} ({self.registro_academico})"
