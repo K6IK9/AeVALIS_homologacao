@@ -12,14 +12,9 @@ urlpatterns = [
     path("accounts/", include("django.contrib.auth.urls")),  # Para autenticação
 ]
 
-# Servir arquivos estáticos
+# Servir arquivos estáticos apenas em desenvolvimento
 if settings.DEBUG:
-    # Desenvolvimento - servir da pasta static/
     urlpatterns += static(
         settings.STATIC_URL, document_root=settings.STATICFILES_DIRS[0]
     )
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-else:
-    # Produção - servir da pasta staticfiles/ (após collectstatic)
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
