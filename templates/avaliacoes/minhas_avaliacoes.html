@@ -42,6 +42,8 @@
             --font-size-2xl: 1.875rem;
         }
 
+
+
         /* Reset global */
         * {
             margin: 0;
@@ -53,6 +55,25 @@
         body {
             background: var(--cor01);
             line-height: 1.6;
+        }
+
+                /* Botão de voltar */
+        .back-button {
+            background: var(--cor03);
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            display: inline-block;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+
+        .back-button:hover {
+            background: var(--cor04);
+            transform: translateY(-2px);
+            color: white;
+            text-decoration: none;
         }
 
         /* Layout base */
@@ -190,6 +211,10 @@
                 font-size: var(--font-size-xs);
                 width: 100%;
             }
+            .back-button {
+                width: 100%;
+                text-align: center;
+            }
             
             .container {
                 padding: 10px;
@@ -314,13 +339,13 @@
 </head>
 <body>
     <div class="container">
+        <a href="{% url 'inicio' %}" class="back-button">← Voltar</a>
         <div class="header">
             <h1>{{ titulo }}</h1>
             <p>Consulte suas avaliações respondidas anteriormente</p>
         </div>
 
         <div class="nav-links">
-            <a href="{% url 'inicio' %}">Voltar ao Início</a>
             <a href="{% url 'listar_avaliacoes' %}">Ver Todas as Avaliações</a>
         </div>
 
