@@ -237,11 +237,11 @@
         
         {% for qp in perguntas_questionario %}
         <div class="pergunta-card">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                <h6 style="margin: 0;">
+            <div class="pergunta-header">
+                <h6 class="pergunta-numero">
                     Pergunta {{ qp.ordem }}
                     {% if qp.pergunta.obrigatoria %}
-                        <span style="color: var(--cor08);">*</span>
+                        <span class="obrigatorio">*</span>
                     {% endif %}
                 </h6>
                 {% if qp.pergunta.categoria %}
@@ -381,18 +381,90 @@
 </div>
 
 <style>
+/* Variáveis para tamanhos de fontes */
+:root {
+    --font-size-xs: 0.75rem;  /* 12px */
+    --font-size-sm: 0.875rem; /* 14px */
+    --font-size-base: 1rem;   /* 16px */
+    --font-size-md: 1.125rem; /* 18px */
+    --font-size-lg: 1.25rem;  /* 20px */
+    --font-size-xl: 1.5rem;   /* 24px */
+}
+
+.pergunta-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.pergunta-numero {
+    margin: 0;
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    color: var(--cor03);
+}
+
+.obrigatorio {
+    color: var(--cor08);
+    margin-left: 3px;
+}
+
 /* Estilos específicos para o formulário de avaliação */
+.avaliacao-card {
+    padding: 20px;
+    background-color: rgba(55, 111, 108, 0.05);
+    border-radius: var(--border-radius-medium);
+    margin-bottom: 30px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.pergunta-card {
+    background: var(--cor07);
+    border: 1px solid #eee;
+    border-radius: var(--border-radius-medium);
+    padding: 20px;
+    margin-bottom: 25px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
+}
+
+.pergunta-titulo {
+    font-size: var(--font-size-md);
+    margin-bottom: 20px;
+    font-weight: 500;
+    color: var(--cor04);
+}
+
+.pergunta-navegacao {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 30px;
+}
+
+.pergunta-numero {
+    font-size: var(--font-size-sm);
+    color: #666;
+    background: var(--cor01);
+    padding: 8px 15px;
+    border-radius: var(--border-radius-medium);
+}
+
+.badge {
+    padding: 5px 10px;
+    border-radius: var(--border-radius-small);
+    font-weight: 500;
+    font-size: var(--font-size-xs);
+}
+
 .form-check-input[type="radio"] {
     display: none;
 }
 
-.rating-option input[type="radio"] + label {
-    cursor: pointer;
-}
-
-.rating-option input[type="radio"]:checked + label .rating-value {
-    background: var(--cor02);
-    color: var(--cor07);
+.likert-scale {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px 0;
 }
 
 .likert-scale .form-check {
@@ -412,8 +484,53 @@
 
 .likert-scale .form-check-input:checked + .form-check-label {
     background: var(--cor02);
-    color: var(--cor07);
+    color: var(--cor05);
     border-color: var(--cor02);
+    font-weight: 600;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 253, 148, 0.2);
+}
+
+.rating-container {
+    margin: 20px 0;
+}
+
+.rating-option {
+    display: inline-block;
+}
+
+.rating-value {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--border-radius-circle);
+    border: 2px solid var(--cor01);
+    margin: 5px;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.rating-option input[type="radio"] + label {
+    cursor: pointer;
+}
+
+.rating-option input[type="radio"]:checked + label .rating-value {
+    background: var(--cor02);
+    color: var(--cor05);
+    border-color: var(--cor02);
+    font-weight: 600;
+    transform: scale(1.1);
+    box-shadow: 0 4px 8px rgba(0, 253, 148, 0.2);
+}
+
+.multipla-escolha {
+    margin: 15px 0;
+}
+
+.multipla-escolha .form-check {
+    margin-bottom: 10px;
 }
 
 .multipla-escolha .form-check-input + .form-check-label {
@@ -422,102 +539,193 @@
     border: 2px solid var(--cor01);
     border-radius: var(--border-radius-small);
     display: block;
-    margin-bottom: 10px;
     transition: all var(--transition-fast);
 }
 
 .multipla-escolha .form-check-input:checked + .form-check-label {
     background: var(--cor02);
-    color: var(--cor07);
+    color: var(--cor05);
     border-color: var(--cor02);
+    font-weight: 600;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 253, 148, 0.2);
+}
+
+.sim-nao {
+    display: flex;
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.sim-nao .form-check {
+    flex: 1;
 }
 
 .sim-nao .form-check-input + .form-check-label {
     cursor: pointer;
-    padding: 15px 30px;
+    padding: 15px;
     border: 2px solid var(--cor01);
     border-radius: var(--border-radius-medium);
     display: block;
     transition: all var(--transition-fast);
     text-align: center;
-    min-width: 120px;
 }
 
 .sim-nao .form-check-input:checked + .form-check-label {
     background: var(--cor02);
-    color: var(--cor07);
+    color: var(--cor05);
     border-color: var(--cor02);
+    font-weight: 600;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 253, 148, 0.2);
+}
+
+.texto-livre textarea {
+    border: 2px solid var(--cor01);
+    border-radius: var(--border-radius-small);
+    padding: 15px;
+    transition: all var(--transition-fast);
+}
+
+.texto-livre textarea:focus {
+    border-color: var(--cor02);
+    box-shadow: 0 0 0 0.2rem rgba(0, 253, 148, 0.25);
+}
+
+.btn {
+    padding: 10px 20px;
+    border-radius: var(--border-radius-medium);
+    font-weight: 600;
+    transition: all var(--transition-fast);
+    background-color: var(--cor02);
+    border-color: var(--cor02);
+    color: var(--cor05);
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    background-color: var(--cor06);
+    border-color: var(--cor06);
+}
+
+.btn-secondary {
+    background-color: var(--cor03);
+    border-color: var(--cor03);
+    color: var(--cor07);
+}
+
+.btn-secondary:hover {
+    background-color: var(--cor04);
+    border-color: var(--cor04);
+    color: var(--cor07);
 }
 
 /* Media queries para responsividade em dispositivos móveis */
 @media (max-width: 768px) {
+    .container {
+        padding: 15px;
+    }
+    
+    .header {
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+    
     .header h1 {
-        font-size: 1.8rem;
+        font-size: var(--font-size-xl);
+    }
+    
+    .avaliacao-card {
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+    
+    .pergunta-card {
+        padding: 15px;
+        margin-bottom: 20px;
     }
     
     .likert-scale {
         display: grid;
         grid-template-columns: repeat(5, 1fr);
         gap: 5px;
+        margin: 15px 0;
     }
     
     .likert-scale .form-check {
         margin: 0;
     }
     
-    .pergunta-card {
-        padding: 15px;
+    .sim-nao {
+        flex-direction: column;
+        gap: 10px;
     }
     
     .sim-nao .form-check-input + .form-check-label {
-        padding: 10px 20px;
-        min-width: 100px;
+        padding: 10px;
     }
     
-    .btn-lg {
-        padding: 0.5rem 1rem;
-        font-size: 1rem;
+    .pergunta-navegacao {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .pergunta-navegacao .btn,
+    .pergunta-navegacao a {
+        width: 100%;
+        text-align: center;
+    }
+    
+    .pergunta-numero {
+        order: -1;
+        width: 100%;
+        text-align: center;
+        margin-bottom: 15px;
     }
 }
 
 @media (max-width: 480px) {
-    .container-fluid {
+    .container {
         padding: 10px;
     }
     
     .header h1 {
-        font-size: 1.5rem;
+        font-size: 1.3rem;
     }
     
-    .pergunta-card {
-        padding: 10px;
+    .header p {
+        font-size: var(--font-size-sm);
     }
     
-    .pergunta-text {
-        font-size: 1rem;
-    }
-    
-    .likert-scale {
-        grid-template-columns: repeat(5, 1fr);
+    .pergunta-titulo {
+        font-size: var(--font-size-base);
     }
     
     .likert-scale .form-check-input + .form-check-label {
-        padding: 5px;
-        font-size: 0.8rem;
+        padding: 8px 5px;
+        font-size: var(--font-size-xs);
+    }
+    
+    .rating-value {
+        width: 30px;
+        height: 30px;
+        font-size: var(--font-size-xs);
     }
     
     .multipla-escolha .form-check-input + .form-check-label {
         padding: 10px;
+        font-size: var(--font-size-sm);
     }
     
-    .sim-nao .form-check {
-        margin-bottom: 8px;
-    }
-    
-    .sim-nao .form-check-input + .form-check-label {
+    .btn {
         padding: 8px 15px;
-        min-width: 80px;
-        font-size: 0.9rem;
+        font-size: var(--font-size-sm);
+    }
+    
+    .back-button {
+        font-size: var(--font-size-sm);
+        padding: 8px 15px;
     }
 }
 

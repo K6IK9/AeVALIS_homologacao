@@ -32,6 +32,14 @@
             --spacing-lg: 24px;
             --transition-fast: 0.2s;
             --transition-medium: 0.3s;
+            
+            /* Tamanhos de fonte */
+            --font-size-xs: 0.75rem;
+            --font-size-sm: 0.875rem;
+            --font-size-md: 1rem;
+            --font-size-lg: 1.25rem;
+            --font-size-xl: 1.5rem;
+            --font-size-2xl: 1.875rem;
         }
 
         /* Reset global */
@@ -65,34 +73,51 @@
 
         .header h1 {
             margin: 0 0 10px 0;
-            font-size: 2.2em;
+            font-size: var(--font-size-2xl);
             font-family: var(--font02);
+            font-weight: 600;
+            letter-spacing: 0.5px;
         }
 
         .header p {
             margin: 0;
             opacity: 0.9;
+            font-size: var(--font-size-md);
         }
 
         /* Navegação */
         .nav-links {
-            margin-bottom: 20px;
+            margin-bottom: 25px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
         }
 
         .nav-links a {
-            display: inline-block;
-            padding: 10px 20px;
+            display: inline-flex;
+            align-items: center;
+            padding: 10px 18px;
             background: var(--cor02);
             color: var(--cor04);
             text-decoration: none;
             border-radius: var(--border-radius-small);
             font-weight: 600;
-            transition: background-color var(--transition-fast);
+            font-size: var(--font-size-sm);
+            transition: all var(--transition-fast);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .nav-links a:first-child::before {
+            content: "←";
+            margin-right: 5px;
+            font-weight: bold;
         }
 
         .nav-links a:hover {
             background: var(--cor06);
             color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
         }
 
         /* Cards de avaliação */
@@ -110,38 +135,68 @@
             }
             
             .header h1 {
-                font-size: 1.8em;
+                font-size: var(--font-size-xl);
             }
             
             .container {
                 padding: 15px;
+            }
+            
+            .nav-links {
+                flex-direction: column;
+                width: 100%;
+            }
+            
+            .nav-links a {
+                width: 100%;
+                justify-content: center;
             }
         }
         
         @media (max-width: 480px) {
             .avaliacoes-grid {
                 grid-template-columns: 1fr;
+                gap: 15px;
             }
             
             .header {
                 padding: 15px;
+                margin-bottom: 20px;
             }
             
             .header h1 {
-                font-size: 1.5em;
+                font-size: var(--font-size-lg);
+            }
+            
+            .header p {
+                font-size: var(--font-size-xs);
             }
             
             .avaliacao-card {
                 padding: 15px;
             }
             
+            .avaliacao-header h3 {
+                font-size: var(--font-size-md);
+            }
+            
+            .avaliacao-info p {
+                font-size: var(--font-size-xs);
+                margin-bottom: 6px;
+            }
+            
             .btn {
                 padding: 8px 12px;
-                font-size: 14px;
+                font-size: var(--font-size-xs);
+                width: 100%;
             }
             
             .container {
                 padding: 10px;
+            }
+            
+            .empty-state {
+                padding: 30px 15px;
             }
         }
 
@@ -167,7 +222,8 @@
         .avaliacao-header h3 {
             color: var(--cor03);
             margin-bottom: 5px;
-            font-size: 1.3em;
+            font-size: var(--font-size-lg);
+            font-weight: 600;
         }
 
         .avaliacao-info {
@@ -175,12 +231,15 @@
         }
 
         .avaliacao-info p {
-            margin-bottom: 5px;
+            margin-bottom: 8px;
             color: var(--cor04);
+            font-size: var(--font-size-sm);
+            line-height: 1.4;
         }
 
         .avaliacao-info strong {
             color: var(--cor03);
+            font-weight: 600;
         }
 
         .avaliacao-actions {
@@ -190,15 +249,25 @@
         }
 
         .btn {
-            padding: 10px 16px;
+            padding: 10px 18px;
             border: none;
             border-radius: var(--border-radius-small);
             cursor: pointer;
             text-decoration: none;
             font-weight: 600;
+            font-size: var(--font-size-sm);
             transition: all var(--transition-fast);
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             text-align: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            min-width: 120px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
         }
 
         .btn-primary {
@@ -240,24 +309,7 @@
             margin-bottom: 20px;
         }
 
-        /* Responsividade */
-        @media (max-width: 768px) {
-            .container {
-                padding: 15px;
-            }
-
-            .header h1 {
-                font-size: 1.8em;
-            }
-
-            .avaliacoes-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .avaliacao-actions {
-                flex-direction: column;
-            }
-        }
+        /* Responsividade adicional já tratada nas media queries acima */
     </style>
 </head>
 <body>
@@ -268,7 +320,7 @@
         </div>
 
         <div class="nav-links">
-            <a href="{% url 'inicio' %}">← Voltar ao Início</a>
+            <a href="{% url 'inicio' %}">Voltar ao Início</a>
             <a href="{% url 'listar_avaliacoes' %}">Ver Todas as Avaliações</a>
         </div>
 

@@ -415,8 +415,27 @@
             white-space: pre-wrap;
         }
 
+        /* Variáveis para tamanhos de fontes */
+        :root {
+            --font-size-xs: 0.75rem;  /* 12px */
+            --font-size-sm: 0.875rem; /* 14px */
+            --font-size-base: 1rem;   /* 16px */
+            --font-size-md: 1.125rem; /* 18px */
+            --font-size-lg: 1.25rem;  /* 20px */
+            --font-size-xl: 1.5rem;   /* 24px */
+        }
+
         /* Responsividade específica */
         @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .header {
+                padding: 15px;
+                margin-bottom: 20px;
+            }
+            
             .avaliacoes-grid {
                 grid-template-columns: 1fr;
                 gap: 15px;
@@ -429,18 +448,54 @@
             .data-table th,
             .data-table td {
                 padding: 10px 8px;
-                font-size: 13px;
+                font-size: var(--font-size-xs);
             }
 
             .btn {
-                font-size: 13px;
+                font-size: var(--font-size-sm);
                 padding: 10px 16px;
+                width: 100%;
+            }
+            
+            .form-section {
+                padding: 15px;
+                margin-bottom: 20px;
+            }
+            
+            .form-section h2 {
+                font-size: var(--font-size-md);
+                margin-bottom: 15px;
+            }
+            
+            /* Ajuste para botões no header de relatório */
+            .form-section > div:first-child {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .form-section > div:first-child > div {
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+                width: 100%;
             }
         }
 
         @media (max-width: 480px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: var(--font-size-lg);
+            }
+            
+            .header p {
+                font-size: var(--font-size-sm);
+            }
+            
             .form-section {
-                padding: 20px;
+                padding: 15px;
             }
 
             .metric-value {
@@ -450,6 +505,26 @@
             .comment-header {
                 flex-direction: column;
                 gap: 5px;
+            }
+            
+            .back-button {
+                font-size: var(--font-size-sm);
+                padding: 8px 15px;
+                margin-bottom: 15px;
+            }
+            
+            .form-group label {
+                font-size: var(--font-size-sm);
+            }
+            
+            .form-control {
+                padding: 8px;
+                font-size: var(--font-size-sm);
+            }
+            
+            /* Ajustes para navegação no relatório */
+            .form-section > div:first-child h2 {
+                font-size: var(--font-size-base);
             }
         }
     </style>

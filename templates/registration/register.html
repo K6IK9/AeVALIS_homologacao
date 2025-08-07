@@ -459,38 +459,56 @@
             <div class="form-grid">
                 <label for="username" class="labelInput">
                     <img src="{% static 'assets/perfil.svg' %}" alt="Matricula">
-                    {{ form.username }}
+                    <input type="text" name="username" id="id_username" placeholder="Matrícula" required maxlength="20" {% if form.username.value %}value="{{ form.username.value }}"{% endif %}>
+                    {% if form.username.errors %}
+                    <span class="field-error">{{ form.username.errors.0 }}</span>
+                    {% endif %}
                 </label>
 
                 <label for="email" class="labelInput">
                     <img src="{% static 'assets/email.svg' %}" alt="Email">
-                    {{ form.email }}
+                    <input type="email" name="email" id="id_email" placeholder="Email" required maxlength="254" {% if form.email.value %}value="{{ form.email.value }}"{% endif %}>
+                    {% if form.email.errors %}
+                    <span class="field-error">{{ form.email.errors.0 }}</span>
+                    {% endif %}
                 </label>
 
                 <label for="first_name" class="labelInput">
                     <img src="{% static 'assets/perfil.svg' %}" alt="Nome">
-                    {{ form.first_name }}
+                    <input type="text" name="first_name" id="id_first_name" placeholder="Nome" required maxlength="30" {% if form.first_name.value %}value="{{ form.first_name.value }}"{% endif %}>
+                    {% if form.first_name.errors %}
+                    <span class="field-error">{{ form.first_name.errors.0 }}</span>
+                    {% endif %}
                 </label>
 
                 <label for="last_name" class="labelInput">
                     <img src="{% static 'assets/perfil.svg' %}" alt="Sobrenome">
-                    {{ form.last_name }}
+                    <input type="text" name="last_name" id="id_last_name" placeholder="Sobrenome" required maxlength="150" {% if form.last_name.value %}value="{{ form.last_name.value }}"{% endif %}>
+                    {% if form.last_name.errors %}
+                    <span class="field-error">{{ form.last_name.errors.0 }}</span>
+                    {% endif %}
                 </label>
 
                 <label for="password1" class="labelInput" style="position:relative;">
                     <img src="{% static 'assets/lock.svg' %}" alt="Senha">
-                    {{ form.password1 }}
-                    <button type="button" class="toggle-password" tabindex="-1" style="position:absolute; right:50px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer;">
+                    <input type="password" name="password1" id="id_password1" placeholder="Senha" required maxlength="128">
+                    <button type="button" class="toggle-password" tabindex="-1" style="position:absolute; right:10px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer;">
                         <img src="{% static 'assets/eye.svg' %}" alt="Mostrar senha" style="width:22px;">
                     </button>
+                    {% if form.password1.errors %}
+                    <span class="field-error">{{ form.password1.errors.0 }}</span>
+                    {% endif %}
                 </label>
 
                 <label for="password2" class="labelInput" style="position:relative;">
                     <img src="{% static 'assets/lock.svg' %}" alt="Confirmar senha">
-                    {{ form.password2 }}
-                    <button type="button" class="toggle-password" tabindex="-1" style="position:absolute; right:50px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer;">
+                    <input type="password" name="password2" id="id_password2" placeholder="Confirmar Senha" required maxlength="128">
+                    <button type="button" class="toggle-password" tabindex="-1" style="position:absolute; right:10px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer;">
                         <img src="{% static 'assets/eye.svg' %}" alt="Mostrar senha" style="width:22px;">
                     </button>
+                    {% if form.password2.errors %}
+                    <span class="field-error">{{ form.password2.errors.0 }}</span>
+                    {% endif %}
                 </label>
             </div>
 
@@ -505,7 +523,7 @@
         document.querySelectorAll('.toggle-password').forEach(function(btn) {
             btn.addEventListener('click', function(e) {
                 e.preventDefault();
-                var input = btn.parentElement.querySelector('input');
+                var input = btn.parentElement.querySelector('input[type="password"], input[type="text"]');
                 if (input.type === 'password') {
                     input.type = 'text';
                 } else {
