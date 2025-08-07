@@ -39,7 +39,7 @@
         }
 
         body {
-            height: 100vh;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -51,13 +51,14 @@
             header,
             main,
             footer {
-                width: 90vw;
+                width: 90%;
+                max-width: 1000px;
                 margin: auto;
             }
 
             header,
             footer {
-                height: 10vh;
+                height: auto;
                 position: absolute;
             }
 
@@ -70,7 +71,57 @@
             }
 
             main {
-                height: 60vh;
+                height: auto;
+                min-height: 400px;
+                padding: 40px 0;
+            }
+        }
+        
+        /* Media queries para responsividade */
+        @media (max-width: 768px) {
+            body header {
+                flex-direction: column;
+                text-align: center;
+                top: 2vh;
+            }
+            
+            body header img {
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+            
+            body main {
+                padding: 80px 0 40px;
+                margin-top: 60px;
+            }
+            
+            #loginForm {
+                padding: 80px 25px 40px 25px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            body header, 
+            body footer {
+                width: 95%;
+            }
+            
+            body header h1 {
+                font-size: 1.5rem;
+            }
+            
+            #perfilImg {
+                width: 120px;
+                height: 120px;
+            }
+            
+            #perfilImg img {
+                width: 60px;
+            }
+            
+            body main {
+                padding: 60px 0 40px;
+                margin-top: 80px;
             }
         }
 
@@ -99,25 +150,44 @@
         }
 
         .login-error {
-            background-color: rgba(255, 0, 0, 0.1);
-            border-left: 4px solid #ff0000;
+            background-color: rgba(255, 0, 0, 0.15);
+            border-left: 4px solid var(--cor08);
             padding: 15px;
             margin-bottom: 20px;
-            border-radius: 5px;
+            border-radius: 8px;
             box-shadow: var(--shadow);
+            animation: errorPulse 2s infinite;
+        }
+        
+        @keyframes errorPulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 60, 60, 0.4); }
+            70% { box-shadow: 0 0 0 6px rgba(255, 60, 60, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 60, 60, 0); }
         }
 
         .login-error p {
-            color: var(--cor01);
+            color: var(--cor07);
             margin-bottom: 5px;
         }
 
         .login-error p:first-child {
-            font-weight: 500;
+            font-weight: 600;
         }
 
         .login-error strong {
-            color: #ff6b6b;
+            color: white;
+        }
+        
+        .login-error ul {
+            list-style-type: none;
+            padding-left: 0;
+            margin-top: 8px;
+        }
+        
+        .login-error li {
+            color: var(--cor07);
+            margin-bottom: 5px;
+            padding-left: 0;
         }
 
 
@@ -150,7 +220,7 @@
         }
 
         #loginForm {
-            width: 80vw;
+            width: 100%;
             max-width: 800px;
             display: flex;
             flex-direction: column;
@@ -178,8 +248,8 @@
             }
 
             #buttonLogin {
-                width: 100px;
-                padding: 8px 16px;
+                width: 120px;
+                padding: 10px 16px;
                 border-radius: 0 0 10px 10px;
                 border: none;
                 box-shadow: var(--shadow);
@@ -188,19 +258,63 @@
                 color: var(--cor05);
 
                 font-weight: bold;
+                font-size: 1rem;
+                letter-spacing: 0.5px;
 
                 cursor: pointer;
+                transition: all 0.2s ease;
 
                 position: absolute;
                 bottom: 0;
                 left: 50%;
                 transform: translate(-50%, 100%);
             }
+            
+            #buttonLogin:hover {
+                background: #00e085;
+                box-shadow: 0 6px 12px rgba(0, 253, 148, 0.3);
+            }
         }
 
         @media (max-width: 768px) {
             #loginForm .form-grid {
                 grid-template-columns: 1fr;
+            }
+            
+            #loginForm {
+                max-width: 95%;
+                padding: 100px 25px 40px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            #loginForm {
+                max-width: 100%;
+                padding: 80px 20px 40px;
+            }
+            
+            #loginForm .form-grid {
+                gap: 15px;
+            }
+            
+            .labelInput input {
+                padding: 12px 10px 12px 30px;
+                font-size: 14px;
+            }
+            
+            .login-error {
+                padding: 12px;
+                font-size: 0.9rem;
+            }
+            
+            .login-error strong {
+                display: block;
+                margin-bottom: 3px;
+            }
+            
+            .field-error {
+                font-size: 0.75rem;
+                padding: 4px 6px;
             }
         }
 
@@ -242,15 +356,26 @@
         }
 
         .field-error {
-            color: var(--cor08, #ff3c3c);
-            font-size: 0.75rem;
+            color: var(--cor08);
+            font-size: 0.8rem;
             margin-top: 5px;
+            padding: 5px 8px;
             display: block;
             font-weight: 500;
+            background-color: rgba(255, 60, 60, 0.1);
+            border-radius: 5px;
+            border-left: 3px solid var(--cor08);
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .labelInput.error input {
-            border: 2px solid var(--cor08, #ff3c3c) !important;
+            border: 2px solid var(--cor08) !important;
+            background-color: rgba(255, 60, 60, 0.05);
         }
 
         .toggle-password {
@@ -314,12 +439,12 @@
                 {% for field in form %}
                     {% if field.errors %}
                         {% for error in field.errors %}
-                            <strong>{{ field.label }}:</strong> {{ error }}
+                            <li><strong>{{ field.label }}:</strong> {{ error }}</li>
                         {% endfor %}
                     {% endif %}
                 {% endfor %}
                 {% for error in form.non_field_errors %}
-                    {{ error }}
+                    <li>{{ error }}</li>
                 {% endfor %}
             </ul>
         </div>

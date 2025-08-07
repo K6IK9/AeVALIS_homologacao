@@ -34,7 +34,6 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-
             font-family: var(--font01);
         }
 
@@ -43,21 +42,20 @@
             display: flex;
             justify-content: center;
             align-items: center;
-
             position: relative;
-
             background: linear-gradient(-45deg, var(--cor04), var(--cor03));
 
             header,
             main,
             footer {
-                width: 90vw;
+                width: 90%;
+                max-width: 500px;
                 margin: auto;
             }
 
             header,
             footer {
-                height: 10vh;
+                height: auto;
                 position: absolute;
             }
 
@@ -70,7 +68,52 @@
             }
 
             main {
-                height: 60vh;
+                height: auto;
+                min-height: 400px;
+                display: flex;
+                align-items: center;
+            }
+        }
+        
+        /* Media queries para responsividade */
+        @media (max-width: 768px) {
+            body header {
+                flex-direction: column;
+                text-align: center;
+                top: 2vh;
+            }
+            
+            body header img {
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+            
+            body main {
+                padding: 20px 0;
+            }
+            
+            #loginForm {
+                padding: 80px 25px 40px 25px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            body header, 
+            body footer {
+                width: 95%;
+            }
+            
+            body header h1 {
+                font-size: 1.5rem;
+            }
+            
+            #perfilImg {
+                width: 120px;
+                height: 120px;
+            }
+            
+            #perfilImg img {
+                width: 60px;
             }
         }
 
@@ -99,25 +142,33 @@
         }
 
         .login-error {
-            background-color: rgba(255, 0, 0, 0.1);
-            border-left: 4px solid #ff0000;
+            background-color: rgba(255, 0, 0, 0.15);
+            border-left: 4px solid var(--cor08);
             padding: 15px;
             margin-bottom: 20px;
-            border-radius: 5px;
+            border-radius: 8px;
             box-shadow: var(--shadow);
+            animation: errorPulse 2s infinite;
+        }
+        
+        @keyframes errorPulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 60, 60, 0.4); }
+            70% { box-shadow: 0 0 0 6px rgba(255, 60, 60, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 60, 60, 0); }
         }
 
         .login-error p {
-            color: var(--cor01);
-            margin-bottom: 5px;
+            color: var(--cor07);
+            margin-bottom: 8px;
+            font-size: 0.95rem;
         }
 
         .login-error p:first-child {
-            font-weight: 500;
+            font-weight: 600;
         }
 
         .login-error strong {
-            color: #ff6b6b;
+            color: white;
         }
 
 
@@ -150,7 +201,8 @@
         }
 
         #loginForm {
-            width: 60vw;
+            width: 100%;
+            max-width: 450px;
             display: flex;
             flex-direction: column;
             gap: 25px;
@@ -163,8 +215,8 @@
             position: relative;
 
             #buttonLogin {
-                width: 100px;
-                padding: 8px 16px;
+                width: 120px;
+                padding: 10px 16px;
                 border-radius: 0 0 10px 10px;
                 border: none;
                 box-shadow: var(--shadow);
@@ -173,13 +225,21 @@
                 color: var(--cor05);
 
                 font-weight: bold;
+                font-size: 1rem;
+                letter-spacing: 0.5px;
 
                 cursor: pointer;
+                transition: all 0.2s ease;
 
                 position: absolute;
                 bottom: 0;
                 left: 50%;
                 transform: translate(-50%, 100%);
+            }
+            
+            #buttonLogin:hover {
+                background: #00e085;
+                box-shadow: 0 6px 12px rgba(0, 253, 148, 0.3);
             }
         }
 
@@ -201,7 +261,8 @@
 
             input {
                 width: 100%;
-                padding: 10px 10px 10px 30px;
+                padding: 12px 10px 12px 30px;
+                font-size: 14px;
 
                 border-radius: 5px;
                 border: none;

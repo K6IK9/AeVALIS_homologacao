@@ -449,6 +449,78 @@
     border-color: var(--cor02);
 }
 
+/* Media queries para responsividade em dispositivos móveis */
+@media (max-width: 768px) {
+    .header h1 {
+        font-size: 1.8rem;
+    }
+    
+    .likert-scale {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 5px;
+    }
+    
+    .likert-scale .form-check {
+        margin: 0;
+    }
+    
+    .pergunta-card {
+        padding: 15px;
+    }
+    
+    .sim-nao .form-check-input + .form-check-label {
+        padding: 10px 20px;
+        min-width: 100px;
+    }
+    
+    .btn-lg {
+        padding: 0.5rem 1rem;
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .container-fluid {
+        padding: 10px;
+    }
+    
+    .header h1 {
+        font-size: 1.5rem;
+    }
+    
+    .pergunta-card {
+        padding: 10px;
+    }
+    
+    .pergunta-text {
+        font-size: 1rem;
+    }
+    
+    .likert-scale {
+        grid-template-columns: repeat(5, 1fr);
+    }
+    
+    .likert-scale .form-check-input + .form-check-label {
+        padding: 5px;
+        font-size: 0.8rem;
+    }
+    
+    .multipla-escolha .form-check-input + .form-check-label {
+        padding: 10px;
+    }
+    
+    .sim-nao .form-check {
+        margin-bottom: 8px;
+    }
+    
+    .sim-nao .form-check-input + .form-check-label {
+        padding: 8px 15px;
+        min-width: 80px;
+        font-size: 0.9rem;
+    }
+}
+
         </div>
     </main>
 
