@@ -1,4 +1,4 @@
-{% load permission_tags %}
+{% load user_tags %}
 {% load static %}
 
 <!DOCTYPE html>
@@ -9,863 +9,462 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>IF SADD - Gerenciar Usuários</title>
 
-  <style>
-    /* Importação das fontes */
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Vidaloka&display=swap');
-
-    /* Variáveis CSS comuns */
-    :root {
-      /* Cores principais */
-      --cor01: #f0f0f0;
-      --cor01-alt: #f1f1f1;
-      --cor02: #00fd94;
-      --cor03: #376f6c;
-      --cor04: #1e3231;
-      --cor05: #090909;
-      --cor06: #00cafd;
-      --cor07: #ffffff;
-      --cor08: #ff3c3c;
-
-      /* Fontes */
-      --font01: "Poppins", sans-serif;
-      --font02: "Vidaloka", serif;
-
-      /* Sombras */
-      --shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
-      --shadow-alt: 4px 2px 8px rgba(0, 0, 0, 0.2);
-
-      /* Bordas e raios */
-      --border-radius-small: 5px;
-      --border-radius-medium: 15px;
-      --border-radius-large: 25px;
-      --border-radius-xl: 35px;
-      --border-radius-circle: 50%;
-
-      /* Espaçamentos */
-      --spacing-xs: 5px;
-      --spacing-sm: 10px;
-      --spacing-md: 15px;
-      --spacing-lg: 20px;
-      --spacing-xl: 25px;
-      --spacing-2xl: 40px;
-      --spacing-3xl: 50px;
-
-      /* Transições */
-      --transition-fast: 0.2s;
-      --transition-medium: 0.3s;
-    }
-
-    /* Reset global */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: var(--font01);
-    }
-
-    body {
-      background: var(--cor01);
-    }
-
-    /* Layout base para páginas de gerenciamento */
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-
-    .header {
-      background: var(--cor03);
-      color: white;
-      padding: 20px;
-      border-radius: var(--border-radius-medium);
-      margin-bottom: 30px;
-      text-align: center;
-    }
-
-    .header h1 {
-      margin: 0 0 10px 0;
-      font-size: 2.2em;
-    }
-
-    .header p {
-      margin: 0;
-      opacity: 0.9;
-    }
-
-    /* Seções de formulário */
-    .form-section {
-      background: var(--cor07);
-      padding: 30px;
-      border-radius: var(--border-radius-medium);
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      margin-bottom: 30px;
-    }
-
-    .form-section h2 {
-      color: var(--cor03);
-      margin-bottom: 20px;
-      font-size: 1.4em;
-    }
-
-    /* Grupos de formulário */
-    .form-group {
-      margin-bottom: var(--spacing-lg);
-    }
-
-    .form-group label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 600;
-      color: var(--cor03);
-    }
-
-    /* Controles de formulário */
-    .form-control,
-    .form-group input,
-    .form-group select {
-      width: 100%;
-      padding: 12px;
-      border: 2px solid #e0e0e0;
-      border-radius: 8px;
-      font-size: 16px;
-      transition: border-color 0.3s;
-      box-sizing: border-box;
-      margin-bottom: 10px;
-    }
-
-    .form-control:focus,
-    .form-group input:focus,
-    .form-group select:focus {
-      outline: none;
-      border-color: var(--cor02);
-    }
-
-    /* Botões */
-    .btn {
-      background: var(--cor02);
-      color: var(--cor05);
-      padding: 12px 24px;
-      border: none;
-      border-radius: 8px;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s;
-      text-decoration: none;
-      display: inline-block;
-    }
-
-    .btn:hover {
-      background: var(--cor06);
-      transform: translateY(-2px);
-    }
-
-    .btn-secondary {
-      background: var(--cor03);
-      color: white;
-    }
-
-    .btn-secondary:hover {
-      background: var(--cor04);
-    }
-
-    .btn-danger {
-      background: var(--cor08);
-      color: white;
-    }
-
-    .btn-danger:hover {
-      background: #c82333;
-    }
-
-    .btn-warning {
-      background: #ffc107;
-      color: var(--cor05);
-    }
-
-    .btn-warning:hover {
-      background: #e0a800;
-    }
-
-    .btn-sm {
-      padding: 8px 16px;
-      font-size: 14px;
-    }
-
-    /* Botão de voltar */
-    .back-button {
-      background: var(--cor03);
-      color: white;
-      text-decoration: none;
-      padding: 10px 20px;
-      border-radius: 8px;
-      display: inline-block;
-      margin-bottom: 20px;
-      transition: all 0.3s;
-    }
-
-    .back-button:hover {
-      background: var(--cor04);
-    }
-
-    /* Tabelas */
-    .data-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-      background: white;
-      border-radius: var(--border-radius-medium);
-      overflow: hidden;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-
-    .data-table th,
-    .data-table td {
-      padding: 15px;
-      text-align: left;
-      border-bottom: 1px solid #f0f0f0;
-    }
-
-    .data-table th {
-      background: var(--cor03);
-      color: white;
-      font-weight: 600;
-      text-transform: uppercase;
-      font-size: 14px;
-    }
-
-    .data-table tbody tr:hover {
-      background: var(--cor01-alt);
-    }
-
-    .data-table tbody tr:last-child td {
-      border-bottom: none;
-    }
-
-    /* Mensagens */
-    .messages {
-      margin-bottom: 20px;
-    }
-
-    .message {
-      padding: 15px;
-      margin-bottom: 10px;
-      border-radius: 8px;
-      font-weight: 500;
-    }
-
-    .message.success {
-      background: #d4edda;
-      color: #155724;
-      border: 1px solid #c3e6cb;
-    }
-
-    .message.error {
-      background: #f8d7da;
-      color: #721c24;
-      border: 1px solid #f5c6cb;
-    }
-
-    .message.warning {
-      background: #fff3cd;
-      color: #856404;
-      border: 1px solid #ffeaa7;
-    }
-
-    .message.info {
-      background: #d1ecf1;
-      color: #0c5460;
-      border: 1px solid #bee5eb;
-    }
-
-    /* Informações adicionais */
-    .item-count {
-      color: var(--cor03);
-      font-style: italic;
-      margin-top: 10px;
-    }
-
-    /* Responsividade */
-    @media (max-width: 768px) {
-      .container {
-        padding: 10px;
-      }
-
-      .form-section {
-        padding: 20px;
-      }
-
-      .data-table {
-        font-size: 14px;
-      }
-
-      .data-table th,
-      .data-table td {
-        padding: 10px 5px;
-      }
-
-      .btn {
-        padding: 10px 15px;
-        font-size: 14px;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .header h1 {
-        font-size: 1.8em;
-      }
-
-      .btn {
-        width: 100%;
-        margin-bottom: 10px;
-      }
-    }
-  </style>
-  <style>
-    /* Estilos específicos para usuários */
-    .form-group label {
-      font-weight: 600;
-      color: var(--cor03);
-      margin-bottom: 8px;
-    }
-
-    .form-control:focus {
-      border-color: var(--cor02);
-      box-shadow: 0 0 0 2px rgba(0, 253, 148, 0.2);
-    }
-
-    .users-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-      background: white;
-      border-radius: var(--border-radius-medium);
-      overflow: hidden;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-
-    .users-table th,
-    .users-table td {
-      padding: 15px;
-      text-align: left;
-      border-bottom: 1px solid #f0f0f0;
-    }
-
-    .users-table th {
-      background: var(--cor03);
-      color: white;
-      font-weight: 600;
-      text-transform: uppercase;
-      font-size: 14px;
-    }
-
-    .users-table tbody tr:hover {
-      background: var(--cor01-alt);
-    }
-
-    .status-badge {
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 600;
-      text-transform: uppercase;
-    }
-
-    .status-ativo {
-      background: #d4edda;
-      color: #155724;
-    }
-
-    .status-inativo {
-      background: #f8d7da;
-      color: #721c24;
-    }
-
-    .role-badge {
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 600;
-      text-transform: uppercase;
-    }
-
-    .role-admin {
-      background: #dc3545;
-      color: white;
-    }
-
-    .role-coordenador {
-      background: #6f42c1;
-      color: white;
-    }
-
-    .role-professor {
-      background: #0d6efd;
-      color: white;
-    }
-
-    .role-aluno {
-      background: #20c997;
-      color: white;
-    }
-
-    .role-sem-role {
-      background: #6c757d;
-      color: white;
-    }
-
-    /* Filtros e busca */
-    .section-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-
-    .filters-section {
-      background: var(--cor07);
-      padding: 20px;
-      border-radius: var(--border-radius-medium);
-      margin-bottom: 20px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-
-    .filter-row {
-      display: flex;
-      gap: 20px;
-      align-items: end;
-      flex-wrap: wrap;
-    }
-
-    .filter-group {
-      flex: 1;
-      min-width: 200px;
-    }
-
-    .filter-group label {
-      display: block;
-      margin-bottom: 5px;
-      font-weight: 600;
-      color: var(--cor03);
-    }
-
-    .btn-filter {
-      background: var(--cor03);
-      color: white;
-      padding: 12px 20px;
-      border: none;
-      border-radius: 8px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s;
-      margin-right: 10px;
-      text-decoration: none;
-    }
-
-    .btn-filter:hover {
-      background: var(--cor04);
-    }
-
-    .search-box {
-      position: relative;
-    }
-
-    .search-box input {
-      padding-left: 40px;
-    }
-
-    .user-count {
-      color: var(--cor03);
-      font-style: italic;
-      margin-top: 10px;
-    }
-
-    /* Ações na tabela */
-    .action-buttons {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .btn-edit {
-      background: var(--cor06);
-      color: white;
-      padding: 6px 12px;
-      border: none;
-      border-radius: 4px;
-      font-size: 12px;
-      cursor: pointer;
-      text-decoration: none;
-      transition: all 0.3s;
-    }
-
-    .btn-edit:hover {
-      background: #0099cc;
-    }
-
-    .btn-reset {
-      background: var(--cor08);
-      color: white;
-      padding: 6px 12px;
-      border: none;
-      border-radius: 4px;
-      font-size: 12px;
-      cursor: pointer;
-      transition: all 0.3s;
-    }
-
-    .btn-reset:hover {
-      background: #c82333;
-    }
-
-    .btn-delete {
-      background: #dc3545;
-      color: white;
-      padding: 6px 12px;
-      border: none;
-      border-radius: 4px;
-      font-size: 12px;
-      cursor: pointer;
-      transition: all 0.3s;
-    }
-
-    .btn-delete:hover {
-      background: #c82333;
-    }
-
-    /* Checkbox */
-    .form-check {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .form-check-input {
-      width: auto;
-      margin: 0;
-    }
-
-    .form-check-label {
-      margin: 0;
-      font-weight: normal;
-    }
-
-    /* Modal */
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.5);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    }
-
-    .modal-overlay.active {
-      display: flex;
-    }
-
-    .modal-content {
-      background: white;
-      padding: 30px;
-      border-radius: var(--border-radius-medium);
-      max-width: 500px;
-      width: 90%;
-      max-height: 80vh;
-      overflow-y: auto;
-    }
-
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-
-    .modal-header h3 {
-      margin: 0;
-      color: var(--cor03);
-    }
-
-    .btn-close-modal {
-      background: none;
-      border: none;
-      font-size: 24px;
-      cursor: pointer;
-      color: var(--cor08);
-    }
-
-    .btn-close-modal:hover {
-      color: #c82333;
-    }
-
-    @media (max-width: 768px) {
-      .filter-row {
-        flex-direction: column;
-        gap: 15px;
-      }
-
-      .filter-group {
-        min-width: 100%;
-      }
-
-      .action-buttons {
-        flex-direction: column;
-        gap: 5px;
-      }
-
-      .users-table {
-        font-size: 14px;
-      }
-
-      .users-table th,
-      .users-table td {
-        padding: 10px 8px;
-      }
-    }
-  </style>
+  <!-- CSS externos -->
+  <link rel="stylesheet" href="{% static 'css/global.css' %}">
+  <link rel="stylesheet" href="{% static 'css/gerenciar.css' %}">
 </head>
 
 <body>
   <div class="container">
-    <a href="{% url 'admin_hub' %}" class="back-button">← Voltar ao Início</a>
-
+    <!-- Header -->
     <div class="header">
       <h1>👥 Gerenciar Usuários</h1>
-      <p>Cadastre, edite e gerencie usuários do sistema</p>
+      <p>Sistema de gerenciamento de usuários e permissões</p>
     </div>
 
-    {% if messages %}
-    <div class="messages">
-      {% for message in messages %}
-      <div class="message {{ message.tags }}">
-        {{ message }}
+    <!-- Navegação -->
+    <div class="nav-breadcrumb">
+      <a href="{% url 'inicio' %}">🏠 Início</a>
+      <span>→</span>
+      <a href="{% url 'admin_hub' %}">⚙️ Administração</a>
+      <span>→</span>
+      <span>👥 Usuários</span>
+    </div>
+
+    {% include "partials/messages.html" %}
+
+    <!-- Estatísticas -->
+    {% if not editing %}
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-number">{{ total_usuarios }}</div>
+        <div class="stat-label">Total de Usuários</div>
       </div>
-      {% endfor %}
+      <div class="stat-card">
+        <div class="stat-number">{{ usuarios_ativos }}</div>
+        <div class="stat-label">Usuários Ativos</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">{{ professores_count }}</div>
+        <div class="stat-label">Professores</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">{{ alunos_count }}</div>
+        <div class="stat-label">Alunos</div>
+      </div>
     </div>
     {% endif %}
 
+    <!-- Formulário de Edição de Usuário -->
+    {% if editing %}
     <div class="form-section">
-      <div class="section-header">
-        <h2>{% if editing %}Editar Usuário{% else %}Cadastrar Novo Usuário{% endif %}</h2>
-      </div>
+      <h2>✏️ Editar Usuário</h2>
+
+      {% include "partials/messages.html" %}
 
       <form method="post">
         {% csrf_token %}
-        <div class="filter-row">
-          <div class="filter-group">
-            <label for="{{ form.username.id_for_label }}">{{ form.username.label }}</label>
-            {{ form.username }}
+        <div class="form-row">
+          <div class="form-group">
+            <label for="username">Nome de usuário:</label>
+            <input type="text" id="username" name="username" value="{{ usuario.username }}" class="form-control"
+              required>
           </div>
-          <div class="filter-group">
-            <label for="{{ form.first_name.id_for_label }}">{{ form.first_name.label }}</label>
-            {{ form.first_name }}
-          </div>
-          <div class="filter-group">
-            <label for="{{ form.last_name.id_for_label }}">{{ form.last_name.label }}</label>
-            {{ form.last_name }}
+          <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" value="{{ usuario.email }}" class="form-control" required>
           </div>
         </div>
-        <div class="filter-row">
-          <div class="filter-group">
-            <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
-            {{ form.email }}
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="first_name">Nome:</label>
+            <input type="text" id="first_name" name="first_name" value="{{ usuario.first_name }}" class="form-control"
+              required>
           </div>
-          <div class="filter-group">
-            <div class="form-check">
-              {{ form.is_active }}
-              <label class="form-check-label" for="{{ form.is_active.id_for_label }}">{{ form.is_active.label }}</label>
+          <div class="form-group">
+            <label for="last_name">Sobrenome:</label>
+            <input type="text" id="last_name" name="last_name" value="{{ usuario.last_name }}" class="form-control"
+              required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="matricula">Matrícula:</label>
+            <input type="text" id="matricula" name="matricula" value="{{ matricula }}" class="form-control"
+              placeholder="Opcional">
+          </div>
+          <div class="form-group">
+            <label for="password">Nova senha:</label>
+            <input type="password" id="password" name="password" class="form-control"
+              placeholder="Deixe em branco para manter a atual">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <div class="checkbox-group">
+              <input type="checkbox" name="is_active" id="is_active" {% if usuario.is_active %}checked{% endif %}>
+              <label for="is_active">Usuário ativo</label>
             </div>
           </div>
         </div>
-        <button type="submit" class="btn">
-          {% if editing %}Atualizar Usuário{% else %}Cadastrar Usuário{% endif %}
-        </button>
-        {% if editing %}
-        <a href="{% url 'gerenciar_usuarios' %}" class="btn btn-secondary">Cancelar</a>
-        {% endif %}
-      </form>
-    </div>
 
-    <!-- Filtros de Busca -->
-    <div class="filters-section">
-      <h3>Filtros de Busca</h3>
-      <form method="get" id="filtro-form">
-        <div class="filter-row">
-          <div class="filter-group search-box">
-            <label for="busca">Buscar por Nome, Matrícula ou Email</label>
-            <input type="text" id="busca" name="busca" value="{{ filtro_busca }}" placeholder="🔍 Digite para buscar..."
-              class="form-control">
-          </div>
-          <div class="filter-group">
-            <label for="status">Status</label>
-            <select id="status" name="status" class="form-control">
-              <option value="">Todos</option>
-              <option value="ativo" {% if filtro_status == 'ativo' %}selected{% endif %}>Ativo</option>
-              <option value="inativo" {% if filtro_status == 'inativo' %}selected{% endif %}>Inativo</option>
-            </select>
-          </div>
-          <div class="filter-group">
-            <label for="role">Role</label>
-            <select id="role" name="role" class="form-control">
-              <option value="">Todas</option>
-              <option value="admin" {% if filtro_role == 'admin' %}selected{% endif %}>Administrador</option>
-              <option value="coordenador" {% if filtro_role == 'coordenador' %}selected{% endif %}>Coordenador</option>
-              <option value="professor" {% if filtro_role == 'professor' %}selected{% endif %}>Professor</option>
-              <option value="aluno" {% if filtro_role == 'aluno' %}selected{% endif %}>Aluno</option>
-              <option value="sem_role" {% if filtro_role == 'sem_role' %}selected{% endif %}>Sem Role</option>
-            </select>
-          </div>
-          <div class="filter-group">
-            <button type="submit" class="btn-filter">Filtrar</button>
-            <a href="{% url 'gerenciar_usuarios' %}" class="btn-filter btn-secondary">Limpar</a>
-          </div>
+        <div class="form-actions">
+          <a href="{% url 'gerenciar_usuarios' %}" class="btn btn-secondary">← Cancelar</a>
+          <button type="submit" class="btn">✓ Atualizar Usuário</button>
         </div>
       </form>
     </div>
+    {% endif %}
+
+    <!-- Seção de Filtros -->
+    {% if not editing %}
+    <div class="filters-section" id="filtersSection">
+      <div class="filter-row">
+        <div class="filter-group">
+          <label for="searchUsuario">Buscar por Nome/Email/Matrícula:</label>
+          <input type="text" id="searchUsuario" placeholder="Digite o nome, email ou matrícula do usuário">
+        </div>
+      </div>
+
+      <div class="filter-row">
+        <div class="filter-group">
+          <label for="filterRole">Filtrar por Função:</label>
+          <select id="filterRole">
+            <option value="">Todas as funções</option>
+            <option value="aluno">Aluno</option>
+            <option value="professor">Professor</option>
+            <option value="coordenador">Coordenador</option>
+            <option value="administrador">Administrador</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="filterStatus">Filtrar por Status:</label>
+          <select id="filterStatus">
+            <option value="">Todos os status</option>
+            <option value="ativo">Ativo</option>
+            <option value="inativo">Inativo</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="filter-row">
+        <div class="filter-group">
+          <button type="button" onclick="clearFiltersUsuarios()" class="btn btn-clear">Limpar Filtros</button>
+        </div>
+      </div>
+    </div>
+    {% endif %}
 
     <!-- Lista de Usuários -->
+    {% if not editing %}
     <div class="form-section">
       <div class="section-header">
-        <h2>Usuários Cadastrados</h2>
+        <h2>👤 Lista de Usuários</h2>
+        {% if user.is_superuser %}
+        <a href="{% url 'registro' %}?next={% url 'gerenciar_usuarios' %}" class="btn">➕ Novo Usuário</a>
+        {% endif %}
       </div>
 
-      {% if usuarios_detalhados %}
-      <table class="users-table">
-        <thead>
-          <tr>
-            <th>Matrícula</th>
-            <th>Nome Completo</th>
-            <th>Email</th>
-            <th>Role</th>
-            <th>Status</th>
-            <th>Ações</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for item in usuarios_detalhados %}
-          <tr>
-            <td>{{ item.usuario.username }}</td>
-            <td>{{ item.nome_completo }}</td>
-            <td>{{ item.usuario.email }}</td>
-            <td>
-              {% if item.role == 'Administrador' %}
-              <span class="role-badge role-admin">{{ item.role }}</span>
-              {% elif item.role == 'Coordenador' %}
-              <span class="role-badge role-coordenador">{{ item.role }}</span>
-              {% elif item.role == 'Professor' %}
-              <span class="role-badge role-professor">{{ item.role }}</span>
-              {% elif item.role == 'Aluno' %}
-              <span class="role-badge role-aluno">{{ item.role }}</span>
-              {% else %}
-              <span class="role-badge role-sem-role">{{ item.role }}</span>
-              {% endif %}
-            </td>
-            <td>
-              {% if item.usuario.is_active %}
-              <span class="status-badge status-ativo">{{ item.status }}</span>
-              {% else %}
-              <span class="status-badge status-inativo">{{ item.status }}</span>
-              {% endif %}
-            </td>
-            <td>
-              <div class="action-buttons">
-                <a href="{% url 'editar_usuario' item.usuario.id %}" class="btn-edit">✏️ Editar</a>
-                <button onclick="resetarSenha({{ item.usuario.id }}, '{{ item.usuario.username }}')"
-                  class="btn-reset">🔑 Resetar Senha</button>
-                {% if item.usuario != request.user %}
-                <button onclick="excluirUsuario({{ item.usuario.id }}, '{{ item.usuario.username }}')"
-                  class="btn-delete">🗑️ Excluir</button>
-                {% endif %}
-              </div>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-      <div class="user-count">
-        Total de usuários: {{ usuarios_detalhados|length }}
+      {% if usuarios %}
+      <div class="table-scroll-hint">
+        <small>💡 Dica: Arraste a tabela lateralmente para ver mais colunas</small>
       </div>
+      <div class="table-responsive">
+        <table class="data-table users-table">
+          <thead>
+            <tr>
+              <th>Avatar</th>
+              <th>Nome</th>
+              <th>Email</th>
+              <th>Matrícula</th>
+              <th>Funções</th>
+              <th>Status</th>
+              <th>Último Login</th>
+              <th class="actions-column">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in usuarios %}
+            <tr data-nome="{{ item.usuario.get_full_name|default:item.usuario.username }}"
+              data-email="{{ item.usuario.email|default:'' }}"
+              data-matricula="{% if item.usuario.perfil_aluno %}{{ item.usuario.perfil_aluno.matricula|default:'' }}{% elif item.usuario.perfil_professor %}{{ item.usuario.perfil_professor.registro_academico|default:'' }}{% else %}{{ item.usuario.username|default:'' }}{% endif %}"
+              data-role="{{ item.role }}" data-status="{{ item.status }}">
+              <td>
+                <div class="user-avatar">
+                  {{ item.usuario.first_name|first|upper|default:"U" }}
+                </div>
+              </td>
+              <td data-label="Nome">
+                <strong>{{ item.usuario.get_full_name|default:item.usuario.username }}</strong>
+              </td>
+              <td data-label="Email">{{ item.usuario.email|default:"Não informado" }}</td>
+              <td data-label="Matrícula">
+                {% if item.usuario.perfil_aluno %}
+                {{ item.usuario.perfil_aluno.matricula|default:"Não informada" }}
+                {% elif item.usuario.perfil_professor %}
+                {{ item.usuario.perfil_professor.registro_academico|default:"Não informada" }}
+                {% else %}
+                {{ item.usuario.username|default:"Não informada" }}
+                {% endif %}
+              </td>
+              <td data-label="Funções">
+                <span class="role-badge {{ item.usuario|get_user_role_class }}">
+                  {{ item.role }}
+                  {% if item.role_manual %}
+                  <small title="Role definida manualmente (não será alterada pelo SUAP)">🔒</small>
+                  {% endif %}
+                </span>
+              </td>
+              <td data-label="Status">
+                {% if item.usuario.is_active %}
+                <span class="status-badge status-active">✅ Ativo</span>
+                {% else %}
+                <span class="status-badge status-inactive">❌ Inativo</span>
+                {% endif %}
+              </td>
+              <td data-label="Último Login">
+                {{ item.usuario.last_login|date:"d/m/Y H:i"|default:"Nunca" }}
+              </td>
+              <td data-label="Ações" class="actions-column">
+                <div class="btn-group">
+                  {% if user.is_superuser or user == item.usuario %}
+                  <a href="{% url 'editar_usuario' item.usuario.id %}" class="btn btn-sm btn-secondary"
+                    title="Editar usuário">
+                    ✏️ Editar
+                  </a>
+                  {% endif %}
+                  <button class="btn btn-sm btn-primary"
+                    onclick="alterarRole({{ item.usuario.id }}, '{{ item.usuario.first_name }} {{ item.usuario.last_name }}', '{{ item.usuario.username }}', '{{ item.role }}')"
+                    title="Alterar permissões do usuário">
+                    🔐 Alterar Role
+                  </button>
+                  {% if item.role_manual and user|get_user_role == 'Administrador' %}
+                  <button class="btn btn-sm btn-warning"
+                    onclick="resetarRoleAutomatica({{ item.usuario.id }}, '{{ item.usuario.username }}')"
+                    title="Permitir que o SUAP volte a gerenciar automaticamente a role">
+                    🔓 Resetar Auto
+                  </button>
+                  {% endif %}
+                  {% if user.is_superuser and user != item.usuario %}
+                  <form method="post" action="{% url 'excluir_usuario' item.usuario.id %}" class="inline-form"
+                    onsubmit="return confirm('Tem certeza que deseja desativar o usuário {{ item.usuario.get_full_name|escapejs }}?\n\nO usuário será desativado e seus dados históricos (avaliações, matrículas) serão preservados.\nEsta ação pode ser revertida reativando o usuário posteriormente.')">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-danger"
+                      title="Desativar usuário">
+                      � Desativar
+                    </button>
+                  </form>
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
       {% else %}
-      <p>Nenhum usuário encontrado com os filtros aplicados.</p>
+      <div class="empty-state">
+        <p class="empty-message">Nenhum usuário encontrado.</p>
+        {% if user.is_superuser %}
+        <p>
+          <a href="{% url 'registro' %}?next={% url 'gerenciar_usuarios' %}" class="btn">
+            ➕ Criar primeiro usuário
+          </a>
+        </p>
+        {% endif %}
+      </div>
       {% endif %}
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Modal para Alteração de Role -->
+  <div id="modal-overlay" class="modal-overlay">
+    <div id="role-modal" class="role-modal" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Alterar Permissões do Usuário</h3>
+        <button type="button" class="btn-close-modal"
+          onclick="closeModal('modal-overlay'); usuarioAtual = null; document.getElementById('role-form').reset();">
+          ✕ Fechar
+        </button>
+      </div>
+
+      <div class="modal-content">
+        <div id="user-info" class="user-info">
+          <!-- Informações do usuário serão carregadas aqui -->
+        </div>
+
+        <form id="role-form" method="post">
+          {% csrf_token %}
+          <input type="hidden" id="usuario-id" name="usuario" value="">
+
+          <div class="form-group">
+            <label for="role-select">Nova Role:</label>
+            <select id="role-select" name="role" class="form-control" required>
+              <option value="">Selecione uma role</option>
+              <option value="admin">Admin</option>
+              <option value="coordenador">Coordenador</option>
+              <option value="professor">Professor</option>
+              <option value="aluno">Aluno</option>
+            </select>
+          </div>
+
+          <div class="actions-end">
+            <button type="button" class="btn btn-secondary"
+              onclick="closeModal('modal-overlay'); usuarioAtual = null; document.getElementById('role-form').reset();">
+              Cancelar
+            </button>
+            <button type="submit" class="btn btn-success">
+              Alterar Permissões
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
 
+  <!-- Script global de gerenciamento -->
+  <script src="{% static 'js/gerenciar-global.js' %}"></script>
+
+  <!-- Scripts específicos da página -->
+  {% if not editing %}
   <script>
-    function resetarSenha(userId, username) {
-      if (confirm(`Tem certeza que deseja resetar a senha do usuário "${username}"?\n\nA nova senha será: 123456`)) {
-        fetch(`/resetar-senha-usuario/${userId}/`, {
-          method: 'POST',
-          headers: {
-            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-            'Content-Type': 'application/json',
-          },
-        })
-          .then(response => response.json())
-          .then(data => {
-            if (data.success) {
-              alert(data.success);
-            } else {
-              alert('Erro: ' + data.error);
-            }
-          })
-          .catch(error => {
-            console.error('Erro:', error);
-            alert('Erro ao resetar senha');
-          });
+    let usuarioAtual = null;
+
+    // Função para filtrar a tabela de usuários usando a função global
+    function filterTableUsuarios() {
+      const searchFilter = document.getElementById('searchUsuario').value.toLowerCase();
+      const roleFilter = document.getElementById('filterRole').value.toLowerCase();
+      const statusFilter = document.getElementById('filterStatus').value.toLowerCase();
+
+      const tableRows = document.querySelectorAll('.data-table tbody tr');
+      let visibleCount = 0;
+
+      tableRows.forEach(row => {
+        const cells = row.querySelectorAll('td');
+
+        // Verifica se a linha tem células (não é a linha "Nenhum usuário encontrado")
+        if (cells.length > 1) {
+          // Busca personalizada em múltiplos campos data-
+          const searchMatch = !searchFilter ||
+            (row.getAttribute('data-nome') || '').toLowerCase().includes(searchFilter) ||
+            (row.getAttribute('data-email') || '').toLowerCase().includes(searchFilter) ||
+            (row.getAttribute('data-matricula') || '').toLowerCase().includes(searchFilter);
+
+          const roleMatch = !roleFilter || (row.getAttribute('data-role') || '').toLowerCase().includes(roleFilter);
+          const statusMatch = !statusFilter || (row.getAttribute('data-status') || '').toLowerCase().includes(statusFilter);
+
+          if (searchMatch && roleMatch && statusMatch) {
+            row.style.display = '';
+            visibleCount++;
+          } else {
+            row.style.display = 'none';
+          }
+        }
+      });
+
+      // Atualizar contador específico desta página
+      updateUserCounter();
+
+      // Lidar com empty state
+      handleEmptyState();
+    }
+
+    // Função para atualizar o contador de usuários
+    function updateUserCounter() {
+      const visibleRows = document.querySelectorAll('.data-table tbody tr:not([style*="display: none"])');
+      let visibleCount = 0;
+
+      visibleRows.forEach(row => {
+        const cells = row.querySelectorAll('td');
+        // Conta apenas linhas que têm células (não é a linha "Nenhum usuário encontrado")
+        if (cells.length > 1) {
+          visibleCount++;
+        }
+      });
+
+      // Atualiza o contador no título
+      const sectionTitle = document.querySelector('.section-header h2');
+      if (sectionTitle) {
+        sectionTitle.textContent = `👤 Lista de Usuários (${visibleCount})`;
+      }
+
+      return visibleCount;
+    }
+
+    // Função para lidar com estado vazio
+    function handleEmptyState() {
+      const visibleCount = updateUserCounter(); // Reutiliza a contagem
+      const emptyState = document.querySelector('.empty-state');
+
+      // Mostra/esconde empty state baseado na contagem
+      if (emptyState) {
+        emptyState.style.display = visibleCount === 0 ? 'block' : 'none';
+      }
+
+      // Remove mensagem temporária se existir
+      const noResultsRow = document.querySelector('.no-results-row');
+      if (noResultsRow) {
+        noResultsRow.remove();
       }
     }
 
-    function excluirUsuario(userId, username) {
-      if (confirm(`Tem certeza que deseja excluir o usuário "${username}"?\n\nEsta ação não pode ser desfeita!`)) {
-        fetch(`/excluir-usuario/${userId}/`, {
-          method: 'POST',
-          headers: {
-            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-            'Content-Type': 'application/json',
-          },
-        })
-          .then(response => response.json())
-          .then(data => {
-            if (data.success) {
-              alert(data.success);
-              location.reload();
-            } else {
-              alert('Erro: ' + data.error);
-            }
-          })
-          .catch(error => {
-            console.error('Erro:', error);
-            alert('Erro ao excluir usuário');
-          });
+    // Função para limpar filtros
+    function clearFiltersUsuarios() {
+      document.getElementById('searchUsuario').value = '';
+      document.getElementById('filterRole').value = '';
+      document.getElementById('filterStatus').value = '';
+      filterTableUsuarios();
+    }
+
+    // Funções para alteração de roles
+    function alterarRole(userId, nome, matricula, roleAtual) {
+      usuarioAtual = userId;
+
+      // Atualizar informações do usuário
+      document.getElementById('user-info').innerHTML = `
+        <h4>Dados do Usuário</h4>
+        <p><strong>Nome:</strong> ${nome}</p>
+        <p><strong>Matrícula:</strong> ${matricula}</p>
+        <p><strong>Role Atual:</strong> <span class="role-badge role-${roleAtual.toLowerCase()}">${roleAtual}</span></p>
+      `;
+
+      // Definir o ID do usuário no formulário
+      document.getElementById('usuario-id').value = userId;
+
+      // Limpar seleção anterior
+      document.getElementById('role-select').value = '';
+
+      // Mostrar modal usando a função global
+      openModal('modal-overlay');
+    }
+
+    function resetarRoleAutomatica(userId, username) {
+      if (confirm(`Tem certeza que deseja permitir que o SUAP volte a gerenciar automaticamente a role do usuário ${username}?\n\nIsso significa que a role será redefinida baseada no tipo de usuário no SUAP no próximo login.`)) {
+        window.location.href = `/resetar-role-automatica/${userId}/`;
       }
     }
 
-    // Busca em tempo real desabilitada - agora só funciona com o botão Filtrar
-    // O usuário precisa clicar em "Filtrar" para pesquisar
+    // Adiciona event listeners aos campos de filtro
+    document.addEventListener('DOMContentLoaded', function () {
+      const searchUsuario = document.getElementById('searchUsuario');
+      const filterRole = document.getElementById('filterRole');
+      const filterStatus = document.getElementById('filterStatus');
 
-    // Opcional: Adicionar funcionalidade de busca com Enter
-    document.getElementById('busca').addEventListener('keypress', function (e) {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        document.getElementById('filtro-form').submit();
-      }
-    });
+      if (searchUsuario) searchUsuario.addEventListener('input', filterTableUsuarios);
+      if (filterRole) filterRole.addEventListener('change', filterTableUsuarios);
+      if (filterStatus) filterStatus.addEventListener('change', filterTableUsuarios);
 
-    // Também para os selects
-    document.getElementById('status').addEventListener('change', function () {
-      document.getElementById('filtro-form').submit();
-    });
-
-    document.getElementById('role').addEventListener('change', function () {
-      document.getElementById('filtro-form').submit();
+      // Inicializa o contador na carga da página
+      updateUserCounter();
     });
   </script>
+  {% endif %}
 </body>
 
 </html>

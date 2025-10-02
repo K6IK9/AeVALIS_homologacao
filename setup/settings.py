@@ -11,8 +11,15 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
-from decouple import config, Csv
+from decouple import config, Csv, RepositoryEnv
 import os
+
+# Carrega o arquivo .env explicitamente da pasta raiz do projeto
+DOTENV_FILE = Path(__file__).resolve().parent.parent / '.env'
+if DOTENV_FILE.exists():
+    # Usa um repositório customizado para o decouple ler o arquivo
+    custom_repo = RepositoryEnv(DOTENV_FILE)
+    config.repository = custom_repo
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -41,6 +48,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rolepermissions",
+    "social_django",
     "avaliacao_docente.apps.AvaliacaoDocenteConfig",
 ]
 
@@ -52,6 +60,7 @@ MIDDLEWARE = [
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
+    "avaliacao_docente.middleware.ClearMessageMiddleware",  # Limpa mensagens antigas
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
@@ -64,9 +73,12 @@ TEMPLATES = [
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
+                "django.template.context_processors.debug",
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "social_django.context_processors.backends",
+                "social_django.context_processors.login_redirect",
             ],
         },
     },
@@ -96,10 +108,10 @@ DATABASES = {
 
 # Use para desenvolvimento rapido
 # DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.sqlite3",
-#         "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
-#     }
+#    "default": {
+#        "ENGINE": "django.db.backends.sqlite3",
+#        "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
+#    }
 # }
 
 # Password validation
@@ -128,45 +140,101 @@ LANGUAGE_CODE = "pt-br"
 
 TIME_ZONE = "America/Cuiaba"
 
-USE_I18N = True
+USE_L10N = True
 
 USE_TZ = True
-
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.2/howto/static-files/
-
-STATIC_URL = "static/"
-
-# Diretórios onde o Django procura arquivos estáticos durante desenvolvimento
-# STATICFILES_DIRS = [
- #  BASE_DIR / "static",
-#]
-
 STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
 
-
-# Diretório onde os arquivos estáticos são coletados para produção
-# STATIC_ROOT = BASE_DIR / "staticfiles"
-
+STATIC_URL = "static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
 
-# https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
-
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# LOGIN_URL = "accounts/login/?next=/"  # URL para onde os usuários não autenticados são redirecionados
+# Configuração de Logging para enviar e-mails de erro
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'mail_admins_dynamic': {
+            'level': 'ERROR',
+            'class': 'avaliacao_docente.utils.DynamicAdminEmailHandler',
+        },
+    },
+    'loggers': {
+        'django.request': {
+            'handlers': ['mail_admins_dynamic'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+    },
+}
 
-LOGOUT_REDIRECT_URL = "/"  # Redireciona para a página de login após o logout
 
-# LOGOUT_REDIRECT_URL = "accounts/login/?next=/"  # Redireciona para a página de login após o logout
-# LOGIN_REDIRECT_URL = '/'  # Redireciona para a página inicial após o login
 
-# LOGIN_REDIRECT_URL = ""
+# ============ CONFIGURAÇÕES DE AUTENTICAÇÃO ============
 
-LOGIN_LOGOUT_REDIRECT_URL = ""  # Redireciona para a página de login após o logout
+# Backends de autenticação - SUAP OAuth2 + Django padrão
+AUTHENTICATION_BACKENDS = (
+    "suap_backend.backends.SuapOAuth2",
+    "django.contrib.auth.backends.ModelBackend",
+)
 
+# URLs de redirecionamento
+LOGIN_URL = "/accounts/login/"
+LOGIN_REDIRECT_URL = "/"
+LOGOUT_REDIRECT_URL = "/accounts/login/"
+
+# ============ CONFIGURAÇÕES SOCIAL AUTH (SUAP) ============
+
+# Chaves de API do SUAP (devem ser definidas nas variáveis de ambiente)
+SOCIAL_AUTH_SUAP_KEY = config(
+    "SOCIAL_AUTH_SUAP_KEY",
+)
+SOCIAL_AUTH_SUAP_SECRET = config(
+    "SOCIAL_AUTH_SUAP_SECRET",
+)
+
+# Configurações do pipeline de autenticação social
+SOCIAL_AUTH_PIPELINE = (
+    "social_core.pipeline.social_auth.social_details",
+    "social_core.pipeline.social_auth.social_uid",
+    "setup.settings.allow_all_users",  # Permite todos os usuários
+    "social_core.pipeline.social_auth.social_user",
+    "social_core.pipeline.user.get_username",
+    "social_core.pipeline.user.create_user",
+    "social_core.pipeline.social_auth.associate_user",
+    "social_core.pipeline.social_auth.load_extra_data",
+    "avaliacao_docente.auth_pipeline.apply_suap_user_type",  # Aplica role e perfis via tipo_usuario
+    "social_core.pipeline.user.user_details",
+)
+
+
+# Configurações de sessão para o social auth
+SOCIAL_AUTH_SUAP_SCOPE = []  # Deixe vazio para evitar erro de invalid_scope
+SOCIAL_AUTH_LOGIN_REDIRECT_URL = "/"
+SOCIAL_AUTH_NEW_USER_REDIRECT_URL = "/"
+SOCIAL_AUTH_LOGIN_ERROR_URL = "/accounts/login/"
+SOCIAL_AUTH_RAISE_EXCEPTIONS = False
+SOCIAL_AUTH_BACKEND_ERROR_URL = "/accounts/login/"
+SOCIAL_AUTH_ALLOWED_REDIRECT_HOSTS = ["127.0.0.1", "localhost"]
+SOCIAL_AUTH_SUAP_REDIRECT_URI = "http://127.0.0.1:8000/complete/suap/"
+
+# Logging para inspecionar o fluxo de autenticação SUAP
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {"class": "logging.StreamHandler"},
+    },
+    "loggers": {
+        "suap_backend": {"handlers": ["console"], "level": "INFO"},
+        "social": {"handlers": ["console"], "level": "INFO"},
+    },
+}
+
+
+# ============ CONFIGURAÇÕES DE ROLES ============
 
 ROLEPERMISSIONS_MODULE = "setup.roles"  # Define o módulo de permissões de função
 
@@ -206,3 +274,8 @@ if "VERCEL" in os.environ:
             },
         },
     }
+
+
+def allow_all_users(strategy, details, user=None, *args, **kwargs):
+    # Pipeline que não bloqueia nenhuma credencial retornada pelo SUAP
+    return

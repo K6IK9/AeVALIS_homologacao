@@ -1,0 +1,248 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>IF SADD - Gerenciar Alunos da Turma</title>
+
+    <link rel="stylesheet" href="{% static 'css/global.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/gerenciar.css' %}" />
+</head>
+
+<body>
+    <div class="container">
+        <a href="{% url 'gerenciar_turmas' %}" class="back-button">← Voltar às Turmas</a>
+
+        <div class="header">
+            <h1>Gerenciar Alunos da Turma</h1>
+            <div class="turma-info">
+                <h2>{{ turma.disciplina.disciplina_nome }}</h2>
+                <p><strong>Professor:</strong> {{ turma.disciplina.professor.user.get_full_name }}</p>
+                <p><strong>Período:</strong> {{ turma.disciplina.periodo_letivo }} | <strong>Turno:</strong> {{
+                    turma.get_turno_display }}</p>
+                <p><strong>Código:</strong> {{ turma.codigo_turma }}</p>
+            </div>
+        </div>
+
+        <!-- Navegação Breadcrumb -->
+        <div class="nav-breadcrumb">
+            <a href="{% url 'inicio' %}">🏠 Início</a>
+            <span>→</span>
+            <a href="{% url 'admin_hub' %}">⚙️ Administração</a>
+            <span>→</span>
+            <a href="{% url 'gerenciar_turmas' %}">📚 Turmas</a>
+            <span>→</span>
+            <span>👥 Gerenciar Alunos</span>
+        </div>
+
+        {% include "partials/messages.html" %}
+
+        <!-- Estatísticas -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">{{ total_alunos }}</div>
+                <div class="stat-label">Total de Alunos</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ alunos_matriculados }}</div>
+                <div class="stat-label">Matriculados</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ alunos_disponiveis }}</div>
+                <div class="stat-label">Disponíveis</div>
+            </div>
+        </div>
+
+        <!-- Filtros e Busca -->
+        <div class="filters-section">
+            <h3 class="filters-title">Filtros e Busca</h3>
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label for="busca_aluno">Buscar por Nome/Matrícula/Email:</label>
+                    <div class="search-box">
+                        <input type="text" name="busca_aluno" id="busca_aluno" class="form-control"
+                            value="{{ busca_aluno }}" placeholder="Digite o nome, matrícula ou email do aluno..." />
+                    </div>
+                </div>
+                <div class="filter-group">
+                    <button type="button" class="btn-filter" onclick="limparFiltros()">Limpar Filtros</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formulário de Ações em Massa -->
+        <div class="form-section">
+            <form method="post" id="form-alunos">
+                {% csrf_token %}
+
+                <div class="bulk-actions-header">
+                    <h3>Ações em Massa</h3>
+                    <div class="btn-group">
+                        <button type="submit" name="acao" value="matricular" class="btn btn-sm btn-success"
+                            onclick="return confirm('Matricular alunos selecionados?')" title="Matricular Selecionados">
+                            ✅ Matricular
+                        </button>
+                        <button type="submit" name="acao" value="desmatricular" class="btn btn-sm btn-danger"
+                            onclick="return confirm('Desmatricular alunos selecionados?')"
+                            title="Desmatricular Selecionados">
+                            ❌ Desmatricular
+                        </button>
+                        <button type="button" onclick="toggleTodos()" class="btn btn-sm btn-secondary"
+                            title="Selecionar/Desmarcar Todos">
+                            🔄 Selecionar Todos
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Lista de Alunos -->
+                <div class="alunos-container">
+                    {% if alunos %}
+                    {% for aluno in alunos %}
+                    <div class="aluno-card {% if aluno.matriculado %}matriculado{% endif %}"
+                        data-nome="{{ aluno.nome|lower }}" data-username="{{ aluno.username|lower }}"
+                        data-email="{{ aluno.email|lower }}"
+                        data-matriculado="{% if aluno.matriculado %}true{% else %}false{% endif %}">
+                        <div class="aluno-checkbox">
+                            <input type="checkbox" name="alunos_selecionados" value="{{ aluno.id }}"
+                                id="aluno_{{ aluno.id }}" />
+                        </div>
+
+                        <div class="aluno-info">
+                            <div class="aluno-nome">
+                                <label for="aluno_{{ aluno.id }}">{{ aluno.nome }}</label>
+                            </div>
+                            <div class="aluno-detalhes">
+                                <span class="aluno-username">@{{ aluno.username }}</span>
+                                <span class="aluno-email">{{ aluno.email }}</span>
+                            </div>
+                        </div>
+
+                        <div class="aluno-status">
+                            {% if aluno.matriculado %}
+                            <span class="status-badge matriculado">✅ Matriculado</span>
+                            {% else %}
+                            <span class="status-badge disponivel">⭕ Disponível</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <div class="empty-state">
+                        <h3>Nenhum aluno encontrado</h3>
+                        {% if busca_aluno %}
+                        <p>Não há alunos que correspondam aos critérios de busca "{{ busca_aluno }}".</p>
+                        <a href="{% url 'gerenciar_alunos_turma' turma.id %}" class="btn-primary">Ver todos os
+                            alunos</a>
+                        {% else %}
+                        <p>Não há alunos cadastrados no sistema.</p>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Função para filtrar os cards de alunos
+        function filterAlunos() {
+            const searchFilter = document.getElementById('busca_aluno').value.toLowerCase().trim();
+
+            const alunoCards = document.querySelectorAll('.aluno-card');
+            let visibleCount = 0;
+            let matriculadosCount = 0;
+            let disponiveisCount = 0;
+
+            alunoCards.forEach(card => {
+                const nome = card.dataset.nome || '';
+                const username = card.dataset.username || '';
+                const email = card.dataset.email || '';
+                const matriculado = card.dataset.matriculado === 'true';
+
+                // A busca procura em nome, username e email
+                const searchMatch = !searchFilter ||
+                    nome.includes(searchFilter) ||
+                    username.includes(searchFilter) ||
+                    email.includes(searchFilter);
+
+                if (searchMatch) {
+                    card.style.display = '';
+                    visibleCount++;
+                    if (matriculado) {
+                        matriculadosCount++;
+                    } else {
+                        disponiveisCount++;
+                    }
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            // Atualizar estatísticas
+            const totalCount = document.getElementById('total-count');
+            const matriculadosCountEl = document.getElementById('alunos_matriculados');
+            const disponiveisCountEl = document.getElementById('alunos_disponiveis');
+
+            if (totalCount) totalCount.textContent = visibleCount;
+            if (matriculadosCountEl) matriculadosCountEl.textContent = matriculadosCount;
+            if (disponiveisCountEl) disponiveisCountEl.textContent = disponiveisCount;
+
+            // Mostrar/ocultar mensagem de empty state
+            const emptyState = document.querySelector('.empty-state');
+            if (emptyState) {
+                emptyState.style.display = visibleCount === 0 ? 'block' : 'none';
+            }
+        }
+
+        // Função para selecionar/desmarcar todos os checkboxes
+        function toggleTodos() {
+            const checkboxes = document.querySelectorAll('input[name="alunos_selecionados"]:not([style*="display: none"])');
+            const todosMarcados = Array.from(checkboxes).every(cb => cb.checked);
+
+            checkboxes.forEach(cb => {
+                cb.checked = !todosMarcados;
+            });
+        }
+
+        // Verificar se há alunos selecionados antes de submeter
+        document.getElementById('form-alunos').addEventListener('submit', function (e) {
+            const selecionados = document.querySelectorAll('input[name="alunos_selecionados"]:checked');
+
+            if (selecionados.length === 0) {
+                e.preventDefault();
+                alert('Selecione pelo menos um aluno para realizar a ação.');
+                return false;
+            }
+        });
+
+        // Função para limpar filtros
+        function limparFiltros() {
+            document.getElementById('busca_aluno').value = '';
+            filterAlunos();
+        }
+
+        // Adicionar event listener para busca automática
+        document.addEventListener('DOMContentLoaded', function () {
+            const buscaInput = document.getElementById('busca_aluno');
+
+            // Busca automática com debounce
+            let timeoutId;
+            buscaInput.addEventListener('input', function () {
+                clearTimeout(timeoutId);
+                timeoutId = setTimeout(() => {
+                    filterAlunos();
+                }, 300); // 300ms de debounce
+            });
+
+            // Aplicar filtro inicial se há valor
+            if (buscaInput.value.trim()) {
+                filterAlunos();
+            }
+        });
+    </script>
+</body>
+
+</html>

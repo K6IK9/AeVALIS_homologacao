@@ -18,7 +18,6 @@ from .models import (
     CicloAvaliacao,
     AvaliacaoDocente,
     RespostaAvaliacao,
-    ComentarioAvaliacao,
 )
 from .views import gerenciar_perfil_usuario
 import datetime
@@ -260,8 +259,6 @@ class ModelTestCase(TestCase):
 
         turma = Turma.objects.create(
             disciplina=disciplina,
-            professor=self.perfil_professor,
-            periodo_letivo=self.periodo,
             turno="matutino",
         )
 
@@ -283,8 +280,6 @@ class ModelTestCase(TestCase):
 
         turma = Turma.objects.create(
             disciplina=disciplina,
-            professor=self.perfil_professor,
-            periodo_letivo=self.periodo,
             turno="noturno",
         )
 
@@ -309,8 +304,6 @@ class ModelTestCase(TestCase):
 
         turma = Turma.objects.create(
             disciplina=disciplina,
-            professor=self.perfil_professor,
-            periodo_letivo=self.periodo,
             turno="vespertino",
         )
 
@@ -332,6 +325,130 @@ class ModelTestCase(TestCase):
         # Contagem deve excluir o admin
         self.assertEqual(turma.count_alunos_matriculados(), 1)  # Só o aluno normal
         self.assertEqual(turma.matriculas.count(), 2)  # Total incluindo admin
+
+    def test_turma_propriedade_professor(self):
+        """Testa que a propriedade professor retorna o professor da disciplina"""
+        disciplina = Disciplina.objects.create(
+            disciplina_nome="Banco de Dados",
+            disciplina_sigla="BD",
+            disciplina_tipo="Obrigatória",
+            curso=self.curso,
+            professor=self.perfil_professor,
+            periodo_letivo=self.periodo,
+        )
+
+        turma = Turma.objects.create(
+            disciplina=disciplina,
+            turno="noturno",
+        )
+
+        # Propriedade deve retornar o professor da disciplina
+        self.assertEqual(turma.professor, self.perfil_professor)
+        self.assertEqual(turma.professor.user, self.user_professor)
+
+    def test_turma_propriedade_periodo_letivo(self):
+        """Testa que a propriedade periodo_letivo retorna o período da disciplina"""
+        disciplina = Disciplina.objects.create(
+            disciplina_nome="Redes",
+            disciplina_sigla="RED",
+            disciplina_tipo="Obrigatória",
+            curso=self.curso,
+            professor=self.perfil_professor,
+            periodo_letivo=self.periodo,
+        )
+
+        turma = Turma.objects.create(
+            disciplina=disciplina,
+            turno="vespertino",
+        )
+
+        # Propriedade deve retornar o período da disciplina
+        self.assertEqual(turma.periodo_letivo, self.periodo)
+        self.assertEqual(turma.periodo_letivo.ano, 2024)
+
+    def test_turma_filtro_por_disciplina_professor(self):
+        """Testa filtro por professor via disciplina__professor"""
+        disciplina1 = Disciplina.objects.create(
+            disciplina_nome="Algoritmos",
+            disciplina_sigla="ALG",
+            disciplina_tipo="Obrigatória",
+            curso=self.curso,
+            professor=self.perfil_professor,
+            periodo_letivo=self.periodo,
+        )
+
+        disciplina2 = Disciplina.objects.create(
+            disciplina_nome="Estrutura de Dados",
+            disciplina_sigla="ED",
+            disciplina_tipo="Obrigatória",
+            curso=self.curso,
+            professor=self.perfil_professor,
+            periodo_letivo=self.periodo,
+        )
+
+        turma1 = Turma.objects.create(disciplina=disciplina1, turno="matutino")
+        turma2 = Turma.objects.create(disciplina=disciplina2, turno="vespertino")
+
+        # Filtrar por professor usando disciplina__professor
+        turmas_prof = Turma.objects.filter(disciplina__professor=self.perfil_professor)
+        self.assertEqual(turmas_prof.count(), 2)
+        self.assertIn(turma1, turmas_prof)
+        self.assertIn(turma2, turmas_prof)
+
+    def test_turma_filtro_por_disciplina_periodo_letivo(self):
+        """Testa filtro por período letivo via disciplina__periodo_letivo"""
+        periodo_outro = PeriodoLetivo.objects.create(
+            nome="2023.2",
+            ano=2023,
+            semestre=2,
+        )
+
+        disciplina1 = Disciplina.objects.create(
+            disciplina_nome="Algoritmos",
+            disciplina_sigla="ALG",
+            disciplina_tipo="Obrigatória",
+            curso=self.curso,
+            professor=self.perfil_professor,
+            periodo_letivo=self.periodo,  # 2024.1
+        )
+
+        disciplina2 = Disciplina.objects.create(
+            disciplina_nome="Banco",
+            disciplina_sigla="BD",
+            disciplina_tipo="Obrigatória",
+            curso=self.curso,
+            professor=self.perfil_professor,
+            periodo_letivo=periodo_outro,  # 2023.2
+        )
+
+        turma1 = Turma.objects.create(disciplina=disciplina1, turno="matutino")
+        turma2 = Turma.objects.create(disciplina=disciplina2, turno="noturno")
+
+        # Filtrar por período usando disciplina__periodo_letivo
+        turmas_2024 = Turma.objects.filter(disciplina__periodo_letivo=self.periodo)
+        self.assertEqual(turmas_2024.count(), 1)
+        self.assertIn(turma1, turmas_2024)
+        self.assertNotIn(turma2, turmas_2024)
+
+    def test_turma_unique_together_disciplina_turno(self):
+        """Testa constraint unique_together para disciplina + turno"""
+        disciplina = Disciplina.objects.create(
+            disciplina_nome="Web",
+            disciplina_sigla="WEB",
+            disciplina_tipo="Obrigatória",
+            curso=self.curso,
+            professor=self.perfil_professor,
+            periodo_letivo=self.periodo,
+        )
+
+        # Criar primeira turma
+        Turma.objects.create(disciplina=disciplina, turno="matutino")
+
+        # Tentar criar turma duplicada (mesma disciplina + turno)
+        from django.db import IntegrityError
+
+        with self.assertRaises(IntegrityError):
+            Turma.objects.create(disciplina=disciplina, turno="matutino")
 
 
 class ViewTestCase(TestCase):
@@ -641,8 +758,6 @@ class AvaliacaoDocenteTestCase(TestCase):
 
         self.turma = Turma.objects.create(
             disciplina=self.disciplina,
-            professor=self.perfil_professor,
-            periodo_letivo=self.periodo,
             turno="matutino",
         )
 
@@ -740,7 +855,7 @@ class AvaliacaoDocenteTestCase(TestCase):
         self.assertEqual(ciclo.nome, "Ciclo Teste 2024.1")
         self.assertEqual(ciclo.questionario, questionario)
         self.assertTrue(ciclo.ativo)
-        self.assertTrue(ciclo.permite_avaliacao_anonima)
+        # Ciclos agora são sempre tratados como anônimos; campo configurável removido do formulário
         self.assertEqual(str(ciclo), f"Ciclo Teste 2024.1 ({self.periodo})")
 
     def test_ciclo_avaliacao_status_property(self):
@@ -787,6 +902,108 @@ class AvaliacaoDocenteTestCase(TestCase):
         self.assertEqual(ciclo_futuro.status, "agendado")
         self.assertEqual(ciclo_passado.status, "finalizado")
         self.assertEqual(ciclo_atual.status, "em_andamento")
+
+    def test_excluir_ciclo_sem_avaliacoes(self):
+        """Deve permitir excluir ciclo que não possui avaliações associadas"""
+        from django.utils import timezone
+        from datetime import timedelta
+
+        questionario = QuestionarioAvaliacao.objects.create(
+            titulo="Questionário Teste", criado_por=self.user_admin
+        )
+
+        data_inicio = timezone.now()
+        data_fim = data_inicio + timedelta(days=10)
+
+        ciclo = CicloAvaliacao.objects.create(
+            nome="Ciclo Excluir",
+            periodo_letivo=self.periodo,
+            data_inicio=data_inicio,
+            data_fim=data_fim,
+            questionario=questionario,
+            criado_por=self.user_admin,
+        )
+
+        # Garantir que não há avaliações (não adicionamos turmas)
+        self.assertEqual(ciclo.avaliacoes.count(), 0)
+
+        self.client.login(username="admin123456", password="senha123")
+        url = reverse("excluir_ciclo", args=[ciclo.id])
+        response = self.client.post(url, follow=True)
+
+        self.assertEqual(response.status_code, 200)
+        # Agora deve excluir pois avaliações não possuem respostas
+        self.assertFalse(CicloAvaliacao.objects.filter(id=ciclo.id).exists())
+
+    def test_nao_excluir_ciclo_com_respostas(self):
+        """Não deve excluir ciclo se há avaliações com respostas"""
+        from django.utils import timezone
+        from datetime import timedelta
+
+        questionario = QuestionarioAvaliacao.objects.create(
+            titulo="Questionário Teste", criado_por=self.user_admin
+        )
+
+        data_inicio = timezone.now()
+        data_fim = data_inicio + timedelta(days=10)
+
+        ciclo = CicloAvaliacao.objects.create(
+            nome="Ciclo Com Respostas",
+            periodo_letivo=self.periodo,
+            data_inicio=data_inicio,
+            data_fim=data_fim,
+            questionario=questionario,
+            criado_por=self.user_admin,
+        )
+        ciclo.turmas.add(self.turma)
+        avaliacao = ciclo.avaliacoes.first()
+        # Adiciona uma resposta simulada
+        categoria = CategoriaPergunta.objects.create(nome="Didática")
+        pergunta = PerguntaAvaliacao.objects.create(
+            enunciado="Pergunta teste", tipo="likert", categoria=categoria
+        )
+        RespostaAvaliacao.objects.create(
+            avaliacao=avaliacao,
+            aluno=self.perfil_aluno,
+            pergunta=pergunta,
+            valor_numerico=4,
+        )
+
+        self.client.login(username="admin123456", password="senha123")
+        url = reverse("excluir_ciclo", args=[ciclo.id])
+        response = self.client.post(url, follow=True)
+        self.assertTrue(CicloAvaliacao.objects.filter(id=ciclo.id).exists())
+        data_fim = data_inicio + timedelta(days=10)
+
+        ciclo = CicloAvaliacao.objects.create(
+            nome="Ciclo Com Avaliações",
+            periodo_letivo=self.periodo,
+            data_inicio=data_inicio,
+            data_fim=data_fim,
+            questionario=questionario,
+            criado_por=self.user_admin,
+        )
+
+        # Adicionar turma para gerar avaliação via signal
+        ciclo.turmas.add(self.turma)
+        self.assertGreater(ciclo.avaliacoes.count(), 0)
+
+        self.client.login(username="admin123456", password="senha123")
+        url = reverse("excluir_ciclo", args=[ciclo.id])
+        response = self.client.post(url, follow=True)
+
+        # Não deve excluir
+        self.assertTrue(CicloAvaliacao.objects.filter(id=ciclo.id).exists())
+        # Verificar mensagem de erro
+        # (messages pode não estar sempre em context dependendo de config, checar condicionalmente)
+        if hasattr(response, "context") and response.context:
+            ctx_messages = response.context.get("messages")
+            if ctx_messages:
+                self.assertTrue(
+                    any(
+                        "Não é possível excluir o ciclo" in str(m) for m in ctx_messages
+                    )
+                )
 
     def test_avaliacao_docente_creation(self):
         """Testa criação de avaliação docente"""
@@ -940,46 +1157,6 @@ class AvaliacaoDocenteTestCase(TestCase):
             valor_boolean=True,
         )
         self.assertEqual(resposta_sim_nao.valor_display(), "Sim")
-
-    def test_comentario_avaliacao_creation(self):
-        """Testa criação de comentário de avaliação"""
-        questionario = QuestionarioAvaliacao.objects.create(
-            titulo="Questionário Teste", criado_por=self.user_admin
-        )
-
-        from django.utils import timezone
-        from datetime import timedelta
-
-        data_inicio = timezone.now()
-        data_fim = data_inicio + timedelta(days=30)
-
-        ciclo = CicloAvaliacao.objects.create(
-            nome="Ciclo Teste",
-            periodo_letivo=self.periodo,
-            data_inicio=data_inicio,
-            data_fim=data_fim,
-            questionario=questionario,
-            criado_por=self.user_admin,
-        )
-
-        avaliacao = AvaliacaoDocente.objects.create(
-            ciclo=ciclo,
-            turma=self.turma,
-            professor=self.perfil_professor,
-            disciplina=self.disciplina,
-        )
-
-        comentario = ComentarioAvaliacao.objects.create(
-            avaliacao=avaliacao,
-            aluno=self.perfil_aluno,
-            elogios="Excelente professor!",
-            sugestoes="Poderia usar mais exemplos práticos",
-        )
-
-        self.assertEqual(comentario.avaliacao, avaliacao)
-        self.assertEqual(comentario.aluno, self.perfil_aluno)
-        self.assertEqual(comentario.elogios, "Excelente professor!")
-        self.assertFalse(comentario.anonimo)
 
     def test_avaliacao_docente_calculos(self):
         """Testa métodos de cálculo da avaliação docente"""

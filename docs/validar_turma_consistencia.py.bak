@@ -1,0 +1,202 @@
+"""
+Script de Validação - Consistência de Dados Turma
+
+⚠️ OBSOLETO - Este script foi utilizado antes da migração 0008 que removeu
+os campos redundantes 'professor' e 'periodo_letivo' de Turma.
+
+HISTÓRICO:
+- Validava se turma.professor == disciplina.professor
+- Validava se turma.periodo_letivo == disciplina.periodo_letivo
+- Utilizado antes da migration 0008_remover_campos_redundantes_turma
+
+STATUS ATUAL (pós-migração 0008):
+- Os campos professor e periodo_letivo foram REMOVIDOS de Turma
+- Agora Turma possui apenas @property que delega para disciplina
+- Este script não é mais necessário e está mantido apenas para referência histórica
+
+Para executar validações atuais, use os testes em avaliacao_docente/tests.py
+"""
+
+import os
+import sys
+
+print("=" * 80)
+print("⚠️  ESTE SCRIPT ESTÁ OBSOLETO")
+print("=" * 80)
+print("\nOs campos 'professor' e 'periodo_letivo' foram removidos de Turma")
+print("na migração 0008_remover_campos_redundantes_turma.")
+print("\nAgora esses dados são acessados via properties:")
+print("  • turma.professor → turma.disciplina.professor")
+print("  • turma.periodo_letivo → turma.disciplina.periodo_letivo")
+print("\nEste arquivo está mantido apenas para referência histórica.")
+print("Para testes atuais, veja: avaliacao_docente/tests.py")
+print("=" * 80)
+sys.exit(0)
+
+
+# ============================================================================
+# CÓDIGO HISTÓRICO ABAIXO - NÃO MAIS FUNCIONAL APÓS MIGRAÇÃO 0008
+# ============================================================================
+"""
+import django
+
+# Adicionar o diretório raiz do projeto ao path
+sys.path.append("c:/Users/kaike_matos/Documents/Docs/avaliacao_docente_suap")
+
+# Configurar o Django
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "setup.settings")
+django.setup()
+
+from django.contrib.auth.models import User
+from avaliacao_docente.models import Turma
+from django.db.models import Q
+
+
+def validar_consistencia_turmas():
+        print("\n✅ Nenhuma turma encontrada. Banco vazio ou sem dados de teste.")
+        return True
+
+    # Listas para armazenar inconsistências
+    inconsistencias_professor = []
+    inconsistencias_periodo = []
+    turmas_ok = 0
+
+    print("\n🔄 Verificando consistência...")
+
+    for turma in turmas:
+        tem_erro = False
+
+        # Verificar professor
+        if turma.professor_id != turma.disciplina.professor_id:
+            inconsistencias_professor.append(
+                {
+                    "turma_id": turma.id,
+                    "codigo": turma.codigo_turma,
+                    "turma_professor": (
+                        turma.professor.user.get_full_name()
+                        if turma.professor
+                        else "None"
+                    ),
+                    "disciplina_professor": (
+                        turma.disciplina.professor.user.get_full_name()
+                        if turma.disciplina.professor
+                        else "None"
+                    ),
+                }
+            )
+            tem_erro = True
+
+        # Verificar período letivo
+        if turma.periodo_letivo_id != turma.disciplina.periodo_letivo_id:
+            inconsistencias_periodo.append(
+                {
+                    "turma_id": turma.id,
+                    "codigo": turma.codigo_turma,
+                    "turma_periodo": (
+                        str(turma.periodo_letivo) if turma.periodo_letivo else "None"
+                    ),
+                    "disciplina_periodo": (
+                        str(turma.disciplina.periodo_letivo)
+                        if turma.disciplina.periodo_letivo
+                        else "None"
+                    ),
+                }
+            )
+            tem_erro = True
+
+        if not tem_erro:
+            turmas_ok += 1
+
+    # Exibir resultados
+    print("\n" + "=" * 70)
+    print("📋 RESULTADO DA VALIDAÇÃO")
+    print("=" * 70)
+
+    print(f"\n✅ Turmas consistentes: {turmas_ok}/{total_turmas}")
+
+    if inconsistencias_professor:
+        print(f"\n❌ INCONSISTÊNCIAS DE PROFESSOR: {len(inconsistencias_professor)}")
+        print("-" * 70)
+        for inc in inconsistencias_professor:
+            print(f"  Turma ID: {inc['turma_id']} ({inc['codigo']})")
+            print(f"    • Turma.professor: {inc['turma_professor']}")
+            print(f"    • Disciplina.professor: {inc['disciplina_professor']}")
+            print()
+
+    if inconsistencias_periodo:
+        print(f"\n❌ INCONSISTÊNCIAS DE PERÍODO LETIVO: {len(inconsistencias_periodo)}")
+        print("-" * 70)
+        for inc in inconsistencias_periodo:
+            print(f"  Turma ID: {inc['turma_id']} ({inc['codigo']})")
+            print(f"    • Turma.periodo_letivo: {inc['turma_periodo']}")
+            print(f"    • Disciplina.periodo_letivo: {inc['disciplina_periodo']}")
+            print()
+
+    # Conclusão
+    print("=" * 70)
+
+    if not inconsistencias_professor and not inconsistencias_periodo:
+        print("\n✅ VALIDAÇÃO CONCLUÍDA COM SUCESSO!")
+        print("   Todos os dados estão consistentes.")
+        print("   Seguro para prosseguir com a migração.\n")
+        return True
+    else:
+        print("\n⚠️  VALIDAÇÃO FALHOU!")
+        print("   Foram encontradas inconsistências nos dados.")
+        print("   CORRIJA os dados antes de prosseguir com a migração.\n")
+        print("💡 SUGESTÃO:")
+        print("   Execute o script de correção automática ou corrija manualmente")
+        print("   as inconsistências listadas acima.\n")
+        return False
+
+
+def corrigir_inconsistencias():
+    """
+    Corrige automaticamente as inconsistências encontradas
+    copiando os dados de disciplina para turma
+    """
+    print("\n🔧 Deseja corrigir automaticamente as inconsistências? (s/n): ", end="")
+    resposta = input().lower().strip()
+
+    if resposta != "s":
+        print("❌ Correção cancelada pelo usuário.")
+        return
+
+    print("\n🔄 Iniciando correção automática...")
+
+    turmas = Turma.objects.select_related(
+        "disciplina", "disciplina__professor", "disciplina__periodo_letivo"
+    ).all()
+
+    corrigidas = 0
+
+    for turma in turmas:
+        modificou = False
+
+        if turma.professor_id != turma.disciplina.professor_id:
+            turma.professor = turma.disciplina.professor
+            modificou = True
+
+        if turma.periodo_letivo_id != turma.disciplina.periodo_letivo_id:
+            turma.periodo_letivo = turma.disciplina.periodo_letivo
+            modificou = True
+
+        if modificou:
+            turma.save()
+            corrigidas += 1
+            print(f"  ✅ Turma {turma.codigo_turma} corrigida")
+
+    print(f"\n✅ Correção concluída! {corrigidas} turma(s) corrigida(s).")
+    print("\n🔄 Executando nova validação...")
+    validar_consistencia_turmas()
+
+
+if __name__ == "__main__":
+    print("\n" + "=" * 70)
+    print("  VALIDAÇÃO DE CONSISTÊNCIA - TURMAS")
+    print("=" * 70)
+
+    resultado = validar_consistencia_turmas()
+
+    if not resultado:
+        corrigir_inconsistencias()

@@ -1,0 +1,3079 @@
+{
+  "data_auditoria": "2025-10-02T14:08:32.803113",
+  "total_modelos": 16,
+  "duplicidades": {
+    "campos_repetidos": [
+      {
+        "campo": "id",
+        "tipo": "BigAutoField",
+        "modelos": [
+          "PerfilAluno",
+          "PerfilProfessor",
+          "Curso",
+          "PeriodoLetivo",
+          "Disciplina",
+          "Turma",
+          "MatriculaTurma",
+          "HorarioTurma",
+          "QuestionarioAvaliacao",
+          "CategoriaPergunta",
+          "PerguntaAvaliacao",
+          "QuestionarioPergunta",
+          "CicloAvaliacao",
+          "AvaliacaoDocente",
+          "RespostaAvaliacao",
+          "ConfiguracaoSite"
+        ],
+        "quantidade": 16
+      },
+      {
+        "campo": "disciplinas",
+        "tipo": "ManyToOneRel",
+        "modelos": [
+          "PerfilProfessor",
+          "Curso",
+          "PeriodoLetivo"
+        ],
+        "quantidade": 3
+      },
+      {
+        "campo": "nome",
+        "tipo": "CharField",
+        "modelos": [
+          "PeriodoLetivo",
+          "CategoriaPergunta",
+          "CicloAvaliacao"
+        ],
+        "quantidade": 3
+      },
+      {
+        "campo": "status",
+        "tipo": "CharField",
+        "modelos": [
+          "Turma",
+          "MatriculaTurma",
+          "AvaliacaoDocente"
+        ],
+        "quantidade": 3
+      },
+      {
+        "campo": "data_criacao",
+        "tipo": "DateTimeField",
+        "modelos": [
+          "Turma",
+          "QuestionarioAvaliacao",
+          "PerguntaAvaliacao",
+          "CicloAvaliacao",
+          "AvaliacaoDocente"
+        ],
+        "quantidade": 5
+      },
+      {
+        "campo": "turma",
+        "tipo": "ForeignKey",
+        "modelos": [
+          "MatriculaTurma",
+          "HorarioTurma",
+          "AvaliacaoDocente"
+        ],
+        "quantidade": 3
+      }
+    ],
+    "metodos_similares": [
+      {
+        "metodo": "__repr__",
+        "modelo1": "PerfilAluno",
+        "modelo2": "PerfilProfessor",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "PerfilAluno",
+        "modelo2": "Curso",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "PerfilAluno",
+        "modelo2": "PeriodoLetivo",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "PerfilAluno",
+        "modelo2": "Disciplina",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "PerfilAluno",
+        "modelo2": "Turma",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "PerfilAluno",
+        "modelo2": "MatriculaTurma",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "PerfilAluno",
+        "modelo2": "HorarioTurma",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "PerfilAluno",
+        "modelo2": "QuestionarioAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "PerfilAluno",
+        "modelo2": "CategoriaPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "PerfilAluno",
+        "modelo2": "PerguntaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "PerfilAluno",
+        "modelo2": "QuestionarioPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "PerfilAluno",
+        "modelo2": "CicloAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "PerfilAluno",
+        "modelo2": "AvaliacaoDocente",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "PerfilAluno",
+        "modelo2": "RespostaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "PerfilAluno",
+        "modelo2": "ConfiguracaoSite",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "PerfilProfessor",
+        "modelo2": "Curso",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "PerfilProfessor",
+        "modelo2": "PeriodoLetivo",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "PerfilProfessor",
+        "modelo2": "Disciplina",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "PerfilProfessor",
+        "modelo2": "Turma",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "PerfilProfessor",
+        "modelo2": "MatriculaTurma",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "PerfilProfessor",
+        "modelo2": "HorarioTurma",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "PerfilProfessor",
+        "modelo2": "QuestionarioAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "PerfilProfessor",
+        "modelo2": "CategoriaPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "PerfilProfessor",
+        "modelo2": "PerguntaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "PerfilProfessor",
+        "modelo2": "QuestionarioPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "PerfilProfessor",
+        "modelo2": "CicloAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "PerfilProfessor",
+        "modelo2": "AvaliacaoDocente",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "PerfilProfessor",
+        "modelo2": "RespostaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "PerfilProfessor",
+        "modelo2": "ConfiguracaoSite",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "Curso",
+        "modelo2": "PeriodoLetivo",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "Curso",
+        "modelo2": "Disciplina",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "Curso",
+        "modelo2": "Turma",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "Curso",
+        "modelo2": "MatriculaTurma",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "Curso",
+        "modelo2": "HorarioTurma",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "Curso",
+        "modelo2": "QuestionarioAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "Curso",
+        "modelo2": "CategoriaPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "Curso",
+        "modelo2": "PerguntaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "Curso",
+        "modelo2": "QuestionarioPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "Curso",
+        "modelo2": "CicloAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "Curso",
+        "modelo2": "AvaliacaoDocente",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "Curso",
+        "modelo2": "RespostaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "Curso",
+        "modelo2": "ConfiguracaoSite",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "PeriodoLetivo",
+        "modelo2": "Disciplina",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "PeriodoLetivo",
+        "modelo2": "Turma",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "PeriodoLetivo",
+        "modelo2": "MatriculaTurma",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "PeriodoLetivo",
+        "modelo2": "HorarioTurma",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "PeriodoLetivo",
+        "modelo2": "QuestionarioAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "PeriodoLetivo",
+        "modelo2": "CategoriaPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "PeriodoLetivo",
+        "modelo2": "PerguntaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "PeriodoLetivo",
+        "modelo2": "QuestionarioPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "PeriodoLetivo",
+        "modelo2": "CicloAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "PeriodoLetivo",
+        "modelo2": "AvaliacaoDocente",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "PeriodoLetivo",
+        "modelo2": "RespostaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "PeriodoLetivo",
+        "modelo2": "ConfiguracaoSite",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "Disciplina",
+        "modelo2": "Turma",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "Disciplina",
+        "modelo2": "MatriculaTurma",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "Disciplina",
+        "modelo2": "HorarioTurma",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "Disciplina",
+        "modelo2": "QuestionarioAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "Disciplina",
+        "modelo2": "CategoriaPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "Disciplina",
+        "modelo2": "PerguntaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "Disciplina",
+        "modelo2": "QuestionarioPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "Disciplina",
+        "modelo2": "CicloAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "Disciplina",
+        "modelo2": "AvaliacaoDocente",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "Disciplina",
+        "modelo2": "RespostaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "Disciplina",
+        "modelo2": "ConfiguracaoSite",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "Turma",
+        "modelo2": "MatriculaTurma",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "Turma",
+        "modelo2": "HorarioTurma",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "Turma",
+        "modelo2": "QuestionarioAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "Turma",
+        "modelo2": "CategoriaPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "Turma",
+        "modelo2": "PerguntaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "Turma",
+        "modelo2": "QuestionarioPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "Turma",
+        "modelo2": "CicloAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "Turma",
+        "modelo2": "AvaliacaoDocente",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "Turma",
+        "modelo2": "RespostaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "Turma",
+        "modelo2": "ConfiguracaoSite",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "MatriculaTurma",
+        "modelo2": "HorarioTurma",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "MatriculaTurma",
+        "modelo2": "QuestionarioAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "MatriculaTurma",
+        "modelo2": "CategoriaPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "MatriculaTurma",
+        "modelo2": "PerguntaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "MatriculaTurma",
+        "modelo2": "QuestionarioPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "MatriculaTurma",
+        "modelo2": "CicloAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "MatriculaTurma",
+        "modelo2": "AvaliacaoDocente",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "MatriculaTurma",
+        "modelo2": "RespostaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "MatriculaTurma",
+        "modelo2": "ConfiguracaoSite",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "HorarioTurma",
+        "modelo2": "QuestionarioAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "HorarioTurma",
+        "modelo2": "CategoriaPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "HorarioTurma",
+        "modelo2": "PerguntaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "HorarioTurma",
+        "modelo2": "QuestionarioPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "HorarioTurma",
+        "modelo2": "CicloAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "HorarioTurma",
+        "modelo2": "AvaliacaoDocente",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "HorarioTurma",
+        "modelo2": "RespostaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "HorarioTurma",
+        "modelo2": "ConfiguracaoSite",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "QuestionarioAvaliacao",
+        "modelo2": "CategoriaPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "QuestionarioAvaliacao",
+        "modelo2": "PerguntaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "QuestionarioAvaliacao",
+        "modelo2": "QuestionarioPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "QuestionarioAvaliacao",
+        "modelo2": "CicloAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "QuestionarioAvaliacao",
+        "modelo2": "AvaliacaoDocente",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "QuestionarioAvaliacao",
+        "modelo2": "RespostaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "QuestionarioAvaliacao",
+        "modelo2": "ConfiguracaoSite",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "CategoriaPergunta",
+        "modelo2": "PerguntaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "CategoriaPergunta",
+        "modelo2": "QuestionarioPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "CategoriaPergunta",
+        "modelo2": "CicloAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "CategoriaPergunta",
+        "modelo2": "AvaliacaoDocente",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "CategoriaPergunta",
+        "modelo2": "RespostaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "CategoriaPergunta",
+        "modelo2": "ConfiguracaoSite",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "PerguntaAvaliacao",
+        "modelo2": "QuestionarioPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "PerguntaAvaliacao",
+        "modelo2": "CicloAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "PerguntaAvaliacao",
+        "modelo2": "AvaliacaoDocente",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "PerguntaAvaliacao",
+        "modelo2": "RespostaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "PerguntaAvaliacao",
+        "modelo2": "ConfiguracaoSite",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "QuestionarioPergunta",
+        "modelo2": "CicloAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "QuestionarioPergunta",
+        "modelo2": "AvaliacaoDocente",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "QuestionarioPergunta",
+        "modelo2": "RespostaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "QuestionarioPergunta",
+        "modelo2": "ConfiguracaoSite",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "CicloAvaliacao",
+        "modelo2": "AvaliacaoDocente",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "CicloAvaliacao",
+        "modelo2": "RespostaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "CicloAvaliacao",
+        "modelo2": "ConfiguracaoSite",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "AvaliacaoDocente",
+        "modelo2": "RespostaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "AvaliacaoDocente",
+        "modelo2": "ConfiguracaoSite",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__repr__",
+        "modelo1": "RespostaAvaliacao",
+        "modelo2": "ConfiguracaoSite",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__str__",
+        "modelo1": "PerfilAluno",
+        "modelo2": "MatriculaTurma",
+        "similaridade": 85.7,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__str__",
+        "modelo1": "Curso",
+        "modelo2": "CicloAvaliacao",
+        "similaridade": 85.4,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "__str__",
+        "modelo1": "QuestionarioAvaliacao",
+        "modelo2": "CategoriaPergunta",
+        "similaridade": 91.8,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "PerfilAluno",
+        "modelo2": "PerfilProfessor",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "PerfilAluno",
+        "modelo2": "Curso",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "PerfilAluno",
+        "modelo2": "PeriodoLetivo",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "PerfilAluno",
+        "modelo2": "Disciplina",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "PerfilAluno",
+        "modelo2": "Turma",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "PerfilAluno",
+        "modelo2": "MatriculaTurma",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "PerfilAluno",
+        "modelo2": "HorarioTurma",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "PerfilAluno",
+        "modelo2": "QuestionarioAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "PerfilAluno",
+        "modelo2": "CategoriaPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "PerfilAluno",
+        "modelo2": "PerguntaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "PerfilAluno",
+        "modelo2": "QuestionarioPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "PerfilAluno",
+        "modelo2": "AvaliacaoDocente",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "PerfilAluno",
+        "modelo2": "RespostaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "PerfilAluno",
+        "modelo2": "ConfiguracaoSite",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "PerfilProfessor",
+        "modelo2": "Curso",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "PerfilProfessor",
+        "modelo2": "PeriodoLetivo",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "PerfilProfessor",
+        "modelo2": "Disciplina",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "PerfilProfessor",
+        "modelo2": "Turma",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "PerfilProfessor",
+        "modelo2": "MatriculaTurma",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "PerfilProfessor",
+        "modelo2": "HorarioTurma",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "PerfilProfessor",
+        "modelo2": "QuestionarioAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "PerfilProfessor",
+        "modelo2": "CategoriaPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "PerfilProfessor",
+        "modelo2": "PerguntaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "PerfilProfessor",
+        "modelo2": "QuestionarioPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "PerfilProfessor",
+        "modelo2": "AvaliacaoDocente",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "PerfilProfessor",
+        "modelo2": "RespostaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "PerfilProfessor",
+        "modelo2": "ConfiguracaoSite",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "Curso",
+        "modelo2": "PeriodoLetivo",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "Curso",
+        "modelo2": "Disciplina",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "Curso",
+        "modelo2": "Turma",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "Curso",
+        "modelo2": "MatriculaTurma",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "Curso",
+        "modelo2": "HorarioTurma",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "Curso",
+        "modelo2": "QuestionarioAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "Curso",
+        "modelo2": "CategoriaPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "Curso",
+        "modelo2": "PerguntaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "Curso",
+        "modelo2": "QuestionarioPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "Curso",
+        "modelo2": "AvaliacaoDocente",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "Curso",
+        "modelo2": "RespostaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "Curso",
+        "modelo2": "ConfiguracaoSite",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "PeriodoLetivo",
+        "modelo2": "Disciplina",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "PeriodoLetivo",
+        "modelo2": "Turma",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "PeriodoLetivo",
+        "modelo2": "MatriculaTurma",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "PeriodoLetivo",
+        "modelo2": "HorarioTurma",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "PeriodoLetivo",
+        "modelo2": "QuestionarioAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "PeriodoLetivo",
+        "modelo2": "CategoriaPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "PeriodoLetivo",
+        "modelo2": "PerguntaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "PeriodoLetivo",
+        "modelo2": "QuestionarioPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "PeriodoLetivo",
+        "modelo2": "AvaliacaoDocente",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "PeriodoLetivo",
+        "modelo2": "RespostaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "PeriodoLetivo",
+        "modelo2": "ConfiguracaoSite",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "Disciplina",
+        "modelo2": "Turma",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "Disciplina",
+        "modelo2": "MatriculaTurma",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "Disciplina",
+        "modelo2": "HorarioTurma",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "Disciplina",
+        "modelo2": "QuestionarioAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "Disciplina",
+        "modelo2": "CategoriaPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "Disciplina",
+        "modelo2": "PerguntaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "Disciplina",
+        "modelo2": "QuestionarioPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "Disciplina",
+        "modelo2": "AvaliacaoDocente",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "Disciplina",
+        "modelo2": "RespostaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "Disciplina",
+        "modelo2": "ConfiguracaoSite",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "Turma",
+        "modelo2": "MatriculaTurma",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "Turma",
+        "modelo2": "HorarioTurma",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "Turma",
+        "modelo2": "QuestionarioAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "Turma",
+        "modelo2": "CategoriaPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "Turma",
+        "modelo2": "PerguntaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "Turma",
+        "modelo2": "QuestionarioPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "Turma",
+        "modelo2": "AvaliacaoDocente",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "Turma",
+        "modelo2": "RespostaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "Turma",
+        "modelo2": "ConfiguracaoSite",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "MatriculaTurma",
+        "modelo2": "HorarioTurma",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "MatriculaTurma",
+        "modelo2": "QuestionarioAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "MatriculaTurma",
+        "modelo2": "CategoriaPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "MatriculaTurma",
+        "modelo2": "PerguntaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "MatriculaTurma",
+        "modelo2": "QuestionarioPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "MatriculaTurma",
+        "modelo2": "AvaliacaoDocente",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "MatriculaTurma",
+        "modelo2": "RespostaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "MatriculaTurma",
+        "modelo2": "ConfiguracaoSite",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "HorarioTurma",
+        "modelo2": "QuestionarioAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "HorarioTurma",
+        "modelo2": "CategoriaPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "HorarioTurma",
+        "modelo2": "PerguntaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "HorarioTurma",
+        "modelo2": "QuestionarioPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "HorarioTurma",
+        "modelo2": "AvaliacaoDocente",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "HorarioTurma",
+        "modelo2": "RespostaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "HorarioTurma",
+        "modelo2": "ConfiguracaoSite",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "QuestionarioAvaliacao",
+        "modelo2": "CategoriaPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "QuestionarioAvaliacao",
+        "modelo2": "PerguntaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "QuestionarioAvaliacao",
+        "modelo2": "QuestionarioPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "QuestionarioAvaliacao",
+        "modelo2": "AvaliacaoDocente",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "QuestionarioAvaliacao",
+        "modelo2": "RespostaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "QuestionarioAvaliacao",
+        "modelo2": "ConfiguracaoSite",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "CategoriaPergunta",
+        "modelo2": "PerguntaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "CategoriaPergunta",
+        "modelo2": "QuestionarioPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "CategoriaPergunta",
+        "modelo2": "AvaliacaoDocente",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "CategoriaPergunta",
+        "modelo2": "RespostaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "CategoriaPergunta",
+        "modelo2": "ConfiguracaoSite",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "PerguntaAvaliacao",
+        "modelo2": "QuestionarioPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "PerguntaAvaliacao",
+        "modelo2": "AvaliacaoDocente",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "PerguntaAvaliacao",
+        "modelo2": "RespostaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "PerguntaAvaliacao",
+        "modelo2": "ConfiguracaoSite",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "QuestionarioPergunta",
+        "modelo2": "AvaliacaoDocente",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "QuestionarioPergunta",
+        "modelo2": "RespostaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "QuestionarioPergunta",
+        "modelo2": "ConfiguracaoSite",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "AvaliacaoDocente",
+        "modelo2": "RespostaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "AvaliacaoDocente",
+        "modelo2": "ConfiguracaoSite",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "clean",
+        "modelo1": "RespostaAvaliacao",
+        "modelo2": "ConfiguracaoSite",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "PerfilAluno",
+        "modelo2": "PerfilProfessor",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "PerfilAluno",
+        "modelo2": "Curso",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "PerfilAluno",
+        "modelo2": "PeriodoLetivo",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "PerfilAluno",
+        "modelo2": "Disciplina",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "PerfilAluno",
+        "modelo2": "Turma",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "PerfilAluno",
+        "modelo2": "MatriculaTurma",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "PerfilAluno",
+        "modelo2": "HorarioTurma",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "PerfilAluno",
+        "modelo2": "QuestionarioAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "PerfilAluno",
+        "modelo2": "CategoriaPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "PerfilAluno",
+        "modelo2": "PerguntaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "PerfilAluno",
+        "modelo2": "QuestionarioPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "PerfilAluno",
+        "modelo2": "CicloAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "PerfilAluno",
+        "modelo2": "AvaliacaoDocente",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "PerfilAluno",
+        "modelo2": "RespostaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "PerfilAluno",
+        "modelo2": "ConfiguracaoSite",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "PerfilProfessor",
+        "modelo2": "Curso",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "PerfilProfessor",
+        "modelo2": "PeriodoLetivo",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "PerfilProfessor",
+        "modelo2": "Disciplina",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "PerfilProfessor",
+        "modelo2": "Turma",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "PerfilProfessor",
+        "modelo2": "MatriculaTurma",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "PerfilProfessor",
+        "modelo2": "HorarioTurma",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "PerfilProfessor",
+        "modelo2": "QuestionarioAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "PerfilProfessor",
+        "modelo2": "CategoriaPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "PerfilProfessor",
+        "modelo2": "PerguntaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "PerfilProfessor",
+        "modelo2": "QuestionarioPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "PerfilProfessor",
+        "modelo2": "CicloAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "PerfilProfessor",
+        "modelo2": "AvaliacaoDocente",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "PerfilProfessor",
+        "modelo2": "RespostaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "PerfilProfessor",
+        "modelo2": "ConfiguracaoSite",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "Curso",
+        "modelo2": "PeriodoLetivo",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "Curso",
+        "modelo2": "Disciplina",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "Curso",
+        "modelo2": "Turma",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "Curso",
+        "modelo2": "MatriculaTurma",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "Curso",
+        "modelo2": "HorarioTurma",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "Curso",
+        "modelo2": "QuestionarioAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "Curso",
+        "modelo2": "CategoriaPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "Curso",
+        "modelo2": "PerguntaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "Curso",
+        "modelo2": "QuestionarioPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "Curso",
+        "modelo2": "CicloAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "Curso",
+        "modelo2": "AvaliacaoDocente",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "Curso",
+        "modelo2": "RespostaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "Curso",
+        "modelo2": "ConfiguracaoSite",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "PeriodoLetivo",
+        "modelo2": "Disciplina",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "PeriodoLetivo",
+        "modelo2": "Turma",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "PeriodoLetivo",
+        "modelo2": "MatriculaTurma",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "PeriodoLetivo",
+        "modelo2": "HorarioTurma",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "PeriodoLetivo",
+        "modelo2": "QuestionarioAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "PeriodoLetivo",
+        "modelo2": "CategoriaPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "PeriodoLetivo",
+        "modelo2": "PerguntaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "PeriodoLetivo",
+        "modelo2": "QuestionarioPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "PeriodoLetivo",
+        "modelo2": "CicloAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "PeriodoLetivo",
+        "modelo2": "AvaliacaoDocente",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "PeriodoLetivo",
+        "modelo2": "RespostaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "PeriodoLetivo",
+        "modelo2": "ConfiguracaoSite",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "Disciplina",
+        "modelo2": "Turma",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "Disciplina",
+        "modelo2": "MatriculaTurma",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "Disciplina",
+        "modelo2": "HorarioTurma",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "Disciplina",
+        "modelo2": "QuestionarioAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "Disciplina",
+        "modelo2": "CategoriaPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "Disciplina",
+        "modelo2": "PerguntaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "Disciplina",
+        "modelo2": "QuestionarioPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "Disciplina",
+        "modelo2": "CicloAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "Disciplina",
+        "modelo2": "AvaliacaoDocente",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "Disciplina",
+        "modelo2": "RespostaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "Disciplina",
+        "modelo2": "ConfiguracaoSite",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "Turma",
+        "modelo2": "MatriculaTurma",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "Turma",
+        "modelo2": "HorarioTurma",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "Turma",
+        "modelo2": "QuestionarioAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "Turma",
+        "modelo2": "CategoriaPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "Turma",
+        "modelo2": "PerguntaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "Turma",
+        "modelo2": "QuestionarioPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "Turma",
+        "modelo2": "CicloAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "Turma",
+        "modelo2": "AvaliacaoDocente",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "Turma",
+        "modelo2": "RespostaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "Turma",
+        "modelo2": "ConfiguracaoSite",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "MatriculaTurma",
+        "modelo2": "HorarioTurma",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "MatriculaTurma",
+        "modelo2": "QuestionarioAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "MatriculaTurma",
+        "modelo2": "CategoriaPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "MatriculaTurma",
+        "modelo2": "PerguntaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "MatriculaTurma",
+        "modelo2": "QuestionarioPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "MatriculaTurma",
+        "modelo2": "CicloAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "MatriculaTurma",
+        "modelo2": "AvaliacaoDocente",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "MatriculaTurma",
+        "modelo2": "RespostaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "MatriculaTurma",
+        "modelo2": "ConfiguracaoSite",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "HorarioTurma",
+        "modelo2": "QuestionarioAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "HorarioTurma",
+        "modelo2": "CategoriaPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "HorarioTurma",
+        "modelo2": "PerguntaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "HorarioTurma",
+        "modelo2": "QuestionarioPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "HorarioTurma",
+        "modelo2": "CicloAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "HorarioTurma",
+        "modelo2": "AvaliacaoDocente",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "HorarioTurma",
+        "modelo2": "RespostaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "HorarioTurma",
+        "modelo2": "ConfiguracaoSite",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "QuestionarioAvaliacao",
+        "modelo2": "CategoriaPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "QuestionarioAvaliacao",
+        "modelo2": "PerguntaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "QuestionarioAvaliacao",
+        "modelo2": "QuestionarioPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "QuestionarioAvaliacao",
+        "modelo2": "CicloAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "QuestionarioAvaliacao",
+        "modelo2": "AvaliacaoDocente",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "QuestionarioAvaliacao",
+        "modelo2": "RespostaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "QuestionarioAvaliacao",
+        "modelo2": "ConfiguracaoSite",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "CategoriaPergunta",
+        "modelo2": "PerguntaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "CategoriaPergunta",
+        "modelo2": "QuestionarioPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "CategoriaPergunta",
+        "modelo2": "CicloAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "CategoriaPergunta",
+        "modelo2": "AvaliacaoDocente",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "CategoriaPergunta",
+        "modelo2": "RespostaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "CategoriaPergunta",
+        "modelo2": "ConfiguracaoSite",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "PerguntaAvaliacao",
+        "modelo2": "QuestionarioPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "PerguntaAvaliacao",
+        "modelo2": "CicloAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "PerguntaAvaliacao",
+        "modelo2": "AvaliacaoDocente",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "PerguntaAvaliacao",
+        "modelo2": "RespostaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "PerguntaAvaliacao",
+        "modelo2": "ConfiguracaoSite",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "QuestionarioPergunta",
+        "modelo2": "CicloAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "QuestionarioPergunta",
+        "modelo2": "AvaliacaoDocente",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "QuestionarioPergunta",
+        "modelo2": "RespostaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "QuestionarioPergunta",
+        "modelo2": "ConfiguracaoSite",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "CicloAvaliacao",
+        "modelo2": "AvaliacaoDocente",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "CicloAvaliacao",
+        "modelo2": "RespostaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "CicloAvaliacao",
+        "modelo2": "ConfiguracaoSite",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "AvaliacaoDocente",
+        "modelo2": "RespostaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "AvaliacaoDocente",
+        "modelo2": "ConfiguracaoSite",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "delete",
+        "modelo1": "RespostaAvaliacao",
+        "modelo2": "ConfiguracaoSite",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "PerfilAluno",
+        "modelo2": "PerfilProfessor",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "PerfilAluno",
+        "modelo2": "Curso",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "PerfilAluno",
+        "modelo2": "PeriodoLetivo",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "PerfilAluno",
+        "modelo2": "Disciplina",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "PerfilAluno",
+        "modelo2": "MatriculaTurma",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "PerfilAluno",
+        "modelo2": "HorarioTurma",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "PerfilAluno",
+        "modelo2": "QuestionarioAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "PerfilAluno",
+        "modelo2": "CategoriaPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "PerfilAluno",
+        "modelo2": "PerguntaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "PerfilAluno",
+        "modelo2": "QuestionarioPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "PerfilAluno",
+        "modelo2": "AvaliacaoDocente",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "PerfilAluno",
+        "modelo2": "RespostaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "PerfilProfessor",
+        "modelo2": "Curso",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "PerfilProfessor",
+        "modelo2": "PeriodoLetivo",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "PerfilProfessor",
+        "modelo2": "Disciplina",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "PerfilProfessor",
+        "modelo2": "MatriculaTurma",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "PerfilProfessor",
+        "modelo2": "HorarioTurma",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "PerfilProfessor",
+        "modelo2": "QuestionarioAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "PerfilProfessor",
+        "modelo2": "CategoriaPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "PerfilProfessor",
+        "modelo2": "PerguntaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "PerfilProfessor",
+        "modelo2": "QuestionarioPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "PerfilProfessor",
+        "modelo2": "AvaliacaoDocente",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "PerfilProfessor",
+        "modelo2": "RespostaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "Curso",
+        "modelo2": "PeriodoLetivo",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "Curso",
+        "modelo2": "Disciplina",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "Curso",
+        "modelo2": "MatriculaTurma",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "Curso",
+        "modelo2": "HorarioTurma",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "Curso",
+        "modelo2": "QuestionarioAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "Curso",
+        "modelo2": "CategoriaPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "Curso",
+        "modelo2": "PerguntaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "Curso",
+        "modelo2": "QuestionarioPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "Curso",
+        "modelo2": "AvaliacaoDocente",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "Curso",
+        "modelo2": "RespostaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "PeriodoLetivo",
+        "modelo2": "Disciplina",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "PeriodoLetivo",
+        "modelo2": "MatriculaTurma",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "PeriodoLetivo",
+        "modelo2": "HorarioTurma",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "PeriodoLetivo",
+        "modelo2": "QuestionarioAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "PeriodoLetivo",
+        "modelo2": "CategoriaPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "PeriodoLetivo",
+        "modelo2": "PerguntaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "PeriodoLetivo",
+        "modelo2": "QuestionarioPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "PeriodoLetivo",
+        "modelo2": "AvaliacaoDocente",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "PeriodoLetivo",
+        "modelo2": "RespostaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "Disciplina",
+        "modelo2": "MatriculaTurma",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "Disciplina",
+        "modelo2": "HorarioTurma",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "Disciplina",
+        "modelo2": "QuestionarioAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "Disciplina",
+        "modelo2": "CategoriaPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "Disciplina",
+        "modelo2": "PerguntaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "Disciplina",
+        "modelo2": "QuestionarioPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "Disciplina",
+        "modelo2": "AvaliacaoDocente",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "Disciplina",
+        "modelo2": "RespostaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "MatriculaTurma",
+        "modelo2": "HorarioTurma",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "MatriculaTurma",
+        "modelo2": "QuestionarioAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "MatriculaTurma",
+        "modelo2": "CategoriaPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "MatriculaTurma",
+        "modelo2": "PerguntaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "MatriculaTurma",
+        "modelo2": "QuestionarioPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "MatriculaTurma",
+        "modelo2": "AvaliacaoDocente",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "MatriculaTurma",
+        "modelo2": "RespostaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "HorarioTurma",
+        "modelo2": "QuestionarioAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "HorarioTurma",
+        "modelo2": "CategoriaPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "HorarioTurma",
+        "modelo2": "PerguntaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "HorarioTurma",
+        "modelo2": "QuestionarioPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "HorarioTurma",
+        "modelo2": "AvaliacaoDocente",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "HorarioTurma",
+        "modelo2": "RespostaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "QuestionarioAvaliacao",
+        "modelo2": "CategoriaPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "QuestionarioAvaliacao",
+        "modelo2": "PerguntaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "QuestionarioAvaliacao",
+        "modelo2": "QuestionarioPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "QuestionarioAvaliacao",
+        "modelo2": "AvaliacaoDocente",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "QuestionarioAvaliacao",
+        "modelo2": "RespostaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "CategoriaPergunta",
+        "modelo2": "PerguntaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "CategoriaPergunta",
+        "modelo2": "QuestionarioPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "CategoriaPergunta",
+        "modelo2": "AvaliacaoDocente",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "CategoriaPergunta",
+        "modelo2": "RespostaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "PerguntaAvaliacao",
+        "modelo2": "QuestionarioPergunta",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "PerguntaAvaliacao",
+        "modelo2": "AvaliacaoDocente",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "PerguntaAvaliacao",
+        "modelo2": "RespostaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "QuestionarioPergunta",
+        "modelo2": "AvaliacaoDocente",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "QuestionarioPergunta",
+        "modelo2": "RespostaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      },
+      {
+        "metodo": "save",
+        "modelo1": "AvaliacaoDocente",
+        "modelo2": "RespostaAvaliacao",
+        "similaridade": 100.0,
+        "recomendacao": "Extrair para método utilitário ou mixin"
+      }
+    ],
+    "choices_duplicados": [],
+    "constraints_sobrepostos": [],
+    "relacionamentos_redundantes": [],
+    "padroes_transversais": []
+  },
+  "estatisticas": {
+    "campos_repetidos": 6,
+    "metodos_similares": 426,
+    "choices_duplicados": 0,
+    "constraints_sobrepostos": 0,
+    "relacionamentos_redundantes": 0,
+    "padroes_transversais": 0
+  }
+}

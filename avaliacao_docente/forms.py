@@ -1,7 +1,9 @@
 from django import forms
+import json
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.db import models
+from django.utils import timezone
 from .models import (
     Curso,
     PerfilProfessor,
@@ -12,10 +14,29 @@ from .models import (
     QuestionarioAvaliacao,
     CategoriaPergunta,
     PerguntaAvaliacao,
+    QuestionarioPergunta,
     CicloAvaliacao,
     RespostaAvaliacao,
-    ComentarioAvaliacao,
 )
+
+
+class DateTimeLocalInput(forms.DateTimeInput):
+    """
+    Widget customizado para campos datetime-local que formata corretamente o valor inicial
+    """
+
+    input_type = "datetime-local"
+
+    def format_value(self, value):
+        if value is None:
+            return ""
+        if hasattr(value, "strftime"):
+            # Converte para timezone local se necessário
+            if timezone.is_aware(value):
+                value = timezone.localtime(value)
+            # Formato exigido pelo input datetime-local: YYYY-MM-DDTHH:MM
+            return value.strftime("%Y-%m-%dT%H:%M")
+        return value
 
 
 class RegistroForm(UserCreationForm):
@@ -235,8 +256,11 @@ class CursoForm(forms.ModelForm):
     def clean_curso_nome(self):
         curso_nome = self.cleaned_data.get("curso_nome")
         if curso_nome:
-            # Verifica se o curso já existe
-            if Curso.objects.filter(curso_nome__iexact=curso_nome).exists():
+            # Verifica se o curso já existe (exceto para o próprio curso em edição)
+            queryset = Curso.objects.filter(curso_nome__iexact=curso_nome)
+            if self.instance and self.instance.pk:
+                queryset = queryset.exclude(pk=self.instance.pk)
+            if queryset.exists():
                 raise forms.ValidationError("Este curso já existe no sistema.")
         return curso_nome
 
@@ -332,7 +356,7 @@ class PeriodoLetivoForm(forms.ModelForm):
         widget=forms.NumberInput(
             attrs={
                 "class": "form-control",
-                "placeholder": "2024",
+                "placeholder": "2025",
                 "min": "2020",
                 "max": "2030",
             }
@@ -366,23 +390,19 @@ class PeriodoLetivoForm(forms.ModelForm):
 
 class TurmaForm(forms.ModelForm):
     """
-    Form para criação e edição de turmas
+    Form para criação e edição de turmas.
+
+    Nota: Professor e Período Letivo são derivados da Disciplina selecionada,
+    não sendo necessários campos separados no formulário.
     """
 
     disciplina = forms.ModelChoiceField(
-        queryset=Disciplina.objects.all(),
+        queryset=Disciplina.objects.select_related(
+            "professor", "periodo_letivo", "curso"
+        ).all(),
         widget=forms.Select(attrs={"class": "form-control"}),
         label="Disciplina",
-    )
-    professor = forms.ModelChoiceField(
-        queryset=PerfilProfessor.non_admin.all(),
-        widget=forms.Select(attrs={"class": "form-control"}),
-        label="Professor",
-    )
-    periodo_letivo = forms.ModelChoiceField(
-        queryset=PeriodoLetivo.objects.all(),
-        widget=forms.Select(attrs={"class": "form-control"}),
-        label="Período Letivo",
+        help_text="O professor e período letivo serão automaticamente definidos pela disciplina.",
     )
     turno = forms.ChoiceField(
         choices=[("", "--- Selecione ---")] + Turma.TURNO_CHOICES,
@@ -394,27 +414,23 @@ class TurmaForm(forms.ModelForm):
         model = Turma
         fields = [
             "disciplina",
-            "professor",
-            "periodo_letivo",
             "turno",
         ]
 
     def clean(self):
         cleaned_data = super().clean()
         disciplina = cleaned_data.get("disciplina")
-        periodo_letivo = cleaned_data.get("periodo_letivo")
         turno = cleaned_data.get("turno")
 
-        if disciplina and periodo_letivo and turno:
-            # Verifica se já existe uma turma para essa disciplina no mesmo período e turno
+        if disciplina and turno:
+            # Verifica se já existe uma turma para essa disciplina no mesmo turno
             if Turma.objects.filter(
                 disciplina=disciplina,
-                periodo_letivo=periodo_letivo,
                 turno=turno,
             ).exists():
                 raise forms.ValidationError(
                     f"Já existe uma turma de {disciplina.disciplina_nome} "
-                    f"no período {periodo_letivo} no turno {turno}."
+                    f"no turno {turno}."
                 )
 
         return cleaned_data
@@ -445,8 +461,6 @@ class CicloAvaliacaoForm(forms.ModelForm):
             "data_inicio",
             "data_fim",
             "turmas",
-            "permite_avaliacao_anonima",
-            "permite_multiplas_respostas",
             "enviar_lembrete_email",
         ]
         widgets = {
@@ -458,18 +472,8 @@ class CicloAvaliacaoForm(forms.ModelForm):
             ),
             "periodo_letivo": forms.Select(attrs={"class": "form-control"}),
             "questionario": forms.Select(attrs={"class": "form-control"}),
-            "data_inicio": forms.DateTimeInput(
-                attrs={"class": "form-control", "type": "datetime-local"}
-            ),
-            "data_fim": forms.DateTimeInput(
-                attrs={"class": "form-control", "type": "datetime-local"}
-            ),
-            "permite_avaliacao_anonima": forms.CheckboxInput(
-                attrs={"class": "form-check-input"}
-            ),
-            "permite_multiplas_respostas": forms.CheckboxInput(
-                attrs={"class": "form-check-input"}
-            ),
+            "data_inicio": DateTimeLocalInput(attrs={"class": "form-control"}),
+            "data_fim": DateTimeLocalInput(attrs={"class": "form-control"}),
             "enviar_lembrete_email": forms.CheckboxInput(
                 attrs={"class": "form-check-input"}
             ),
@@ -479,15 +483,30 @@ class CicloAvaliacaoForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         # Filtrar turmas apenas do período letivo selecionado
         # Para novas instâncias, sempre mostrar todas as turmas ativas
+        # Filtrar questionários para exibir apenas aqueles com perguntas
+        try:
+            self.fields["questionario"].queryset = (
+                QuestionarioAvaliacao.objects.filter(
+                    ativo=True, perguntas__isnull=False
+                )
+                .distinct()
+                .order_by("-data_criacao")
+            )
+        except Exception:
+            # Em migrações iniciais ou cenários sem tabelas, ignore
+            pass
         if self.instance and self.instance.pk:
             try:
-                # Tentar acessar o período letivo apenas se a instância já foi salva
-                periodo_letivo = self.instance.periodo_letivo
-                self.fields["turmas"].queryset = Turma.objects.filter(
-                    periodo_letivo=periodo_letivo, status="ativa"
-                )
+                # Para edição, mostrar todas as turmas ativas mais as turmas já selecionadas
+                # Isso garante que turmas selecionadas apareçam mesmo se mudaram de período
+                turmas_ativas = Turma.objects.filter(status="ativa")
+                turmas_selecionadas = self.instance.turmas.all()
+                # Combinar os querysets sem duplicatas
+                self.fields["turmas"].queryset = (
+                    turmas_ativas | turmas_selecionadas
+                ).distinct()
             except:
-                # Se não conseguir acessar o período letivo, mostra todas as turmas ativas
+                # Se não conseguir acessar as turmas, mostra todas as turmas ativas
                 self.fields["turmas"].queryset = Turma.objects.filter(status="ativa")
         else:
             # Para novas instâncias, mostrar todas as turmas ativas
@@ -497,11 +516,29 @@ class CicloAvaliacaoForm(forms.ModelForm):
         cleaned_data = super().clean()
         data_inicio = cleaned_data.get("data_inicio")
         data_fim = cleaned_data.get("data_fim")
+        questionario = cleaned_data.get("questionario")
 
         if data_inicio and data_fim:
             if data_inicio >= data_fim:
                 raise forms.ValidationError(
                     "A data de início deve ser anterior à data de fim."
+                )
+
+        # Impedir seleção de questionário sem perguntas
+        if questionario:
+            try:
+                has_perguntas = QuestionarioPergunta.objects.filter(
+                    questionario=questionario
+                ).exists()
+            except Exception:
+                has_perguntas = (
+                    True  # Evitar falsos positivos em migrações/checks iniciais
+                )
+
+            if not has_perguntas:
+                self.add_error(
+                    "questionario",
+                    "O questionário selecionado não possui perguntas cadastradas. Cadastre perguntas antes de usá-lo em um ciclo.",
                 )
 
         return cleaned_data
@@ -515,19 +552,35 @@ class QuestionarioAvaliacaoForm(forms.ModelForm):
     class Meta:
         model = QuestionarioAvaliacao
         fields = ["titulo", "descricao", "ativo"]
+        labels = {
+            "titulo": "Título do Questionário",
+            "descricao": "Descrição",
+            "ativo": "Questionário ativo",
+        }
         widgets = {
             "titulo": forms.TextInput(
-                attrs={"class": "form-control", "placeholder": "Título do questionário"}
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Título do questionário",
+                    "maxlength": "100",
+                }
             ),
             "descricao": forms.Textarea(
                 attrs={
                     "class": "form-control",
                     "rows": 3,
                     "placeholder": "Descrição opcional",
+                    "maxlength": "200",
                 }
             ),
             "ativo": forms.CheckboxInput(attrs={"class": "form-check-input"}),
         }
+
+    def clean_titulo(self):
+        titulo = self.cleaned_data.get("titulo")
+        if titulo and len(titulo) > 100:
+            raise forms.ValidationError("O título deve ter no máximo 100 caracteres.")
+        return titulo
 
 
 class CategoriaPerguntaForm(forms.ModelForm):
@@ -562,13 +615,26 @@ class PerguntaAvaliacaoForm(forms.ModelForm):
     Formulário para criar/editar perguntas de avaliação
     """
 
+    # Sobrescrever o campo opcoes_multipla_escolha para usar CharField em vez de JSONField
+    opcoes_multipla_escolha = forms.CharField(
+        required=False,
+        widget=forms.Textarea(
+            attrs={
+                "class": "form-control",
+                "rows": 3,
+                "placeholder": 'Para múltipla escolha, insira uma opção por linha. Também aceitamos CSV (separado por vírgula) ou JSON (ex.: ["A", "B"]).',
+            }
+        ),
+        label="Opções de Múltipla Escolha",
+        help_text='Insira uma opção por linha. Também aceitamos CSV (vírgulas) ou JSON (ex.: ["A", "B"]). Itens duplicados e vazios serão ignorados.',
+    )
+
     class Meta:
         model = PerguntaAvaliacao
         fields = [
             "enunciado",
             "tipo",
             "categoria",
-            "ordem",
             "obrigatoria",
             "ativa",
             "opcoes_multipla_escolha",
@@ -583,54 +649,108 @@ class PerguntaAvaliacaoForm(forms.ModelForm):
             ),
             "tipo": forms.Select(attrs={"class": "form-control"}),
             "categoria": forms.Select(attrs={"class": "form-control"}),
-            "ordem": forms.NumberInput(attrs={"class": "form-control", "min": 0}),
             "obrigatoria": forms.CheckboxInput(attrs={"class": "form-check-input"}),
             "ativa": forms.CheckboxInput(attrs={"class": "form-check-input"}),
-            "opcoes_multipla_escolha": forms.Textarea(
-                attrs={
-                    "class": "form-control",
-                    "rows": 3,
-                    "placeholder": "Para múltipla escolha, insira as opções separadas por linha (JSON será gerado automaticamente)",
-                }
-            ),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # Definir valores padrão para campos obrigatórios
         if not self.instance.pk:
-            self.fields["ordem"].initial = 0
             self.fields["obrigatoria"].initial = True
             self.fields["ativa"].initial = True
+
+        # Exibir as opções de múltipla escolha (se existentes) como linhas no textarea
+        if self.instance.pk and hasattr(self.instance, "opcoes_multipla_escolha"):
+            try:
+                opcoes = self.instance.opcoes_multipla_escolha
+                if opcoes and isinstance(opcoes, (list, tuple)):
+                    self.fields["opcoes_multipla_escolha"].initial = "\n".join(
+                        [str(o) for o in opcoes]
+                    )
+            except Exception:
+                pass
 
     def clean_opcoes_multipla_escolha(self):
         opcoes = self.cleaned_data.get("opcoes_multipla_escolha")
         tipo = self.cleaned_data.get("tipo")
 
-        if tipo == "multipla_escolha":
-            if not opcoes:
-                raise forms.ValidationError(
-                    "Opções são obrigatórias para perguntas de múltipla escolha."
-                )
+        # Se não for múltipla escolha, limpar o campo
+        if tipo != "multipla_escolha":
+            return None
 
-            # Converte texto em lista para JSON
-            try:
-                if isinstance(opcoes, str):
-                    # Se for string, separa por linhas
-                    opcoes_lista = [
-                        linha.strip() for linha in opcoes.split("\n") if linha.strip()
-                    ]
-                    if len(opcoes_lista) < 2:
-                        raise forms.ValidationError(
-                            "É necessário pelo menos 2 opções para múltipla escolha."
-                        )
-                    return opcoes_lista
-                else:
-                    return opcoes
-            except Exception:
-                raise forms.ValidationError("Formato inválido para as opções.")
+        # Se for múltipla escolha, as opções são obrigatórias
+        if not opcoes or not opcoes.strip():
+            raise forms.ValidationError(
+                "Opções são obrigatórias para perguntas de múltipla escolha."
+            )
 
-        return opcoes
+        # Normaliza opções vindas como string (linhas, CSV ou JSON)
+        normalized = []
+
+        if isinstance(opcoes, str):
+            text = opcoes.strip()
+            parsed = None
+
+            # Tenta JSON primeiro se parecer um array
+            if text.startswith("[") and text.endswith("]"):
+                try:
+                    parsed = json.loads(text)
+                    if not isinstance(parsed, list):
+                        parsed = None
+                except (json.JSONDecodeError, ValueError):
+                    parsed = None
+
+            if parsed is None:
+                # Considera quebras de linha como principal separador
+                parts = []
+                for line in text.split("\n"):
+                    line = line.strip()
+                    if not line:
+                        continue
+                    # Também quebra por vírgulas se houver
+                    if "," in line:
+                        parts.extend([p.strip() for p in line.split(",") if p.strip()])
+                    else:
+                        parts.append(line)
+                parsed = parts
+
+            # Processa itens parseados
+            normalized = self._deduplicate_options(parsed)
+
+        elif isinstance(opcoes, (list, tuple)):
+            normalized = self._deduplicate_options(opcoes)
+        else:
+            raise forms.ValidationError("Formato inválido para as opções.")
+
+        if len(normalized) < 2:
+            raise forms.ValidationError(
+                "É necessário pelo menos 2 opções para múltipla escolha."
+            )
+
+        return normalized
+
+    def _deduplicate_options(self, items):
+        """
+        Remove duplicatas preservando ordem e remove itens vazios
+
+        Args:
+            items: Lista de itens para deduplificar
+
+        Returns:
+            Lista com itens únicos e não vazios
+        """
+        seen = set()
+        normalized = []
+
+        for item in items:
+            s = str(item).strip()
+            if not s or s in seen:
+                continue
+            seen.add(s)
+            normalized.append(s)
+
+        return normalized
 
 
 class RespostaAvaliacaoForm(forms.Form):
@@ -739,51 +859,6 @@ class RespostaAvaliacaoForm(forms.Form):
 
         return respostas_salvas
 
-
-class ComentarioAvaliacaoForm(forms.ModelForm):
-    """
-    Formulário para comentários adicionais na avaliação
-    """
-
-    class Meta:
-        model = ComentarioAvaliacao
-        fields = ["elogios", "sugestoes", "criticas_construtivas"]
-        widgets = {
-            "elogios": forms.Textarea(
-                attrs={
-                    "class": "form-control",
-                    "rows": 3,
-                    "placeholder": "Deixe seus elogios e pontos positivos...",
-                }
-            ),
-            "sugestoes": forms.Textarea(
-                attrs={
-                    "class": "form-control",
-                    "rows": 3,
-                    "placeholder": "Deixe suas sugestões de melhoria...",
-                }
-            ),
-            "criticas_construtivas": forms.Textarea(
-                attrs={
-                    "class": "form-control",
-                    "rows": 3,
-                    "placeholder": "Deixe críticas construtivas...",
-                }
-            ),
-        }
-
-    def save(self, avaliacao, aluno=None, session_key=None, anonimo=False, commit=True):
-        comentario = super().save(commit=False)
-        comentario.avaliacao = avaliacao
-        comentario.anonimo = anonimo
-        comentario.session_key = session_key or ""
-
-        if not anonimo and aluno:
-            comentario.aluno = aluno
-
-        if commit:
-            comentario.save()
-
         return comentario
 
 
@@ -813,9 +888,9 @@ class CategoriaPerguntaForm(forms.ModelForm):
             "ordem": forms.NumberInput(
                 attrs={
                     "class": "form-control",
-                    "min": "0",
+                    "min": "1",
                     "max": "999",
-                    "placeholder": "0",
+                    "placeholder": "1",
                 }
             ),
             "ativa": forms.CheckboxInput(attrs={"class": "form-check-input"}),
@@ -829,7 +904,7 @@ class CategoriaPerguntaForm(forms.ModelForm):
         help_texts = {
             "nome": "Nome único para identificar a categoria",
             "descricao": "Descrição opcional para explicar o propósito da categoria",
-            "ordem": "Ordem de exibição nas avaliações (menor número = primeiro)",
+            "ordem": "Ordem de exibição nas avaliações (número único, começando em 1)",
             "ativa": "Marque para manter a categoria ativa no sistema",
         }
 
@@ -865,6 +940,73 @@ class CategoriaPerguntaForm(forms.ModelForm):
 
     def clean_ordem(self):
         ordem = self.cleaned_data.get("ordem")
-        if ordem is not None and ordem < 0:
-            raise forms.ValidationError("A ordem não pode ser negativa.")
+
+        # Validar se a ordem é válida
+        if ordem is not None:
+            if ordem < 1:
+                raise forms.ValidationError(
+                    "A ordem deve ser um número maior que zero (mínimo: 1)."
+                )
+
+            # Verificar se já existe uma categoria com esta ordem
+            qs = CategoriaPergunta.objects.filter(ordem=ordem)
+            if self.instance.pk:
+                qs = qs.exclude(pk=self.instance.pk)
+
+            if qs.exists():
+                categoria_existente = qs.first()
+                raise forms.ValidationError(
+                    f"Já existe uma categoria com ordem {ordem}: '{categoria_existente.nome}'. "
+                    f"Escolha uma ordem diferente."
+                )
+
         return ordem
+
+
+from .models import (
+    QuestionarioAvaliacao,
+    CategoriaPergunta,
+    PerguntaAvaliacao,
+    RespostaAvaliacao,
+    ConfiguracaoSite,
+)
+from django.forms import modelformset_factory
+
+
+class QuestionarioForm(forms.ModelForm):
+    class Meta:
+        model = QuestionarioAvaliacao
+        fields = ["titulo", "descricao"]
+
+
+class CategoriaForm(forms.ModelForm):
+    class Meta:
+        model = CategoriaPergunta
+        fields = ["nome"]
+
+
+class PerguntaForm(forms.ModelForm):
+    class Meta:
+        model = PerguntaAvaliacao
+        fields = ["enunciado", "tipo", "categoria", "obrigatoria"]
+
+
+RespostaFormSet = modelformset_factory(
+    RespostaAvaliacao, fields=("valor_texto",), extra=1
+)
+
+
+class ConfiguracaoSiteForm(forms.ModelForm):
+    class Meta:
+        model = ConfiguracaoSite
+        fields = ["metodo_envio_email", "email_notificacao_erros"]
+        widgets = {
+            "metodo_envio_email": forms.RadioSelect,
+            "email_notificacao_erros": forms.EmailInput(
+                attrs={"class": "form-control", "placeholder": "seuerro@email.com"}
+            ),
+        }
+        labels = {
+            "metodo_envio_email": "Método de Envio de E-mail",
+            "email_notificacao_erros": "E-mail para Notificação de Erros",
+        }

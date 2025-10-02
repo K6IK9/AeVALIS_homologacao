@@ -6,583 +6,376 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editar Perguntas do Questionário - IF SADD</title>
+    <title>Editar Perguntas - {{ questionario.titulo }} - IF SADD</title>
 
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- CSS Global -->
+    <link rel="stylesheet" href="{% static 'css/global.css' %}">
+    <!-- CSS de Gerenciamento -->
+    <link rel="stylesheet" href="{% static 'css/gerenciar.css' %}">
+    <!-- CSS específico desta página -->
+    <link rel="stylesheet" href="{% static 'css/editar_questionario.css' %}">
 
-    <style>
-        /* Importação das fontes */
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Vidaloka&display=swap');
-
-        /* Variáveis CSS comuns */
-        :root {
-            /* Cores principais */
-            --cor01: #f0f0f0;
-            --cor01-alt: #f1f1f1;
-            --cor02: #00fd94;
-            --cor03: #376f6c;
-            --cor04: #1e3231;
-            --cor05: #090909;
-            --cor06: #00cafd;
-            --cor07: #ffffff;
-            --cor08: #ff3c3c;
-
-            /* Fontes */
-            --font01: "Poppins", sans-serif;
-            --font02: "Vidaloka", serif;
-
-            /* Sombras */
-            --shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
-            --shadow-alt: 4px 2px 8px rgba(0, 0, 0, 0.2);
-
-            /* Bordas e raios */
-            --border-radius-small: 5px;
-            --border-radius-medium: 15px;
-            --border-radius-large: 25px;
-            --border-radius-xl: 35px;
-            --border-radius-circle: 50%;
-
-            /* Espaçamentos */
-            --spacing-xs: 5px;
-            --spacing-sm: 10px;
-            --spacing-md: 15px;
-            --spacing-lg: 20px;
-            --spacing-xl: 25px;
-            --spacing-2xl: 40px;
-            --spacing-3xl: 50px;
-
-            /* Transições */
-            --transition-fast: 0.2s;
-            --transition-medium: 0.3s;
-        }
-
-        /* Reset global */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: var(--font01);
-        }
-
-        body {
-            background: var(--cor01);
-        }
-
-        /* Layout base para páginas de gerenciamento */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .header {
-            background: var(--cor03);
-            color: white;
-            padding: 20px;
-            border-radius: var(--border-radius-medium);
-            margin-bottom: 30px;
-            text-align: center;
-        }
-
-        .header h1 {
-            margin: 0 0 10px 0;
-            font-size: 2.2em;
-        }
-
-        .header p {
-            margin: 0;
-            opacity: 0.9;
-        }
-
-        /* Botão de voltar */
-        .back-button {
-            background: var(--cor03);
-            color: white;
-            text-decoration: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            display: inline-block;
-            margin-bottom: 20px;
-            transition: all 0.3s;
-        }
-
-        .back-button:hover {
-            background: var(--cor04);
-            transform: translateY(-2px);
-            color: white;
-            text-decoration: none;
-        }
-
-        /* Mensagens */
-        .messages {
-            margin-bottom: 20px;
-        }
-
-        .message {
-            padding: 12px 16px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-        }
-
-        .message.success {
-            background: #d4edda;
-            color: #155724;
-            border-left: 4px solid #28a745;
-        }
-
-        .message.error {
-            background: #f8d7da;
-            color: #721c24;
-            border-left: 4px solid #dc3545;
-        }
-
-        .message.warning {
-            background: #fff3cd;
-            color: #856404;
-            border-left: 4px solid #ffc107;
-        }
-
-        .message.info {
-            background: #d1ecf1;
-            color: #0c5460;
-            border-left: 4px solid #17a2b8;
-        }
-
-        /* Responsividade */
-        @media (max-width: 768px) {
-            .container {
-                padding: 15px;
-            }
-
-            .header h1 {
-                font-size: 1.8em;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .header h1 {
-                font-size: 1.6em;
-            }
-
-            .back-button {
-                width: 100%;
-                text-align: center;
-            }
-        }
-    </style>
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css" rel="stylesheet">
 </head>
 
 <body>
-    <main>
-        <div class="container">
-            <a href="{% url 'gerenciar_questionarios' %}" class="back-button">← Voltar</a>
-
-            <!-- Header da página -->
-            <div class="header">
-                <h1>Editar Perguntas do Questionário</h1>
-                <p>Gerencie as perguntas do questionário</p>
-            </div>
-
-            <!-- Mensagens -->
-            {% if messages %}
-            <div class="messages">
-                {% for message in messages %}
-                <div class="message {{ message.tags }}">
-                    {{ message }}
-                </div>
-                {% endfor %}
-            </div>
-            {% endif %}
-
-            <!-- Conteúdo principal -->
-<div class="row">
-    <!-- Informações do Questionário -->
-    <div class="col-md-4">
-        <div class="card card-custom">
-            <div class="card-header">
-                <h6 class="card-title mb-0">
-                    <i class="bi bi-info-circle"></i> Informações do Questionário
-                </h6>
-            </div>
-            <div class="card-body">
-                <h5>{{ questionario.titulo }}</h5>
-                <p class="text-muted">{{ questionario.descricao }}</p>
-
-                <hr>
-
-                <div class="d-flex justify-content-between">
-                    <span><strong>Status:</strong></span>
-                    {% if questionario.ativo %}
-                    <span class="badge bg-success">Ativo</span>
-                    {% else %}
-                    <span class="badge bg-secondary">Inativo</span>
-                    {% endif %}
-                </div>
-
-                <div class="d-flex justify-content-between mt-2">
-                    <span><strong>Perguntas:</strong></span>
-                    <span class="badge bg-primary">{{ perguntas_existentes.count }}</span>
-                </div>
-
-                <div class="d-flex justify-content-between mt-2">
-                    <span><strong>Criado em:</strong></span>
-                    <small>{{ questionario.data_criacao|date:"d/m/Y" }}</small>
-                </div>
-
-                <hr>
-
-                <a href="{% url 'listar_avaliacoes' %}" class="btn btn-outline-secondary btn-sm w-100">
-                    <i class="bi bi-arrow-left"></i> Voltar
-                </a>
-            </div>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>Gerenciamento de Perguntas</h1>
+            <p>Editar perguntas do questionário: {{ questionario.titulo }}</p>
         </div>
 
-        <!-- Adicionar Nova Pergunta -->
-        <div class="card card-custom mt-4">
-            <div class="card-header">
-                <h6 class="card-title mb-0">
-                    <i class="bi bi-plus-circle"></i> Adicionar Pergunta
-                </h6>
-            </div>
-            <div class="card-body">
-                <form method="post">
-                    {% csrf_token %}
+        <!-- Navegação Breadcrumb -->
+        <div class="nav-breadcrumb">
+            <a href="{% url 'inicio' %}">🏠 Início</a>
+            <span>→</span>
+            <a href="{% url 'gerenciar_questionarios' %}">📝 Questionários</a>
+            <span>→</span>
+            <span>Editar Perguntas</span>
+        </div>
 
-                    <!-- Debug info -->
-                    {% if form.errors %}
-                    <div class="alert alert-danger">
-                        <strong>Erros no formulário:</strong>
-                        {{ form.errors }}
+        <!-- Mensagens -->
+        {% include "partials/messages.html" %}
+
+        <div class="admin-card card-white-bg">
+            <!-- Formulário de Nova/Editar Pergunta -->
+            <div class="form-section">
+            <h2>
+                {% if editando %}Editar Pergunta{% else %}Criar Nova Pergunta{% endif %}
+            </h2>
+
+            <form method="post" class="question-form">
+                {% csrf_token %}
+                {% if editando %}
+                    <input type="hidden" name="pergunta_id" value="{{ pergunta_editando.id }}">
+                {% endif %}
+
+                {% if form.errors %}
+                <div class="error-message">
+                    <strong>Erros no formulário:</strong>
+                    {{ form.errors }}
+                </div>
+                {% endif %}
+
+                <div class="form-group">
+                    <label for="{{ form.enunciado.id_for_label }}">
+                        Enunciado da Pergunta
+                    </label>
+                    {{ form.enunciado }}
+                    {% if form.enunciado.errors %}
+                    <div class="form-error">
+                        {% for error in form.enunciado.errors %}
+                        <small>{{ error }}</small>
+                        {% endfor %}
                     </div>
                     {% endif %}
+                </div>
 
-                    <div class="mb-3">
-                        <label for="{{ form.enunciado.id_for_label }}" class="form-label">
-                            <strong>{{ form.enunciado.label }}</strong>
-                        </label>
-                        {{ form.enunciado }}
-                        {% if form.enunciado.errors %}
-                        <div class="text-danger">
-                            {% for error in form.enunciado.errors %}
-                            <small>{{ error }}</small>
-                            {% endfor %}
-                        </div>
-                        {% endif %}
+                <div class="form-group">
+                    <label for="{{ form.tipo.id_for_label }}">
+                        Tipo de Pergunta
+                    </label>
+                    {{ form.tipo }}
+                    {% if form.tipo.errors %}
+                    <div class="form-error">
+                        {% for error in form.tipo.errors %}
+                        <small>{{ error }}</small>
+                        {% endfor %}
                     </div>
+                    {% endif %}
+                </div>
 
-                    <div class="mb-3">
-                        <label for="{{ form.tipo.id_for_label }}" class="form-label">
-                            <strong>{{ form.tipo.label }}</strong>
-                        </label>
-                        {{ form.tipo }}
-                        {% if form.tipo.errors %}
-                        <div class="text-danger">
-                            {% for error in form.tipo.errors %}
-                            <small>{{ error }}</small>
-                            {% endfor %}
-                        </div>
-                        {% endif %}
+                <div class="form-group" id="opcoes-container" style="display: none;">
+                    <label for="{{ form.opcoes_multipla_escolha.id_for_label }}">Opções de Resposta</label>
+                    {{ form.opcoes_multipla_escolha }}
+                    <small class="form-help">Digite uma opção por linha</small>
+                    {% if form.opcoes_multipla_escolha.errors %}
+                    <div class="form-error">
+                        {% for error in form.opcoes_multipla_escolha.errors %}
+                        <small>{{ error }}</small>
+                        {% endfor %}
                     </div>
+                    {% endif %}
+                </div>
 
-                    <div class="mb-3" id="opcoes-container" style="display: none;">
-                        <label for="{{ form.opcoes_multipla_escolha.id_for_label }}" class="form-label">
-                            <strong>{{ form.opcoes_multipla_escolha.label }}</strong>
-                        </label>
-                        {{ form.opcoes_multipla_escolha }}
-                        <small class="form-text text-muted">
-                            Para múltipla escolha, separe as opções com quebra de linha.
-                        </small>
-                        {% if form.opcoes_multipla_escolha.errors %}
-                        <div class="text-danger">
-                            {% for error in form.opcoes_multipla_escolha.errors %}
-                            <small>{{ error }}</small>
-                            {% endfor %}
-                        </div>
-                        {% endif %}
+                <div class="form-group">
+                    <label for="{{ form.categoria.id_for_label }}">
+                        Categoria da Pergunta
+                    </label>
+                    {{ form.categoria }}
+                    {% if form.categoria.errors %}
+                    <div class="form-error">
+                        {% for error in form.categoria.errors %}
+                        <small>{{ error }}</small>
+                        {% endfor %}
                     </div>
+                    {% endif %}
+                </div>
 
-                    <div class="mb-3">
-                        <label for="{{ form.categoria.id_for_label }}" class="form-label">
-                            <strong>{{ form.categoria.label }}</strong>
-                        </label>
-                        {{ form.categoria }}
-                        {% if form.categoria.errors %}
-                        <div class="text-danger">
-                            {% for error in form.categoria.errors %}
-                            <small>{{ error }}</small>
-                            {% endfor %}
-                        </div>
-                        {% endif %}
-                    </div>
-
-                    <div class="form-check mb-3">
+                <div class="form-group">
+                    <div class="checkbox-group">
                         {{ form.obrigatoria }}
-                        <label class="form-check-label" for="{{ form.obrigatoria.id_for_label }}">
-                            {{ form.obrigatoria.label }}
-                        </label>
+                        <label for="{{ form.obrigatoria.id_for_label }}">Pergunta obrigatória</label>
                     </div>
+                </div>
 
-                    <!-- Campos hidden necessários -->
-                    <input type="hidden" name="ordem" value="{{ perguntas_existentes.count|add:1 }}">
-                    <input type="hidden" name="ativa" value="true">
+                {% if form.non_field_errors %}
+                <div class="error-text-bottom">
+                    {% for error in form.non_field_errors %}
+                    {{ error }}
+                    {% endfor %}
+                </div>
+                {% endif %}
 
-                    <button type="submit" name="adicionar_pergunta" class="btn btn-primary-custom btn-sm w-100">
-                        <i class="bi bi-plus-lg"></i> Adicionar Pergunta
+                <div class="form-actions">
+                    {% if editando %}
+                    <button type="submit" name="salvar_edicao" class="btn btn-success">
+                        Salvar Alterações
                     </button>
-                </form>
-            </div>
+                    <a href="{% url 'editar_questionario_perguntas' questionario.id %}" class="btn btn-secondary">
+                        Cancelar
+                    </a>
+                    {% else %}
+                    <button type="submit" name="adicionar_pergunta" class="btn btn-success">
+                        Adicionar Pergunta
+                    </button>
+                    {% endif %}
+                </div>
+            </form>
         </div>
     </div>
 
-    <!-- Lista de Perguntas -->
-    <div class="col-md-8">
-        <div class="card card-custom">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h6 class="card-title mb-0">
-                    <i class="bi bi-list-ol"></i> Perguntas do Questionário
-                </h6>
-                <small class="text-muted">{{ perguntas_existentes.count }} pergunta(s)</small>
+        <!-- Filtros e Busca -->
+        {% if not editando %}
+        <div class="filters-section">
+            <h3 class="filters-title">Filtros e Busca</h3>
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label for="searchPerguntaTexto">Buscar por Texto:</label>
+                    <div class="search-box">
+                        <input type="text" id="searchPerguntaTexto" class="form-control"
+                            placeholder="Digite parte do enunciado da pergunta..." autocomplete="off">
+                    </div>
+                </div>
+                <div class="filter-group">
+                    <label for="filterTipo">Filtrar por Tipo:</label>
+                    <select id="filterTipo" class="form-control">
+                        <option value="">Todos os tipos</option>
+                        <option value="multipla_escolha">Múltipla Escolha</option>
+                        <option value="texto">Texto Livre</option>
+                        <option value="escala">Escala de Avaliação</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="filterObrigatoria">Filtrar por Obrigatória:</label>
+                    <select id="filterObrigatoria" class="form-control">
+                        <option value="">Todas</option>
+                        <option value="sim">Obrigatórias</option>
+                        <option value="nao">Opcionais</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <button type="button" class="btn-filter" onclick="clearFilters()">Limpar Filtros</button>
+                </div>
             </div>
-            <div class="card-body">
-                {% if perguntas_existentes %}
-                <div class="list-group">
+        </div>
+        {% endif %}
+
+        <div class="admin-card card-white-bg">
+            <!-- Lista de Perguntas -->
+            <div class="form-section">
+            <h2>📋 Perguntas do Questionário</h2>
+
+            <div class="item-count">
+                Total de perguntas: <span id="total-count">{{ perguntas_existentes.count }}</span>
+            </div>
+
+            {% if perguntas_existentes %}
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th style="text-align: center; width: 80px;">Ordem</th>
+                        <th>Enunciado</th>
+                        <th>Tipo</th>
+                        <th>Categoria</th>
+                        <th>Obrigatória</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
                     {% for qp in perguntas_existentes %}
-                    <div class="list-group-item">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div class="flex-grow-1">
-                                <div class="d-flex align-items-center mb-2">
-                                    <span class="badge bg-secondary me-2">{{ qp.ordem }}</span>
-                                    {% if qp.pergunta.obrigatoria %}
-                                    <span class="badge bg-warning me-2">Obrigatória</span>
-                                    {% endif %}
-                                    <span class="badge bg-info">{{ qp.pergunta.get_tipo_display }}</span>
-                                </div>
-
-                                <h6 class="mb-1">{{ qp.pergunta.enunciado }}</h6>
-
-                                {% if qp.pergunta.categoria %}
+                        <td style="text-align: center;">
+                            <span class="category-order-number">{{ qp.ordem_no_questionario }}</span>
+                        </td>
+                        <td>
+                            <strong>{{ qp.pergunta.enunciado|truncatechars:80 }}</strong>
+                            {% if qp.pergunta.opcoes_multipla_escolha %}
+                            <div class="question-options-preview">
                                 <small class="text-muted">
-                                    <i class="bi bi-tag"></i> {{ qp.pergunta.categoria.nome }}
+                                    Opções:
+                                    {% for opcao in qp.pergunta.opcoes_multipla_escolha|slice:":3" %}
+                                    {{ opcao }}{% if not forloop.last %}, {% endif %}
+                                    {% endfor %}
+                                    {% if qp.pergunta.opcoes_multipla_escolha|length > 3 %}...{% endif %}
                                 </small>
-                                {% endif %}
-
-                                {% if qp.pergunta.opcoes_multipla_escolha %}
-                                <div class="mt-2">
-                                    <small class="text-muted">Opções:</small>
-                                    <div class="ms-3">
-                                        {% for opcao in qp.pergunta.opcoes_multipla_escolha %}
-                                        <div>• {{ opcao }}</div>
-                                        {% endfor %}
-                                    </div>
-                                </div>
-                                {% endif %}
                             </div>
-
-                            <div class="btn-group btn-group-sm">
-                                <form method="post" style="display: inline;">
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if qp.pergunta.tipo == 'multipla_escolha' %}
+                            <span class="badge type-multiple">📋 Múltipla Escolha</span>
+                            {% elif qp.pergunta.tipo == 'texto_livre' %}
+                            <span class="badge type-text">📝 Texto Livre</span>
+                            {% elif qp.pergunta.tipo == 'likert' %}
+                            <span class="badge type-scale">📊 Escala Likert</span>
+                            {% elif qp.pergunta.tipo == 'nps' %}
+                            <span class="badge type-nps">⭐ NPS (0-10)</span>
+                            {% elif qp.pergunta.tipo == 'sim_nao' %}
+                            <span class="badge type-binary">☑️ Sim/Não</span>
+                            {% else %}
+                            <span class="badge type-other">❓ {{ qp.pergunta.get_tipo_display }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if qp.pergunta.categoria %}
+                            {{ qp.pergunta.categoria.nome }}
+                            {% else %}
+                            <em class="text-muted">Sem categoria</em>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if qp.pergunta.obrigatoria %}
+                            <span class="status-badge status-active">✓ Obrigatória</span>
+                            {% else %}
+                            <span class="status-badge status-inactive">○ Opcional</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="btn-group">
+                                <a href="?editar_pergunta={{ qp.pergunta.id }}" class="btn btn-sm btn-secondary"
+                                    title="Editar Pergunta">
+                                    ✏️ Editar
+                                </a>
+                                <form method="post" class="inline-form"
+                                    onsubmit="return confirm('Tem certeza que deseja remover esta pergunta?')">
                                     {% csrf_token %}
                                     <input type="hidden" name="pergunta_id" value="{{ qp.pergunta.id }}">
-                                    <button type="submit" name="remover_pergunta" class="btn btn-danger btn-sm"
-                                        onclick="return confirm('Tem certeza que deseja remover esta pergunta?')"
-                                        title="Remover esta pergunta">
-                                        <i class="bi bi-trash"></i> Remover
+                                    <button type="submit" name="remover_pergunta" class="btn btn-sm btn-danger"
+                                        title="Remover Pergunta">
+                                        🗑️ Remover
                                     </button>
                                 </form>
                             </div>
-                        </div>
-                    </div>
+                        </td>
+                    </tr>
                     {% endfor %}
-                </div>
-                {% else %}
-                <div class="text-center py-4">
-                    <i class="bi bi-question-circle" style="font-size: 3rem; color: #ccc;"></i>
-                    <p class="mt-3 text-muted">Nenhuma pergunta adicionada ainda.</p>
-                    <p class="text-muted">Use o formulário ao lado para adicionar a primeira pergunta.</p>
-                </div>
-                {% endif %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">
+                <h3>📝 Nenhuma pergunta cadastrada</h3>
+                <p>Adicione a primeira pergunta ao questionário usando o formulário acima.</p>
             </div>
+            {% endif %}
         </div>
     </div>
-</div>
+    </div>
 
-<style>
-    /* Estilização dos cards customizados */
-    .card-custom {
-        border: 1px solid #dee2e6;
-        border-radius: 0.5rem;
-        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-        background-color: var(--cor07);
-    }
+    <script>
+        // Mostrar/ocultar opções múltipla escolha
+        document.addEventListener('DOMContentLoaded', function () {
+            const tipoSelect = document.getElementById('id_tipo');
+            const opcoesContainer = document.getElementById('opcoes-container');
 
-    .card-custom .card-header {
-        background-color: #f8f9fa;
-        border-bottom: 1px solid #dee2e6;
-        padding: 0.75rem 1rem;
-    }
-
-    .card-title {
-        font-size: 1rem;
-        font-weight: 600;
-        color: var(--cor03);
-    }
-
-    /* Botões customizados */
-    .btn-primary-custom {
-        background-color: var(--cor02);
-        border-color: var(--cor02);
-        color: var(--cor05);
-        font-weight: 600;
-    }
-
-    .btn-primary-custom:hover {
-        background-color: var(--cor06);
-        border-color: var(--cor06);
-        color: var(--cor05);
-        transform: translateY(-1px);
-    }
-
-    .btn-outline-secondary {
-        background-color: transparent;
-        border-color: var(--cor03);
-        color: var(--cor03);
-        font-weight: 600;
-    }
-
-    .btn-outline-secondary:hover {
-        background-color: var(--cor03);
-        border-color: var(--cor03);
-        color: var(--cor07);
-        transform: translateY(-1px);
-    }
-
-    .btn-danger {
-        background-color: var(--cor08);
-        border-color: var(--cor08);
-        color: var(--cor07);
-        font-weight: 600;
-    }
-
-    .btn-danger:hover {
-        background-color: #cc3636;
-        border-color: #cc3636;
-        color: var(--cor07);
-        transform: translateY(-1px);
-    }
-
-    .btn-danger.btn-sm {
-        padding: 0.25rem 0.5rem;
-        font-size: 0.875rem;
-        border-radius: 0.2rem;
-    }
-
-    /* Lista de perguntas */
-    .list-group-item {
-        border: 1px solid #dee2e6;
-        border-radius: 0.375rem;
-        margin-bottom: 0.5rem;
-        background-color: var(--cor07);
-        transition: all var(--transition-fast) ease;
-    }
-
-    .list-group-item:hover {
-        background-color: #f8f9fa;
-        border-color: var(--cor03);
-        transform: translateY(-1px);
-    }
-
-    /* Badges customizados */
-    .badge {
-        font-size: 0.75rem;
-        padding: 0.35rem 0.65rem;
-    }
-
-    .badge.bg-secondary {
-        background-color: var(--cor03) !important;
-        color: var(--cor07);
-    }
-
-    .badge.bg-warning {
-        background-color: #ffc107 !important;
-        color: var(--cor05);
-    }
-
-    .badge.bg-info {
-        background-color: var(--cor06) !important;
-        color: var(--cor05);
-    }
-
-    .badge.bg-success {
-        background-color: var(--cor02) !important;
-        color: var(--cor05);
-    }
-
-    .badge.bg-primary {
-        background-color: var(--cor02) !important;
-        color: var(--cor05);
-    }
-
-    /* Alerts customizados */
-    .alert-danger {
-        background-color: rgba(255, 60, 60, 0.1);
-        border-color: var(--cor08);
-        color: #721c24;
-        border-left: 4px solid var(--cor08);
-    }
-
-    /* Text danger customizado */
-    .text-danger {
-        color: var(--cor08) !important;
-    }
-</style>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        // Adicionar classes do Bootstrap aos campos do formulário
-        const inputs = document.querySelectorAll('input, textarea, select');
-        inputs.forEach(function (input) {
-            if (input.type !== 'checkbox') {
-                input.classList.add('form-control');
-                if (input.tagName === 'SELECT') {
-                    input.classList.add('form-select');
+            function toggleOpcoes() {
+                if (tipoSelect.value === 'multipla_escolha') {
+                    opcoesContainer.style.display = 'block';
+                } else {
+                    opcoesContainer.style.display = 'none';
                 }
             }
+
+            // Verificar no carregamento
+            toggleOpcoes();
+
+            // Verificar quando mudar
+            tipoSelect.addEventListener('change', toggleOpcoes);
         });
 
-        // Controlar exibição do campo opções baseado no tipo
-        const tipoSelect = document.querySelector('#id_tipo');
-        const opcoesContainer = document.querySelector('#opcoes-container');
+        // Funções de filtro
+        function filterTable() {
+            const searchText = document.getElementById('searchPerguntaTexto').value.toLowerCase();
+            const filterTipo = document.getElementById('filterTipo').value;
+            const filterObrigatoria = document.getElementById('filterObrigatoria').value;
 
-        function toggleOpcoes() {
-            const tipo = tipoSelect.value;
-            if (tipo === 'multipla_escolha') {
-                opcoesContainer.style.display = 'block';
-            } else {
-                opcoesContainer.style.display = 'none';
+            const table = document.querySelector('.data-table tbody');
+            const rows = table.querySelectorAll('tr');
+            let visibleCount = 0;
+
+            rows.forEach(row => {
+                const enunciado = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+                const tipo = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
+                const obrigatoria = row.querySelector('td:nth-child(5)').textContent.toLowerCase();
+
+                let showRow = true;
+
+                // Filtro por texto do enunciado
+                if (searchText && !enunciado.includes(searchText)) {
+                    showRow = false;
+                }
+
+                // Filtro por tipo
+                if (filterTipo) {
+                    const tipoMap = {
+                        'multipla_escolha': 'múltipla escolha',
+                        'texto': 'texto livre',
+                        'escala': 'escala'
+                    };
+                    if (!tipo.includes(tipoMap[filterTipo])) {
+                        showRow = false;
+                    }
+                }
+
+                // Filtro por obrigatória
+                if (filterObrigatoria) {
+                    if (filterObrigatoria === 'sim' && !obrigatoria.includes('obrigatória')) {
+                        showRow = false;
+                    }
+                    if (filterObrigatoria === 'nao' && !obrigatoria.includes('opcional')) {
+                        showRow = false;
+                    }
+                }
+
+                if (showRow) {
+                    visibleCount++;
+                }
+
+                row.style.display = showRow ? '' : 'none';
+            });
+
+            // Atualiza o contador
+            const totalCount = document.getElementById('total-count');
+            if (totalCount) {
+                totalCount.textContent = visibleCount;
             }
         }
 
-        tipoSelect.addEventListener('change', toggleOpcoes);
-        toggleOpcoes(); // Executar na inicialização
+        function clearFilters() {
+            document.getElementById('searchPerguntaTexto').value = '';
+            document.getElementById('filterTipo').value = '';
+            document.getElementById('filterObrigatoria').value = '';
+            filterTable();
+        }
 
-        // Ajustar textarea
-        const textareas = document.querySelectorAll('textarea');
-        textareas.forEach(function (textarea) {
-            if (textarea.id === 'id_enunciado') {
-                textarea.rows = 3;
-            } else if (textarea.id === 'id_opcoes_multipla_escolha') {
-                textarea.rows = 4;
-            }
+        // Adicionar event listeners para filtros
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('searchPerguntaTexto').addEventListener('input', filterTable);
+            document.getElementById('filterTipo').addEventListener('change', filterTable);
+            document.getElementById('filterObrigatoria').addEventListener('change', filterTable);
         });
-    });
-</script>
-
-        </div>
-    </main>
-
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    </script>
 </body>
 
 </html>
-

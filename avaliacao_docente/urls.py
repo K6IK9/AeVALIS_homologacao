@@ -4,7 +4,11 @@ from . import views
 from .views import AdminHubView, IndexView
 
 urlpatterns = [
-    path("gerenciar-roles/", views.gerenciar_roles, name="gerenciar_roles"),
+    path(
+        "resetar-role-automatica/<int:usuario_id>/",
+        views.resetar_role_automatica,
+        name="resetar_role_automatica",
+    ),
     path("gerenciar-usuarios/", views.gerenciar_usuarios, name="gerenciar_usuarios"),
     path(
         "editar-usuario/<int:usuario_id>/", views.editar_usuario, name="editar_usuario"
@@ -38,16 +42,65 @@ urlpatterns = [
         name="excluir_disciplina",
     ),
     path("gerenciar-periodos/", views.gerenciar_periodos, name="gerenciar_periodos"),
+    path(
+        "editar-periodo/<int:periodo_id>/", views.editar_periodo, name="editar_periodo"
+    ),
+    path(
+        "editar-periodo-simples/<int:periodo_id>/",
+        views.editar_periodo_simples,
+        name="editar_periodo_simples",
+    ),
+    path(
+        "excluir-periodo/<int:periodo_id>/",
+        views.excluir_periodo,
+        name="excluir_periodo",
+    ),
     path("gerenciar-turmas/", views.gerenciar_turmas, name="gerenciar_turmas"),
     path("editar-turma/<int:turma_id>/", views.editar_turma, name="editar_turma"),
     path("excluir-turma/<int:turma_id>/", views.excluir_turma, name="excluir_turma"),
+    path(
+        "gerenciar-alunos-turma/<int:turma_id>/",
+        views.gerenciar_alunos_turma,
+        name="gerenciar_alunos_turma",
+    ),
     path("buscar-alunos-turma/", views.buscar_alunos_turma, name="buscar_alunos_turma"),
     path(
         "matricular-alunos-massa/",
         views.matricular_alunos_massa,
         name="matricular_alunos_massa",
     ),
-    path("admin-hub/", views.AdminHubView.as_view(), name="admin_hub"),
+    path("admin_hub/", views.AdminHubView.as_view(), name="admin_hub"),
+    path(
+        "admin_hub/configuracao/",
+        views.gerenciar_configuracao_site,
+        name="gerenciar_configuracao_site",
+    ),
+    # URLs para exportação CSV do admin hub
+    path(
+        "admin-hub/exportar-usuarios-csv/",
+        views.exportar_usuarios_csv,
+        name="exportar_usuarios_csv",
+    ),
+    path(
+        "admin-hub/exportar-cursos-csv/",
+        views.exportar_cursos_csv,
+        name="exportar_cursos_csv",
+    ),
+    path(
+        "admin-hub/exportar-disciplinas-csv/",
+        views.exportar_disciplinas_csv,
+        name="exportar_disciplinas_csv",
+    ),
+    path(
+        "admin-hub/exportar-turmas-csv/",
+        views.exportar_turmas_csv,
+        name="exportar_turmas_csv",
+    ),
+    path(
+        "admin-hub/exportar-periodos-csv/",
+        views.exportar_periodos_csv,
+        name="exportar_periodos_csv",
+    ),
     # URLs para Avaliação Docente
     path("avaliacoes/", views.listar_avaliacoes, name="listar_avaliacoes"),
     path("minhas-avaliacoes/", views.minhas_avaliacoes, name="minhas_avaliacoes"),
@@ -136,6 +189,16 @@ urlpatterns = [
         views.excluir_ciclo,
         name="excluir_ciclo",
     ),
-    path("debug-static/", views.debug_static, name="debug_static"),
+    path(
+        "encerrar-ciclo/<int:ciclo_id>/",
+        views.encerrar_ciclo,
+        name="encerrar_ciclo",
+    ),
+    path(
+        "encerrar-avaliacao/<int:avaliacao_id>/",
+        views.encerrar_avaliacao,
+        name="encerrar_avaliacao",
+    ),
     path("", IndexView.as_view(), name="inicio"),
+    path("perfil/", views.perfil_usuario, name="perfil_usuario"),
 ]

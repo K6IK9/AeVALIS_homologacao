@@ -19,13 +19,14 @@ from .models import (
     CicloAvaliacao,
     AvaliacaoDocente,
     RespostaAvaliacao,
-    ComentarioAvaliacao,
     # Modelos deprecated (manter compatibilidade)
-    Avaliacao,
-    Pergunta,
-    AvaliacaoPergunta,
-    RespostaAluno,
+    ConfiguracaoSite,
 )
+
+
+# ============ CONFIGURAÇÕES DO SITE =============
+
+admin.site.register(ConfiguracaoSite)
 
 
 class PerfilAlunoInline(admin.StackedInline):
@@ -126,14 +127,13 @@ class PerguntaAvaliacaoAdmin(admin.ModelAdmin):
         "enunciado_resumido",
         "tipo",
         "categoria",
-        "ordem",
         "obrigatoria",
         "ativa",
     )
     list_filter = ("tipo", "categoria", "obrigatoria", "ativa")
-    list_editable = ("ordem", "obrigatoria", "ativa")
+    list_editable = ("obrigatoria", "ativa")
     search_fields = ("enunciado",)
-    ordering = ("categoria__ordem", "ordem")
+    ordering = ("categoria__ordem",)
 
     def enunciado_resumido(self, obj):
         return obj.enunciado[:80] + "..." if len(obj.enunciado) > 80 else obj.enunciado
@@ -212,12 +212,6 @@ class RespostaAvaliacaoInline(admin.TabularInline):
     fields = ("pergunta", "aluno", "valor_display", "data_resposta")
 
 
-class ComentarioAvaliacaoInline(admin.StackedInline):
-    model = ComentarioAvaliacao
-    extra = 0
-    readonly_fields = ("data_comentario",)
-
-
 @admin.register(AvaliacaoDocente)
 class AvaliacaoDocenteAdmin(admin.ModelAdmin):
     list_display = (
@@ -229,7 +223,12 @@ class AvaliacaoDocenteAdmin(admin.ModelAdmin):
         "total_respostas",
         "percentual_participacao_display",
     )
-    list_filter = ("status", "ciclo", "disciplina__curso", "turma__periodo_letivo")
+    list_filter = (
+        "status",
+        "ciclo",
+        "disciplina__curso",
+        "turma__disciplina__periodo_letivo",
+    )
     search_fields = (
         "professor__user__first_name",
         "professor__user__last_name",
@@ -244,7 +243,7 @@ class AvaliacaoDocenteAdmin(admin.ModelAdmin):
         "percentual_participacao_display",
         "media_geral_display",
     )
-    inlines = [RespostaAvaliacaoInline, ComentarioAvaliacaoInline]
+    inlines = [RespostaAvaliacaoInline]
 
     def percentual_participacao_display(self, obj):
         percentual = obj.percentual_participacao()
@@ -300,53 +299,6 @@ class RespostaAvaliacaoAdmin(admin.ModelAdmin):
     pergunta_resumida.short_description = "Pergunta"
 
 
-@admin.register(ComentarioAvaliacao)
-class ComentarioAvaliacaoAdmin(admin.ModelAdmin):
-    list_display = (
-        "avaliacao",
-        "aluno_display",
-        "tem_elogios",
-        "tem_sugestoes",
-        "tem_criticas",
-        "data_comentario",
-    )
-    list_filter = ("anonimo", "data_comentario", "avaliacao__ciclo")
-    search_fields = (
-        "avaliacao__professor__user__first_name",
-        "avaliacao__professor__user__last_name",
-        "elogios",
-        "sugestoes",
-        "criticas_construtivas",
-    )
-    ordering = ("-data_comentario",)
-    readonly_fields = ("data_comentario",)
-
-    def aluno_display(self, obj):
-        if obj.anonimo:
-            return f"Anônimo ({obj.session_key[:8]})"
-        return obj.aluno
-
-    aluno_display.short_description = "Aluno"
-
-    def tem_elogios(self, obj):
-        return bool(obj.elogios.strip())
-
-    tem_elogios.boolean = True
-    tem_elogios.short_description = "Elogios"
-
-    def tem_sugestoes(self, obj):
-        return bool(obj.sugestoes.strip())
-
-    tem_sugestoes.boolean = True
-    tem_sugestoes.short_description = "Sugestões"
-
-    def tem_criticas(self, obj):
-        return bool(obj.criticas_construtivas.strip())
-
-    tem_criticas.boolean = True
-    tem_criticas.short_description = "Críticas"
-
-
 # ============ MODELOS BÁSICOS ============
 
 # Registra os modelos básicos
@@ -362,50 +314,47 @@ admin.site.register(HorarioTurma)
 
 # ============ MODELOS DEPRECATED ============
 
+# Os modelos abaixo foram marcados como obsoletos e suas classes de admin foram removidas
+# para evitar erros no sistema. O código foi mantido comentado para referência futura,
+# caso seja necessário consultar a estrutura antiga.
 
-# Registra os modelos deprecated com indicação
-@admin.register(Avaliacao)
-class AvaliacaoDeprecatedAdmin(admin.ModelAdmin):
-    list_display = ("__str__", "data_inicio", "data_fim", "status_avaliacao")
-    readonly_fields = (
-        "data_inicio",
-        "data_fim",
-        "status_avaliacao",
-        "professor_disciplina",
-    )
-
-    def has_add_permission(self, request):
-        return False  # Não permite adicionar novos
-
-    class Meta:
-        verbose_name = "Avaliação (DEPRECATED - Use AvaliacaoDocente)"
-
-
-@admin.register(Pergunta)
-class PerguntaDeprecatedAdmin(admin.ModelAdmin):
-    list_display = ("__str__", "tipo_pergunta")
-    readonly_fields = ("enunciado_pergunta", "tipo_pergunta")
-
-    def has_add_permission(self, request):
-        return False
-
-    class Meta:
-        verbose_name = "Pergunta (DEPRECATED - Use PerguntaAvaliacao)"
-
-
-@admin.register(AvaliacaoPergunta)
-class AvaliacaoPerguntaDeprecatedAdmin(admin.ModelAdmin):
-    list_display = ("__str__",)
-    readonly_fields = ("avaliacao", "pergunta")
-
-    def has_add_permission(self, request):
-        return False
-
-
-@admin.register(RespostaAluno)
-class RespostaAlunoDeprecatedAdmin(admin.ModelAdmin):
-    list_display = ("__str__",)
-    readonly_fields = ("resposta_pergunta", "aluno", "avaliacao_pergunta")
-
-    def has_add_permission(self, request):
-        return False
+# @admin.register(Avaliacao)
+# class AvaliacaoDeprecatedAdmin(admin.ModelAdmin):
+#     list_display = ("aluno", "turma", "ciclo_avaliacao", "respondida", "data_respondida")
+#     readonly_fields = ("aluno", "turma", "ciclo_avaliacao", "respondida", "data_respondida")
+#
+#     def has_add_permission(self, request):
+#         return False  # Não permite adicionar novos
+#
+#     class Meta:
+#         verbose_name = "Avaliação (DEPRECATED - Use AvaliacaoDocente)"
+#
+#
+# @admin.register(Pergunta)
+# class PerguntaDeprecatedAdmin(admin.ModelAdmin):
+#     list_display = ("__str__", "tipo_pergunta")
+#     readonly_fields = ("enunciado_pergunta", "tipo_pergunta")
+#
+#     def has_add_permission(self, request):
+#         return False
+#
+#     class Meta:
+#         verbose_name = "Pergunta (DEPRECATED - Use PerguntaAvaliacao)"
+#
+#
+# @admin.register(AvaliacaoPergunta)
+# class AvaliacaoPerguntaDeprecatedAdmin(admin.ModelAdmin):
+#     list_display = ("__str__",)
+#     readonly_fields = ("avaliacao", "pergunta")
+#
+#     def has_add_permission(self, request):
+#         return False
+#
+#
+# @admin.register(RespostaAluno)
+# class RespostaAlunoDeprecatedAdmin(admin.ModelAdmin):
+#     list_display = ("__str__",)
+#     readonly_fields = ("resposta_pergunta", "aluno", "avaliacao_pergunta")
+#
+#     def has_add_permission(self, request):
+#         return False
